@@ -43,6 +43,8 @@
         ];
         $trailing = [
             ['route' => 'portal.admin', 'label' => 'Admin'],
+            ['route' => 'messaging.studio', 'label' => 'Messaging'],
+            ['route' => 'portal.reports', 'label' => 'Reports'],
             ['route' => 'portal.settings', 'label' => 'Settings'],
             ['route' => 'portal.mockups', 'label' => 'Mockups'],
             ['route' => 'portal.ideas', 'label' => 'Ideas'],
@@ -51,7 +53,7 @@
     @endphp
     <header class="gl-glass border-b border-white/60 shadow-[0_1px_0_rgba(0,0,0,.02)] sticky top-0 z-30" x-data="{ mobile:false, design:false }">
         <div class="mx-auto w-full max-w-[1400px] px-4 sm:px-6 h-16 flex items-center gap-3">
-            @php $ppin = '<svg style="height:0.78em;width:auto;display:inline-block;vertical-align:-0.04em;margin:0 -0.01em" viewBox="0 0 24 24" fill="#059669" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C7.58 2 4 5.58 4 10c0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 12 12.5 2.5 2.5 0 0 0 12 7.5Z"/></svg>'; @endphp
+            @php $ppin = '<svg style="height:0.78em;width:auto;display:inline-block;vertical-align:-0.04em;margin:0 -0.01em" viewBox="0 0 24 24" fill="#059669" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1.6C7.3 1.6 3.5 5.4 3.5 10.1c0 5.6 8.5 12.3 8.5 12.3s8.5-6.7 8.5-12.3C20.5 5.4 16.7 1.6 12 1.6Zm0 5.9a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4Z"/></svg>'; @endphp
             <a href="{{ route('portal.home') }}" class="font-extrabold lowercase text-lg tracking-tight text-slate-900 shrink-0 inline-flex items-center">l{!! $ppin !!}c{!! $ppin !!}lie</a>
 
             {{-- Desktop nav --}}

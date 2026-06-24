@@ -145,7 +145,7 @@
 <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 @php
-    $pin = '<svg style="height:0.92em;width:auto;display:inline-block;vertical-align:-0.16em;margin:0 -0.015em" viewBox="0 0 24 24" fill="#059669" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C7.58 2 4 5.58 4 10c0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 12 12.5 2.5 2.5 0 0 0 12 7.5Z"/></svg>';
+    $pin = '<svg style="height:0.92em;width:auto;display:inline-block;vertical-align:-0.16em;margin:0 -0.015em" viewBox="0 0 24 24" fill="#059669" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1.6C7.3 1.6 3.5 5.4 3.5 10.1c0 5.6 8.5 12.3 8.5 12.3s8.5-6.7 8.5-12.3C20.5 5.4 16.7 1.6 12 1.6Zm0 5.9a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4Z"/></svg>';
     $wordmark = '<span class="wordmark lowercase text-ink">l'.$pin.'c'.$pin.'lie</span>';
     // Languages we plan to support (English live; rest scaffolded for translation).
     $languages = ['en' => '🇬🇧 English', 'pl' => '🇵🇱 Polski', 'es' => '🇪🇸 Español', 'fr' => '🇫🇷 Français', 'ur' => '🇵🇰 اردو', 'zh' => '🇨🇳 中文'];
@@ -189,8 +189,17 @@
                 <a href="{{ $l[0] }}" class="whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium text-muted transition hover:bg-black/[0.05] hover:text-ink">{{ $l[1] }}</a>
             @endforeach
 
-            {{-- Categories dropdown --}}
-            @php $navCategories = \App\Models\Category::orderBy('sort')->get(['name','slug']); @endphp
+            {{-- Categories mega-menu (parents + sub-categories + a featured local shop) --}}
+            @php
+                $navParents = \App\Models\Category::whereNull('parent_id')
+                    ->with(['children' => fn ($q) => $q->orderBy('sort')])
+                    ->orderBy('sort')->get();
+                $navFeatured = \App\Models\Business::live()->where('featured', true)->whereNotNull('photos')
+                        ->with(['category', 'activeOffers'])->inRandomOrder()->first()
+                    ?? \App\Models\Business::live()->whereNotNull('photos')
+                        ->with(['category', 'activeOffers'])->inRandomOrder()->first();
+                $navFeaturedOffer = $navFeatured?->activeOffers->first();
+            @endphp
             <div x-data="{ o: false }" @mouseenter="o=true" @mouseleave="o=false" class="relative">
                 <button @click="o=!o" class="group flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium text-muted transition hover:bg-black/[0.05] hover:text-ink">
                     <svg class="h-3.5 w-3.5 text-muted/70 transition group-hover:text-emerald" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
@@ -198,13 +207,42 @@
                     <svg class="h-3 w-3 transition" :class="o && 'rotate-180'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
                 <div x-show="o" x-cloak x-transition class="absolute left-0 top-full pt-2">
-                    <div class="grid w-[300px] grid-cols-2 gap-1 rounded-2xl border border-white/60 bg-white/95 glass p-2 shadow-xl">
-                        @foreach ($navCategories as $c)
-                            <a href="/category/{{ $c->slug }}" class="flex items-center gap-2 rounded-xl px-2.5 py-2 text-sm font-medium text-ink hover:bg-black/[0.05]">
-                                <svg class="h-4 w-4 text-emerald" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{!! \App\Models\Category::iconPath($c->slug) !!}</svg>
-                                {{ $c->name }}
-                            </a>
-                        @endforeach
+                    <div class="flex w-[740px] gap-1 rounded-2xl border border-white/60 bg-white/95 glass p-2.5 shadow-2xl">
+                        <div class="grid flex-1 grid-cols-2 gap-x-2">
+                            @foreach ($navParents as $p)
+                                <div class="rounded-xl p-2">
+                                    <a href="/category/{{ $p->slug }}" class="mb-1.5 flex items-center gap-2 text-sm font-bold text-ink transition hover:text-emerald">
+                                        <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-soft text-emerald">
+                                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{!! \App\Models\Category::iconPath($p->slug) !!}</svg>
+                                        </span>
+                                        {{ $p->name }}
+                                    </a>
+                                    <div class="flex flex-col gap-0.5 pl-9">
+                                        @foreach ($p->children->take(4) as $c)
+                                            <a href="/category/{{ $c->slug }}" class="text-xs text-muted transition hover:text-emerald">{{ $c->name }}</a>
+                                        @endforeach
+                                        @if ($p->children->count() > 4)
+                                            <a href="/category/{{ $p->slug }}" class="text-xs font-semibold text-emerald">All {{ $p->name }} &rarr;</a>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        @if ($navFeatured)
+                            <div class="w-[210px] shrink-0 rounded-xl border-l border-hair pl-3">
+                                <div class="mb-2 px-1 text-[11px] font-bold uppercase tracking-wider text-muted">Featured local</div>
+                                <a href="/shop/{{ $navFeatured->slug }}" class="group block overflow-hidden rounded-xl border border-hair transition hover:border-emerald">
+                                    <div class="h-28 bg-cover bg-center" style="background-image:url('{{ $navFeatured->photos[0] ?? '' }}')"></div>
+                                    <div class="p-3">
+                                        <div class="truncate text-sm font-bold text-ink group-hover:text-emerald">{{ $navFeatured->name }}</div>
+                                        <div class="truncate text-xs text-muted">{{ $navFeatured->category?->name }} · {{ $navFeatured->city ?? 'Newcastle' }}</div>
+                                        @if ($navFeaturedOffer)
+                                            <div class="mt-2 inline-block rounded-lg bg-emerald-soft px-2 py-1 text-[11px] font-bold text-emerald">{{ $navFeaturedOffer->badge }}</div>
+                                        @endif
+                                    </div>
+                                </a>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -300,17 +338,20 @@
                     @endforeach
                 </div>
             </div>
-            {{-- Categories in mobile --}}
+            {{-- Categories in mobile (grouped by parent) --}}
             <div class="mt-1 border-t border-hair pt-2">
                 <div class="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-muted">Categories</div>
-                <div class="grid grid-cols-2 gap-1">
-                    @foreach ($navCategories as $c)
-                        <a href="/category/{{ $c->slug }}" @click="open=false" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-ink hover:bg-black/[0.05]">
-                            <svg class="h-4 w-4 text-emerald" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{!! \App\Models\Category::iconPath($c->slug) !!}</svg>
-                            {{ $c->name }}
-                        </a>
-                    @endforeach
-                </div>
+                @foreach ($navParents as $p)
+                    <a href="/category/{{ $p->slug }}" @click="open=false" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-ink hover:bg-black/[0.05]">
+                        <svg class="h-4 w-4 text-emerald" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{!! \App\Models\Category::iconPath($p->slug) !!}</svg>
+                        {{ $p->name }}
+                    </a>
+                    <div class="flex flex-wrap gap-1 px-3 pb-2 pl-10">
+                        @foreach ($p->children as $c)
+                            <a href="/category/{{ $c->slug }}" @click="open=false" class="rounded-full bg-black/[0.04] px-2.5 py-1 text-xs text-muted hover:text-emerald">{{ $c->name }}</a>
+                        @endforeach
+                    </div>
+                @endforeach
             </div>
             <div class="mt-2 flex flex-col gap-2 border-t border-hair pt-3">
                 <a href="/business/login" class="rounded-full border border-hair px-4 py-2.5 text-center text-sm font-semibold text-ink">Business login</a>
@@ -336,9 +377,10 @@
                 <a href="/" class="text-xl">{!! $wordmark !!}</a>
                 <p class="mt-3 max-w-xs text-sm leading-relaxed text-muted">Bringing back the indies. Discover real discounts from the independent shops, pubs and makers on your high street.</p>
                 <p class="mt-4 inline-flex items-center gap-2 rounded-full bg-emerald-soft px-3 py-1.5 text-xs font-semibold text-emerald">
-                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C7.58 2 4 5.58 4 10c0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 12 12.5 2.5 2.5 0 0 0 12 7.5Z"/></svg>
+                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1.6C7.3 1.6 3.5 5.4 3.5 10.1c0 5.6 8.5 12.3 8.5 12.3s8.5-6.7 8.5-12.3C20.5 5.4 16.7 1.6 12 1.6Zm0 5.9a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4Z"/></svg>
                     Newcastle NE1 · indies only, always
                 </p>
+                <x-seal variant="light" class="mt-6 h-20 w-20" />
             </div>
             <div>
                 <h4 class="text-xs font-semibold uppercase tracking-wider text-muted">Product</h4>
@@ -361,15 +403,44 @@
                 <ul class="mt-4 space-y-2.5 text-sm">
                     <li><a href="/#founders" class="text-ink/80 transition hover:text-emerald">Founders</a></li>
                     <li><a href="/#download" class="text-ink/80 transition hover:text-emerald">Get the app</a></li>
+                    <li><a href="{{ route('legal.terms') }}" class="text-ink/80 transition hover:text-emerald">Terms &amp; Conditions</a></li>
+                    <li><a href="{{ route('legal.privacy') }}" class="text-ink/80 transition hover:text-emerald">Privacy Policy</a></li>
+                    <li><a href="{{ route('legal.cookies') }}" class="text-ink/80 transition hover:text-emerald">Cookie Policy</a></li>
+                    <li><a href="{{ route('subscriptions.preferences') }}" class="text-ink/80 transition hover:text-emerald">Email preferences</a></li>
                 </ul>
             </div>
         </div>
         <div class="mt-12 flex flex-col items-center justify-between gap-3 border-t border-hair pt-6 text-xs text-muted sm:flex-row">
-            <p>© locolie 2026. All rights reserved.</p>
-            <p>Proudly built to back the UK's independents.</p>
+            <p>© {{ config('legal.company') }} 2026. All rights reserved.</p>
+            <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+                <a href="{{ route('legal.terms') }}" class="transition hover:text-ink">Terms</a>
+                <a href="{{ route('legal.privacy') }}" class="transition hover:text-ink">Privacy</a>
+                <a href="{{ route('legal.cookies') }}" class="transition hover:text-ink">Cookies</a>
+                <button type="button" onclick="try{localStorage.removeItem('ll_cookie_consent');location.reload();}catch(e){}" class="transition hover:text-ink">Cookie settings</button>
+            </div>
         </div>
     </div>
 </footer>
+
+{{-- ===================== COOKIE CONSENT (PECR / GDPR) ===================== --}}
+<div x-data="{
+        show: false,
+        init() { try { this.show = !localStorage.getItem('ll_cookie_consent'); } catch (e) { this.show = true; } },
+        save(choice) { try { localStorage.setItem('ll_cookie_consent', JSON.stringify({ choice, at: Date.now() })); } catch (e) {} this.show = false; }
+     }"
+     x-show="show" x-cloak x-transition.opacity
+     class="fixed inset-x-0 bottom-0 z-[60] p-3 sm:p-4">
+    <div class="glass-card mx-auto flex max-w-3xl flex-col gap-4 rounded-3xl p-5 sm:flex-row sm:items-center sm:gap-5">
+        <div class="flex-1">
+            <p class="text-sm font-bold text-ink">We use cookies 🍪</p>
+            <p class="mt-1 text-xs leading-relaxed text-muted">We use essential cookies to make locolie work, and optional ones to improve it. You can accept all, reject the optional ones, or read our <a href="{{ route('legal.cookies') }}" class="font-semibold text-emerald underline">Cookie Policy</a>.</p>
+        </div>
+        <div class="flex shrink-0 gap-2">
+            <button @click="save('rejected')" class="rounded-full border border-hair bg-white px-4 py-2.5 text-xs font-bold text-ink transition hover:bg-black/[0.04]">Reject optional</button>
+            <button @click="save('accepted')" class="rounded-full bg-ink px-5 py-2.5 text-xs font-bold text-white transition hover:bg-emerald">Accept all</button>
+        </div>
+    </div>
+</div>
 
 <script>
   // Dynamic location badge: reverse-geocode the visitor (free OSM, no key) and

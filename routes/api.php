@@ -8,7 +8,7 @@ use App\Http\Controllers\Api\SyncController;
 use Illuminate\Support\Facades\Route;
 
 /*
- | GoLocal JSON API (prototype).
+ | Locolie JSON API (prototype).
  | Stateless. Browsing is public; retailer actions are scoped by a per-business
  | owner secret returned at signup. Sanctum token auth is a thin future add for native iOS.
  */
@@ -29,6 +29,9 @@ Route::get('/businesses/secret/{secret}/redemptions', [BusinessController::class
 
 // Web push (shopper opt-in)
 Route::post('/push/subscribe', [PushController::class, 'subscribe']);
+// Native push: iOS / Android apps register their FCM / APNs device token here.
+Route::post('/devices/register', [PushController::class, 'registerDevice']);
+Route::delete('/devices/{token}', [PushController::class, 'unregisterDevice']);
 
 // Redemption
 Route::post('/offers/{offer}/redeem', [RedemptionController::class, 'redeem']);

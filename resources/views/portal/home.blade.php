@@ -11,8 +11,8 @@
   .gl-app svg.ic{ width:16px;height:16px;stroke:currentColor;stroke-width:1.75;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0; }
   .gl-app .ic-sm{ width:12px;height:12px; } .gl-app .ic-lg{ width:20px;height:20px; } .gl-app .ic-filled{ fill:currentColor;stroke:none; }
   .pin-dot{ display:inline-block; width:.5em;height:.5em; background:var(--accent); border-radius:50% 50% 50% 0; transform:rotate(-45deg); margin:0 .02em 0 .06em; }
-  .pin-letter{ height:.9em; width:auto; display:inline-block; vertical-align:-0.12em; margin:0 .005em; fill:var(--accent); }
-  .wordmark{ font-weight:800; letter-spacing:-0.03em; }
+  .pin-letter{ height:.96em; width:auto; display:inline-block; vertical-align:-0.1em; margin:0 -.006em; fill:var(--accent); filter:drop-shadow(0 2px 6px color-mix(in srgb, var(--accent) 42%, transparent)); }
+  .wordmark{ font-weight:800; letter-spacing:-0.035em; }
 
   /* studio */
   .studio{ position:relative; border-radius:34px; overflow:hidden; padding:36px 20px 48px;
@@ -59,8 +59,8 @@
 
   .app-header{ background:color-mix(in srgb, var(--ink) 80%, transparent); -webkit-backdrop-filter:blur(22px) saturate(180%); backdrop-filter:blur(22px) saturate(180%); padding:12px 15px 14px; flex-shrink:0; }
   .app-header-row{ display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px; min-height:40px; }
-  .app-header-brand{ color:#fff; font-size:27px; font-weight:800; justify-self:center; letter-spacing:-.03em; display:inline-flex; align-items:center; line-height:1; }
-  .app-header-brand .pin-letter{ height:.82em; vertical-align:baseline; margin:0 .006em; }
+  .app-header-brand{ color:#fff; font-size:28px; font-weight:800; justify-self:center; letter-spacing:-.04em; display:inline-flex; align-items:center; line-height:1; text-shadow:0 1px 14px rgba(0,0,0,.22); }
+  .app-header-brand .pin-letter{ height:.9em; vertical-align:-0.05em; margin:0 -.012em; }
   .app-header-loc{ display:flex; align-items:center; gap:4px; color:rgba(255,255,255,.75); font-size:12px; cursor:pointer; justify-self:start; min-width:0; }
   .app-header-loc strong{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .bell{ justify-self:end; }
@@ -348,6 +348,16 @@
                       <select class="field" style="background:rgba(255,255,255,.95);border:0;color:var(--text-2);" x-model="form.cLoc">
                         <option value="NE">Newcastle (NE)</option><option value="all">Everywhere</option>
                       </select>
+                    </div>
+                    <div style="margin-top:16px; display:flex; flex-direction:column; gap:10px; font-size:12.5px; color:rgba(255,255,255,.8); line-height:1.5;">
+                      <label style="display:flex; gap:9px; align-items:flex-start; cursor:pointer;">
+                        <input type="checkbox" x-model="form.agreeTerms" style="margin-top:2px; width:16px; height:16px; accent-color:#059669; flex:0 0 auto;">
+                        <span>I agree to the <a href="/terms" target="_blank" style="color:#6ee7b7; font-weight:600; text-decoration:underline;">Terms</a> and <a href="/privacy" target="_blank" style="color:#6ee7b7; font-weight:600; text-decoration:underline;">Privacy Policy</a>.</span>
+                      </label>
+                      <label style="display:flex; gap:9px; align-items:flex-start; cursor:pointer;">
+                        <input type="checkbox" x-model="form.mktOptIn" style="margin-top:2px; width:16px; height:16px; accent-color:#059669; flex:0 0 auto;">
+                        <span>Email me offers &amp; discounts from indies near me. Unsubscribe anytime.</span>
+                      </label>
                     </div>
                   </div>
                   <div x-show="onb===2">
@@ -662,6 +672,17 @@
                     <input class="field" style="background:rgba(255,255,255,.95);border:0;" x-model="form.bName" placeholder="Business name">
                     <select class="field" style="background:rgba(255,255,255,.95);border:0;color:var(--text-2);" x-model="form.bCat"><option value="">Choose a category…</option><template x-for="o in catOptions" :key="o.key"><option :value="o.id || ''" :disabled="o.header" x-text="o.label"></option></template></select>
                     <input class="field" style="background:rgba(255,255,255,.95);border:0;" x-model="form.bPostcode" placeholder="Postcode (e.g. NE1 6QF)">
+                    <input class="field" type="email" style="background:rgba(255,255,255,.95);border:0;" x-model="form.bEmail" placeholder="Your email">
+                    <div style="display:flex; flex-direction:column; gap:9px; font-size:12px; color:rgba(255,255,255,.8); line-height:1.5; margin-top:2px;">
+                      <label style="display:flex; gap:8px; align-items:flex-start; cursor:pointer;">
+                        <input type="checkbox" x-model="form.bAgreeTerms" style="margin-top:2px; width:15px; height:15px; accent-color:#059669; flex:0 0 auto;">
+                        <span>I agree to the <a href="/terms" target="_blank" style="color:#6ee7b7; font-weight:600; text-decoration:underline;">Terms</a> &amp; <a href="/privacy" target="_blank" style="color:#6ee7b7; font-weight:600; text-decoration:underline;">Privacy Policy</a>, and I'm authorised to list this business.</span>
+                      </label>
+                      <label style="display:flex; gap:8px; align-items:flex-start; cursor:pointer;">
+                        <input type="checkbox" x-model="form.bMktOptIn" style="margin-top:2px; width:15px; height:15px; accent-color:#059669; flex:0 0 auto;">
+                        <span>Send me tips &amp; product updates from locolie.</span>
+                      </label>
+                    </div>
                     <button class="pri-btn" @click="signupBusiness()">Create business account</button>
                     <p x-show="bizError" style="color:#fca5a5;font-size:12px;text-align:center;" x-text="bizError"></p>
                   </div>
@@ -792,7 +813,7 @@ function goLocalApp() {
     tab:'home', view:'none', btab:'home', cCat:null, cSub:null, cSub2:null, active:null, activeOffer:null, focus:null,
     lastCode:null, countdown:'', codeExpired:false, loading:false,
     verifyMsg:'', verifyOk:false, bizError:'',
-    mapsKey: @json($mapsKey ?? ''), mapsId: @json($mapsId ?? 'DEMO_MAP_ID'), mapsReady:false, _gmaps:null,
+    mapsKey: @json($mapsKey ?? ''), mapsId: @json($mapsId ?? 'DEMO_MAP_ID'), mapsReady:false,
     vapidKey: @json($vapidKey ?? ''),
     brand:'locolie', themeKey:'mono', location:'NE',
     brandNames:['locolie','Vicinity','Patch','TownLoop','Mooch','Highstreet'],
@@ -803,7 +824,7 @@ function goLocalApp() {
     notifications:[], unread:0, notifOpen:false, seen:[], notifyOn:false,
     gResults:[], tickN:0, map:null, markers:[], bizMap:null,
     userLat:null, userLng:null, scanMsg:'', scanMode:null,
-    form:{ cName:'', cEmail:'', cLoc:'NE', prefs:[], bName:'', bCat:'', bPostcode:'', bEmail:'', oTitle:'', oBadge:'', oTerms:'', oSale:'ongoing', oQty:20, verify:'', gSearch:'', placeId:'' },
+    form:{ cName:'', cEmail:'', cLoc:'NE', prefs:[], agreeTerms:false, mktOptIn:true, bName:'', bCat:'', bPostcode:'', bEmail:'', bAgreeTerms:false, bMktOptIn:true, oTitle:'', oBadge:'', oTerms:'', oSale:'ongoing', oQty:20, verify:'', gSearch:'', placeId:'' },
 
     googlePlaces:[
       {name:'The Quayside Tap', postcode:'NE1 3RW', cat:'pubs-bars'},
@@ -853,7 +874,7 @@ function goLocalApp() {
       return [...list].sort((a,b)=> this.sort==='rating' ? (b.rating-a.rating) : (parseFloat(this.dist(a))-parseFloat(this.dist(b))));
     },
     get filterCount(){ return [this.fDist, this.fRating, this.fOffer, this.fSale].filter(v=>v!==null).length + (this.openNow?1:0); },
-    get featured(){ return [...this.applyFilters(this.withOffers)].sort((a,b)=>((b.featured?1:0)-(a.featured?1:0))||(b.rating-a.rating)||(b.reviews_count-a.reviews_count)).slice(0,8); },
+    get featured(){ const near = this.userLat ? (b=>parseFloat(this.dist(b))||999) : (()=>0); return [...this.applyFilters(this.withOffers)].sort((a,b)=>((b.featured?1:0)-(a.featured?1:0))||(near(a)-near(b))||(b.rating-a.rating)||(b.reviews_count-a.reviews_count)).slice(0,8); },
     // Explore-by-category rows are grouped by PARENT (only parents that have live offers).
     get categoriesWithBiz(){ const list=this.applyFilters(this.withOffers); return this.parents.filter(p=>list.some(b=>(b.cat_slugs||[]).includes(p.slug))); },
     get currentParent(){ return this.parents.find(p=>p.slug===this.cCat); },
@@ -898,8 +919,8 @@ function goLocalApp() {
     get searchResults(){ const q=(this.searchQ||'').toLowerCase().trim(); if(!q) return []; return this.withOffers.filter(b=> b.name.toLowerCase().includes(q) || (b.category||'').toLowerCase().includes(q) || b.offers.some(o=>(o.title||'').toLowerCase().includes(q)||(o.badge||'').toLowerCase().includes(q))); },
 
     wordmark(){ return this.markFor(this.brand); },
-    pinGlyph(){ return '<svg class="pin-letter" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C7.58 2 4 5.58 4 10c0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 12 12.5 2.5 2.5 0 0 0 12 7.5Z"/></svg>'; },
-    markFor(n){ return String(n).replace(/o/gi, this.pinGlyph()); },
+    pinGlyph(){ return '<svg class="pin-letter" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1.6C7.3 1.6 3.5 5.4 3.5 10.1c0 5.6 8.5 12.3 8.5 12.3s8.5-6.7 8.5-12.3C20.5 5.4 16.7 1.6 12 1.6Zm0 5.9a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4Z"/></svg>'; },
+    markFor(n){ const s=String(n); const cap=s.charAt(0).toUpperCase()+s.slice(1); return cap.replace(/o/i, this.pinGlyph()); },
     grouped(c){ return c ? String(c).replace(/(\d{2})(\d{2})(\d{2})/,'$1 · $2 · $3') : ''; },
     initials(n){ return (n||'?').split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase(); },
 
@@ -944,7 +965,7 @@ function goLocalApp() {
       setInterval(()=>this.pollOffers(), 15000);
 
       // Real distance from the user's current location (falls back to seed distance if denied).
-      if(navigator.geolocation){ navigator.geolocation.getCurrentPosition(p=>{ this.userLat=p.coords.latitude; this.userLng=p.coords.longitude; if(this.tab==='map'&&this.map){ this.renderMarkers(); this.recenter(); } }, ()=>{}, {timeout:8000, maximumAge:300000}); }
+      if(navigator.geolocation){ navigator.geolocation.getCurrentPosition(p=>{ this.userLat=p.coords.latitude; this.userLng=p.coords.longitude; if(this.tab==='map'&&this.gm().map){ this.renderMarkers(); this.recenter(); } }, ()=>{}, {timeout:8000, maximumAge:300000}); }
     },
     loadScript(src){ return new Promise((res,rej)=>{ if(document.querySelector('script[data-src="'+src+'"]')){ res(); return; } const s=document.createElement('script'); s.src=src; s.dataset.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); },
     load(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } },
@@ -956,22 +977,24 @@ function goLocalApp() {
       this.businesses = await this.api('/businesses'+qs).catch(()=>[]);
       this.loading = false;
       if(initial){ this.seen = this.allOfferIds(); this.save('gl_seen', this.seen); }
-      if(this.tab==='map' && this.map) this.renderMarkers();
+      if(this.tab==='map' && this.gm().map) this.renderMarkers();
     },
     allOfferIds(){ const ids=[]; this.businesses.forEach(b=>b.offers.forEach(o=>ids.push(o.id))); return ids; },
     cycleLocation(){ const order=['NE','all']; this.location = order[(order.indexOf(this.location)+1)%order.length]; this.customer.location=this.location; this.save('gl_customer',this.customer); this.cCat=null; this.fetchBusinesses(true).then(()=>{ if(this.tab==='map') this.recenter(); }); },
 
     togglePref(slug){ const i=this.form.prefs.indexOf(slug); if(i<0) this.form.prefs.push(slug); else this.form.prefs.splice(i,1); },
-    onbNext(){ if(this.onb===1){ if(!this.form.cName){ alert('Enter your name'); return; } this.onb=2; } else if(this.onb===2){ this.onb=3; } else { this.finishOnboarding(true); } },
+    onbNext(){ if(this.onb===1){ if(!this.form.cName){ alert('Enter your name'); return; } if(!this.form.agreeTerms){ alert('Please agree to the Terms and Privacy Policy to continue.'); return; } this.onb=2; } else if(this.onb===2){ this.onb=3; } else { this.finishOnboarding(true); } },
     async finishOnboarding(notify){
       if(notify){ await this.subscribePush(); }
       this.location=this.form.cLoc; this.prefs=[...this.form.prefs]; this.notifyOn=!!notify;
-      this.customer={ name:this.form.cName, email:this.form.cEmail, location:this.location, prefs:this.prefs, notify:this.notifyOn };
+      this.customer={ name:this.form.cName, email:this.form.cEmail, location:this.location, prefs:this.prefs, notify:this.notifyOn, mkt:!!this.form.mktOptIn, termsAt:new Date().toISOString() };
       this.save('gl_customer',this.customer); this.tab='home'; this.view='none';
       await this.fetchBusinesses(true); if(this.prefs.length) this.cCat='foryou';
     },
     // Register the service worker + subscribe this browser to web push (VAPID).
     async subscribePush(){
+      // Native app (Capacitor shell): use the OS push token (APNs/FCM), not web VAPID.
+      if(window.Capacitor?.isNativePlatform?.()){ return await this.registerNativePush(); }
       try{
         if(!('serviceWorker' in navigator) || !('PushManager' in window) || !this.vapidKey) return false;
         const perm = await Notification.requestPermission();
@@ -984,6 +1007,27 @@ function goLocalApp() {
         }
         const j = sub.toJSON();
         await this.api('/push/subscribe', { method:'POST', body: JSON.stringify({ endpoint:j.endpoint, keys:j.keys, category_prefs:this.form.prefs }) });
+        return true;
+      }catch(e){ return false; }
+    },
+    // Native push: ask iOS/Android for permission, register, and POST the device
+    // token to /api/devices/register (backend storage already exists). The Capacitor
+    // runtime is injected by the native shell, so no JS bundle change is needed.
+    async registerNativePush(){
+      try{
+        const Push = window.Capacitor?.Plugins?.PushNotifications;
+        if(!Push) return false;
+        if(!this._nativePushBound){
+          this._nativePushBound = true;
+          Push.addListener('registration', (t)=>{
+            const platform = (window.Capacitor.getPlatform && window.Capacitor.getPlatform()) || 'ios';
+            this.api('/devices/register', { method:'POST', body: JSON.stringify({ platform, token: t.value, topics: this.prefs }) }).catch(()=>{});
+          });
+          Push.addListener('registrationError', ()=>{});
+        }
+        const perm = await Push.requestPermissions();
+        if(perm.receive !== 'granted') return false;
+        await Push.register();
         return true;
       }catch(e){ return false; }
     },
@@ -1040,7 +1084,7 @@ function goLocalApp() {
       const o = offer || this.activeOffer; if(!o) return;
       this.activeOffer = o;
       try{
-        const r = await this.api('/offers/'+o.id+'/redeem', { method:'POST', body: JSON.stringify({ customer_name: this.customer?.name, customer_email: this.customer?.email, marketing_opt_in: !!this.customer?.email }) });
+        const r = await this.api('/offers/'+o.id+'/redeem', { method:'POST', body: JSON.stringify({ customer_name: this.customer?.name, customer_email: this.customer?.email, marketing_opt_in: this.customer?.mkt !== false }) });
         this.lastCode = { code:r.code, biz:r.business, badge:r.badge, offer:r.offer, status:'pending', expiresAt: Date.now()+(r.ttl_seconds*1000) };
         this.codeExpired=false; this.view='code'; this.renderCodeQr();
         if(this.secret) this.loadBiz();
@@ -1060,7 +1104,7 @@ function goLocalApp() {
       const data = await this.api('/businesses'+qs).catch(()=>null); if(!data) return;
       const fresh=[];
       data.forEach(b=>b.offers.forEach(o=>{ if(!this.seen.includes(o.id)){ if(this.matchesPrefs(b)){ fresh.push({biz:b.name, text:o.badge+' - '+o.title}); } this.seen.push(o.id); } }));
-      this.businesses = data; if(this.tab==='map' && this.map) this.renderMarkers();
+      this.businesses = data; if(this.tab==='map' && this.gm().map) this.renderMarkers();
       if(fresh.length){ this.save('gl_seen', this.seen); fresh.forEach(f=>{ this.notifications.unshift({id:Date.now()+Math.random(), biz:f.biz, text:f.text}); this.unread++; if(this.notifyOn && 'Notification' in window && Notification.permission==='granted'){ try{ new Notification('New offer at '+f.biz, {body:f.text, icon:'/icon.svg'}); }catch(e){} } }); this.notifications = this.notifications.slice(0,20); this.save('gl_notifs', this.notifications); }
       if(this.secret) this.loadBiz();
     },
@@ -1081,16 +1125,22 @@ function goLocalApp() {
         +'</span>';
       return el;
     },
+    // Non-reactive holder for Google Maps objects. CRITICAL: map / markers /
+    // clusterer must NOT live on `this` - Alpine wraps component state in a
+    // reactive Proxy, and a proxied AdvancedMarkerElement never reaches the
+    // native renderer (setting .map silently no-ops). Keep them off the proxy.
+    gm(){ return window.__glmap || (window.__glmap = { markers: [] }); },
     // Load the Maps + Marker libraries once (async).
     async ensureMaps(){
-      if(this.mapsReady) return true;
+      const g = this.gm();
+      if(this.mapsReady && g.lib) return true;
       if(!this.mapsKey || !(window.google && google.maps && google.maps.importLibrary)) return false;
       try{
         const [maps, marker] = await Promise.all([
           google.maps.importLibrary('maps'),
           google.maps.importLibrary('marker'),
         ]);
-        this._gmaps = { Map: maps.Map, InfoWindow: maps.InfoWindow, AdvancedMarkerElement: marker.AdvancedMarkerElement };
+        g.lib = { Map: maps.Map, InfoWindow: maps.InfoWindow, AdvancedMarkerElement: marker.AdvancedMarkerElement };
         this.mapsReady = true;
         return true;
       }catch(e){ console.error('Google Maps failed to load', e); return false; }
@@ -1101,36 +1151,39 @@ function goLocalApp() {
       // Wait until the container is visible (has height) - the usual "blank map" cause.
       if(!el || el.clientHeight < 40){ if(n<80){ setTimeout(()=>this.initMap(n+1), 120); } return; }
       if(!await this.ensureMaps()) return;
-      if(!this.map){
-        this.map = new this._gmaps.Map(el, {
+      const g = this.gm();
+      if(!g.map){
+        g.map = new g.lib.Map(el, {
           center:{lat:54.9733, lng:-1.6122}, zoom:13, mapId:this.mapsId,
           disableDefaultUI:true, zoomControl:true, clickableIcons:false, gestureHandling:'greedy',
         });
-        this.infoWin = new this._gmaps.InfoWindow();
-        this.map.addListener('zoom_changed', ()=>this.updateMapLabels());
+        g.infoWin = new g.lib.InfoWindow();
+        g.map.addListener('zoom_changed', ()=>this.updateMapLabels());
       }
       this.renderMarkers(); this.recenter();
     },
     recenter(){
-      if(!this.map) return;
+      const g = this.gm();
+      if(!g.map) return;
       const bounds = new google.maps.LatLngBounds();
       let any=false;
       this.visible.filter(b=>b.lat).forEach(b=>{ bounds.extend({lat:+b.lat, lng:+b.lng}); any=true; });
       if(this.userLat){ bounds.extend({lat:this.userLat, lng:this.userLng}); any=true; }
-      if(any){ this.map.fitBounds(bounds, 50); google.maps.event.addListenerOnce(this.map,'idle',()=>{ if(this.map.getZoom()>15) this.map.setZoom(15); }); }
+      if(any){ g.map.fitBounds(bounds, 50); google.maps.event.addListenerOnce(g.map,'idle',()=>{ if(g.map.getZoom()>15) g.map.setZoom(15); }); }
     },
-    mapRefresh(){ if(this.map){ this.renderMarkers(); this.recenter(); } },
+    mapRefresh(){ if(this.gm().map){ this.renderMarkers(); this.recenter(); } },
     renderMarkers(){
-      if(!this.map || !this.mapsReady) return;
+      const g = this.gm();
+      if(!g.map || !this.mapsReady) return;
       const esc=s=>String(s||'').replace(/</g,'&lt;');
-      const AME = this._gmaps.AdvancedMarkerElement;
+      const AME = g.lib.AdvancedMarkerElement;
       // Clear previous markers.
-      (this.markers||[]).forEach(m=>m.map=null);
-      this.markers=[];
-      if(this._userMarker){ this._userMarker.map=null; this._userMarker=null; }
+      (g.markers||[]).forEach(m=>m.map=null);
+      g.markers=[];
+      if(g.userMarker){ g.userMarker.map=null; g.userMarker=null; }
       if(this.userLat){
         const u=document.createElement('div'); u.className='user-dot'; u.title='You';
-        this._userMarker = new AME({ map:this.map, position:{lat:this.userLat, lng:this.userLng}, content:u });
+        g.userMarker = new AME({ map:g.map, position:{lat:this.userLat, lng:this.userLng}, content:u });
       }
       this.visible.filter(b=>b.lat).forEach(b=>{
         const off=b.offers&&b.offers[0];
@@ -1138,29 +1191,30 @@ function goLocalApp() {
         m.content.addEventListener('click', ()=>{
           const pop=document.createElement('div'); pop.className='map-pop';
           pop.innerHTML='<div class="po-name">'+esc(b.name)+'</div><div class="po-sec">'+esc(b.category)+'</div>'+(off?'<div class="po-off">'+esc(off.badge)+' - '+esc(off.title)+'</div>':'')+'<button class="pv" type="button">View offers</button>';
-          pop.querySelector('.pv').onclick=()=>{ this.infoWin.close(); this.openBusiness(b); };
-          this.infoWin.setContent(pop); this.infoWin.open({ map:this.map, anchor:m });
+          pop.querySelector('.pv').onclick=()=>{ g.infoWin.close(); this.openBusiness(b); };
+          g.infoWin.setContent(pop); g.infoWin.open({ map:g.map, anchor:m });
         });
-        this.markers.push(m);
+        g.markers.push(m);
       });
       // Clustered group: dense pins collapse into a count bubble, split as you zoom in.
-      if(this.cluster){ this.cluster.clearMarkers(); this.cluster.addMarkers(this.markers); }
-      else { this.cluster = new markerClusterer.MarkerClusterer({ map:this.map, markers:this.markers }); }
+      if(g.cluster){ g.cluster.clearMarkers(); g.cluster.addMarkers(g.markers); }
+      else { g.cluster = new markerClusterer.MarkerClusterer({ map:g.map, markers:g.markers }); }
       this.updateMapLabels();
     },
     // Show the name/category cards only when zoomed in (≥14); zoomed out stays as clean dots + clusters.
-    updateMapLabels(){ if(!this.map) return; const el=document.getElementById('cmap'); if(el) el.classList.toggle('labels-on', (this.map.getZoom()||0)>=14); },
+    updateMapLabels(){ const g=this.gm(); if(!g.map) return; const el=document.getElementById('cmap'); if(el) el.classList.toggle('labels-on', (g.map.getZoom()||0)>=14); },
     // Small map inside a business profile.
     async initBizMap(b){
       if(!b || !b.lat) return;
       if(!await this.ensureMaps()) return;
-      const AME = this._gmaps.AdvancedMarkerElement;
+      const g = this.gm();
+      const AME = g.lib.AdvancedMarkerElement;
       this.$nextTick(()=>{ setTimeout(()=>{
         const el=document.getElementById('bizmap'); if(!el) return;
-        if(!this.bizMap){ this.bizMap = new this._gmaps.Map(el, { center:{lat:+b.lat, lng:+b.lng}, zoom:15, mapId:this.mapsId, disableDefaultUI:true, gestureHandling:'none', clickableIcons:false }); }
-        else { this.bizMap.setCenter({lat:+b.lat, lng:+b.lng}); }
-        if(this._bizMarker) this._bizMarker.map=null;
-        this._bizMarker = new AME({ map:this.bizMap, position:{lat:+b.lat, lng:+b.lng}, content:this.pinEl(b) });
+        if(!g.bizMap){ g.bizMap = new g.lib.Map(el, { center:{lat:+b.lat, lng:+b.lng}, zoom:15, mapId:this.mapsId, disableDefaultUI:true, gestureHandling:'none', clickableIcons:false }); }
+        else { g.bizMap.setCenter({lat:+b.lat, lng:+b.lng}); }
+        if(g.bizMarker) g.bizMarker.map=null;
+        g.bizMarker = new AME({ map:g.bizMap, position:{lat:+b.lat, lng:+b.lng}, content:this.pinEl(b) });
       }, 90); });
     },
     // Haversine distance (miles) from the user's location; falls back to seed distance.
@@ -1177,7 +1231,8 @@ function goLocalApp() {
 
     async signupBusiness(){
       this.bizError=''; if(!this.form.bName || !this.form.bCat){ this.bizError='Enter a name and category.'; return; }
-      try{ const r = await this.api('/businesses', { method:'POST', body: JSON.stringify({ name:this.form.bName, category_id:Number(this.form.bCat), postcode:this.form.bPostcode, place_id:this.form.placeId }) });
+      if(!this.form.bAgreeTerms){ this.bizError='Please agree to the Terms and Privacy Policy.'; return; }
+      try{ const r = await this.api('/businesses', { method:'POST', body: JSON.stringify({ name:this.form.bName, category_id:Number(this.form.bCat), postcode:this.form.bPostcode, email:this.form.bEmail, place_id:this.form.placeId, terms_accepted:this.form.bAgreeTerms, marketing_opt_in:!!this.form.bMktOptIn }) });
         this.business = r.business; this.secret = r.owner_secret; this.save('gl_biz', this.business); this.save('gl_secret', this.secret);
         this.btab='offers'; await this.loadBiz(); await this.fetchBusinesses();
       }catch(e){ this.bizError=e.message; }

@@ -33,13 +33,13 @@
           <p class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-2">Demo account</p>
           <form method="POST" action="{{ route('business.login.submit') }}">
             @csrf
-            <input type="hidden" name="email" value="demo@golocal.test">
+            <input type="hidden" name="email" value="demo@locolie.test">
             <input type="hidden" name="password" value="golocal">
             <button class="w-full rounded-xl border border-slate-300 hover:border-emerald-500 hover:text-emerald-700 font-semibold py-3 transition text-slate-700">
               Log in as “{{ $demo->name }}” →
             </button>
           </form>
-          <p class="text-xs text-slate-400 mt-2">demo@golocal.test · golocal</p>
+          <p class="text-xs text-slate-400 mt-2">demo@locolie.test · golocal</p>
         </div>
       @endif
     </div>

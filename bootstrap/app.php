@@ -23,6 +23,10 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Unauthenticated business-guard requests go to the business login.
         $middleware->redirectGuestsTo(fn () => route('business.login'));
+
+        // RFC 8058 one-click unsubscribe POSTs come from mail clients with no
+        // CSRF token; the signed URL is the proof of authenticity instead.
+        $middleware->validateCsrfTokens(except: ['unsubscribe']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

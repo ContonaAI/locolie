@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
-    'offer_id', 'user_id', 'customer_name', 'customer_email', 'marketing_opt_in',
-    'code', 'status', 'expires_at', 'redeemed_at',
+    'offer_id', 'user_id', 'customer_name', 'customer_email', 'customer_phone',
+    'marketing_opt_in', 'sms_opt_in', 'code', 'status', 'expires_at', 'redeemed_at',
 ])]
 class Redemption extends Model
 {
@@ -18,6 +18,7 @@ class Redemption extends Model
             'expires_at' => 'datetime',
             'redeemed_at' => 'datetime',
             'marketing_opt_in' => 'boolean',
+            'sms_opt_in' => 'boolean',
         ];
     }
 

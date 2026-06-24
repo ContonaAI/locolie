@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\BusinessPortalController;
+use App\Http\Controllers\LegalController;
 use App\Http\Controllers\PortalController;
 use App\Http\Controllers\SiteController;
+use App\Http\Controllers\SubscriptionController;
 use Illuminate\Support\Facades\Route;
 
 // ── Public presentation / marketing site (ngrok root = our showcase) ─────────
@@ -11,10 +13,20 @@ Route::get('/for-business', [SiteController::class, 'forBusiness'])->name('site.
 Route::get('/category/{slug}', [SiteController::class, 'category'])->name('site.category');
 Route::get('/shop/{slug}', [SiteController::class, 'business'])->name('site.business');
 
+// ── Legal ────────────────────────────────────────────────────────────────────
+Route::get('/terms', [LegalController::class, 'terms'])->name('legal.terms');
+Route::get('/privacy', [LegalController::class, 'privacy'])->name('legal.privacy');
+Route::get('/cookies', [LegalController::class, 'cookies'])->name('legal.cookies');
+
+// ── Subscription preferences + one-click unsubscribe (signed, login-free) ─────
+Route::get('/preferences', [SubscriptionController::class, 'preferences'])->name('subscriptions.preferences');
+Route::post('/preferences', [SubscriptionController::class, 'update'])->name('subscriptions.update');
+Route::match(['get', 'post'], '/unsubscribe', [SubscriptionController::class, 'unsubscribe'])->name('subscriptions.unsubscribe');
+
 // ── SEO: robots + sitemap ────────────────────────────────────────────────────
 Route::get('/robots.txt', fn () => response("User-agent: *\nAllow: /\nDisallow: /portal\nDisallow: /admin\nDisallow: /business\nSitemap: ".url('/sitemap.xml')."\n", 200, ['Content-Type' => 'text/plain']));
 Route::get('/sitemap.xml', function () {
-    $urls = ['/', '/for-business', '/app'];
+    $urls = ['/', '/for-business', '/app', '/terms', '/privacy', '/cookies'];
     $xml = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
     foreach ($urls as $u) {
         $xml .= '<url><loc>'.url($u).'</loc><changefreq>weekly</changefreq></url>';
@@ -40,7 +52,22 @@ Route::middleware('auth:business')->group(function () {
     Route::get('/business/upgrade/success', [BusinessPortalController::class, 'upgradeSuccess'])->name('business.upgrade.success');
     Route::get('/business/customers.csv', [BusinessPortalController::class, 'exportCustomers'])->name('business.customers.export');
     Route::post('/business/customers/email', [BusinessPortalController::class, 'emailCustomers'])->name('business.customers.email');
+
+    // Retailer reporting suite
+    Route::get('/business/reports', [BusinessPortalController::class, 'reports'])->name('business.reports');
+    Route::get('/business/reports.csv', [BusinessPortalController::class, 'reportsExport'])->name('business.reports.export');
+
+    // Retailer self-serve messaging: brand + send email/SMS/push to own customers
+    Route::get('/business/messaging', [BusinessPortalController::class, 'messaging'])->name('business.messaging');
+    Route::post('/business/brand', [BusinessPortalController::class, 'saveBrand'])->name('business.brand');
+    Route::post('/business/messaging/preview', [BusinessPortalController::class, 'messagingPreview'])->name('business.messaging.preview');
+    Route::post('/business/messaging/send', [BusinessPortalController::class, 'messagingSend'])->name('business.messaging.send');
 });
+
+// ── Customer-facing report ("Your locolie" - savings & impact) ───────────────
+Route::get('/my-locolie', [\App\Http\Controllers\CustomerReportController::class, 'entry'])->name('customer.report.entry');
+Route::post('/my-locolie', [\App\Http\Controllers\CustomerReportController::class, 'lookup'])->name('customer.report.lookup');
+Route::get('/my-locolie/view', [\App\Http\Controllers\CustomerReportController::class, 'show'])->name('customer.report')->middleware('signed');
 
 // ── QR window-sticker deep link + printable sticker ──────────────────────────
 Route::get('/c/{token}', [PortalController::class, 'qrRedirect'])->name('qr.redirect');
@@ -63,6 +90,9 @@ Route::middleware('portal')->group(function () {
     Route::post('/ideas', [PortalController::class, 'storeIdea'])->name('portal.ideas.store');
     Route::delete('/ideas/{idea}', [PortalController::class, 'deleteIdea'])->name('portal.ideas.delete');
 
+    // Platform reporting (team)
+    Route::get('/reports', [\App\Http\Controllers\ReportsController::class, 'platform'])->name('portal.reports');
+
     // Admin CRM
     Route::get('/admin', [PortalController::class, 'admin'])->name('portal.admin');
     Route::get('/admin/settings', [PortalController::class, 'settings'])->name('portal.settings');
@@ -71,4 +101,30 @@ Route::middleware('portal')->group(function () {
     Route::post('/admin/prospect/search', [PortalController::class, 'adminProspectSearch'])->name('admin.prospect.search');
     Route::post('/admin/prospect/add', [PortalController::class, 'adminAddProspect'])->name('admin.prospect.add');
     Route::post('/admin/campaign', [PortalController::class, 'adminSendCampaign'])->name('admin.campaign');
+
+    // ── Messaging Studio: branded email / SMS / push across web + native ─────
+    Route::get('/messaging', [\App\Http\Controllers\MessagingController::class, 'studio'])->name('messaging.studio');
+    Route::post('/messaging/brand/{business}', [\App\Http\Controllers\MessagingController::class, 'saveBrand'])->name('messaging.brand');
+    Route::post('/messaging/connect', [\App\Http\Controllers\MessagingController::class, 'connect'])->name('messaging.connect');
+    Route::post('/messaging/disconnect', [\App\Http\Controllers\MessagingController::class, 'disconnect'])->name('messaging.disconnect');
+
+    // Email channel
+    Route::get('/messaging/email', [\App\Http\Controllers\Messaging\EmailStudioController::class, 'index'])->name('messaging.email');
+    Route::post('/messaging/email/preview', [\App\Http\Controllers\Messaging\EmailStudioController::class, 'preview'])->name('messaging.email.preview');
+    Route::post('/messaging/email/test', [\App\Http\Controllers\Messaging\EmailStudioController::class, 'test'])->name('messaging.email.test');
+    Route::post('/messaging/email/send', [\App\Http\Controllers\Messaging\EmailStudioController::class, 'send'])->name('messaging.email.send');
+    Route::get('/messaging/email/connect/google', [\App\Http\Controllers\Messaging\EmailStudioController::class, 'connectGoogle'])->name('messaging.email.google');
+    Route::get('/messaging/email/google/callback', [\App\Http\Controllers\Messaging\EmailStudioController::class, 'googleCallback'])->name('messaging.email.google.callback');
+
+    // SMS channel
+    Route::get('/messaging/sms', [\App\Http\Controllers\Messaging\SmsStudioController::class, 'index'])->name('messaging.sms');
+    Route::post('/messaging/sms/preview', [\App\Http\Controllers\Messaging\SmsStudioController::class, 'preview'])->name('messaging.sms.preview');
+    Route::post('/messaging/sms/test', [\App\Http\Controllers\Messaging\SmsStudioController::class, 'test'])->name('messaging.sms.test');
+    Route::post('/messaging/sms/send', [\App\Http\Controllers\Messaging\SmsStudioController::class, 'send'])->name('messaging.sms.send');
+
+    // Push channel
+    Route::get('/messaging/push', [\App\Http\Controllers\Messaging\PushStudioController::class, 'index'])->name('messaging.push');
+    Route::post('/messaging/push/preview', [\App\Http\Controllers\Messaging\PushStudioController::class, 'preview'])->name('messaging.push.preview');
+    Route::post('/messaging/push/test', [\App\Http\Controllers\Messaging\PushStudioController::class, 'test'])->name('messaging.push.test');
+    Route::post('/messaging/push/send', [\App\Http\Controllers\Messaging\PushStudioController::class, 'send'])->name('messaging.push.send');
 });

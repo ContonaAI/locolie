@@ -38,16 +38,65 @@ return [
     // Google Maps / Places. Used by the app + marketing maps (Maps JavaScript API)
     // and server-side Places lookups. maps_id powers AdvancedMarkerElement styling;
     // defaults to Google's DEMO_MAP_ID so maps work without a cloud Map ID configured.
+    // gmail_* powers "Connect to Google" in the Messaging Studio (OAuth -> Gmail send).
     'google' => [
         'maps_key' => env('GOOGLE_MAPS_API_KEY'),
         'maps_id' => env('GOOGLE_MAPS_MAP_ID', 'DEMO_MAP_ID'),
+        'gmail_client_id' => env('GOOGLE_GMAIL_CLIENT_ID'),
+        'gmail_client_secret' => env('GOOGLE_GMAIL_CLIENT_SECRET'),
+        'gmail_refresh_token' => env('GOOGLE_GMAIL_REFRESH_TOKEN'),
+        'gmail_from' => env('GOOGLE_GMAIL_FROM'),
+    ],
+
+    // ── SMS providers (Messaging Studio). All optional - the SMS channel logs
+    //    and counts sends until one is configured, then delivery goes live. ──
+    'twilio' => [
+        'sid' => env('TWILIO_ACCOUNT_SID'),
+        'token' => env('TWILIO_AUTH_TOKEN'),
+        'from' => env('TWILIO_FROM'),
+    ],
+    'vonage' => [
+        'key' => env('VONAGE_API_KEY'),
+        'secret' => env('VONAGE_API_SECRET'),
+        'from' => env('VONAGE_FROM'),
+    ],
+    'messagebird' => [
+        'key' => env('MESSAGEBIRD_ACCESS_KEY'),
+        'originator' => env('MESSAGEBIRD_ORIGINATOR'),
+    ],
+    'plivo' => [
+        'auth_id' => env('PLIVO_AUTH_ID'),
+        'auth_token' => env('PLIVO_AUTH_TOKEN'),
+        'from' => env('PLIVO_FROM'),
+    ],
+    'sns' => [
+        'key' => env('AWS_ACCESS_KEY_ID'),
+        'secret' => env('AWS_SECRET_ACCESS_KEY'),
+        'region' => env('AWS_DEFAULT_REGION', 'eu-west-1'),
+    ],
+    'clicksend' => [
+        'username' => env('CLICKSEND_USERNAME'),
+        'key' => env('CLICKSEND_API_KEY'),
+        'from' => env('CLICKSEND_FROM'),
+    ],
+
+    // ── Native push for the future iOS / Android apps ──
+    'fcm' => [
+        'project_id' => env('FCM_PROJECT_ID'),
+        'credentials' => env('FCM_CREDENTIALS'), // path to service-account JSON
+    ],
+    'apns' => [
+        'key_id' => env('APNS_KEY_ID'),
+        'team_id' => env('APNS_TEAM_ID'),
+        'bundle_id' => env('APNS_BUNDLE_ID'),
+        'auth_key' => env('APNS_AUTH_KEY'), // path to .p8
     ],
 
     // Web-push VAPID keypair (self-generated, no third-party account needed).
     'vapid' => [
         'public' => env('VAPID_PUBLIC_KEY'),
         'private' => env('VAPID_PRIVATE_KEY'),
-        'subject' => env('VAPID_SUBJECT', env('APP_URL', 'mailto:hello@golocal.app')),
+        'subject' => env('VAPID_SUBJECT', env('APP_URL', 'mailto:hello@locolie.com')),
     ],
 
     // Stripe billing for paid plans (scaffolded — paste keys to go live).

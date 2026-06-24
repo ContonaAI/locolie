@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
     'lat', 'lng', 'phone', 'website', 'hours', 'photos', 'reviews', 'google_place_id',
     'rating', 'reviews_count', 'status', 'featured', 'qr_token', 'owner_secret',
     'plan', 'priority', 'onboarded', 'claimed_at', 'lead_notes', 'owner_email', 'password', 'city',
+    'logo_path', 'brand_color', 'email_from_name', 'reply_to_email', 'sms_sender_id',
 ])]
 #[\Illuminate\Database\Eloquent\Attributes\Hidden(['owner_secret', 'password'])]
 class Business extends Authenticatable
@@ -124,5 +125,60 @@ class Business extends Authenticatable
     public function favouritedBy(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'favourites');
+    }
+
+    public function campaigns(): HasMany
+    {
+        return $this->hasMany(Campaign::class);
+    }
+
+    public function templates(): HasMany
+    {
+        return $this->hasMany(MessageTemplate::class);
+    }
+
+    // ── Brand identity used to make every message bespoke ────────────────────
+
+    /** Public URL for the brand logo, or null if none uploaded. */
+    public function logoUrl(): ?string
+    {
+        if (blank($this->logo_path)) {
+            return null;
+        }
+
+        return \Illuminate\Support\Str::startsWith($this->logo_path, ['http://', 'https://', '/'])
+            ? $this->logo_path
+            : \Illuminate\Support\Facades\Storage::disk('public')->url($this->logo_path);
+    }
+
+    /** Brand accent colour, falling back to the locolie emerald. */
+    public function brandColor(): string
+    {
+        return $this->brand_color ?: '#059669';
+    }
+
+    /** Initials shown when a brand has no logo. */
+    public function brandInitials(): string
+    {
+        return \Illuminate\Support\Str::of($this->name)
+            ->explode(' ')
+            ->take(2)
+            ->map(fn ($w) => \Illuminate\Support\Str::substr($w, 0, 1))
+            ->implode('') ?: 'GL';
+    }
+
+    /** Friendly "from" name for email, defaulting to the business name. */
+    public function emailFromName(): string
+    {
+        return $this->email_from_name ?: $this->name;
+    }
+
+    /** SMS sender id (alphanumeric, <=11 chars), defaulting to a slug of the name. */
+    public function smsSenderId(): string
+    {
+        $id = $this->sms_sender_id
+            ?: \Illuminate\Support\Str::of($this->name)->replaceMatches('/[^A-Za-z0-9]/', '')->substr(0, 11);
+
+        return (string) ($id ?: 'locolie');
     }
 }

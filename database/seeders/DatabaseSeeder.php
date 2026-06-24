@@ -15,13 +15,13 @@ class DatabaseSeeder extends Seeder
     {
         // Admin (us)
         User::updateOrCreate(
-            ['email' => 'admin@golocal.test'],
-            ['name' => 'GoLocal Admin', 'role' => 'admin', 'password' => Hash::make('password')],
+            ['email' => 'admin@locolie.test'],
+            ['name' => 'Locolie Admin', 'role' => 'admin', 'password' => Hash::make('password')],
         );
 
         // A demo business owner
         User::updateOrCreate(
-            ['email' => 'owner@golocal.test'],
+            ['email' => 'owner@locolie.test'],
             ['name' => 'Demo Owner', 'role' => 'owner', 'password' => Hash::make('password')],
         );
 

@@ -78,7 +78,11 @@
         <h2 class="font-bold text-lg text-slate-900">Your customers</h2>
         <div class="flex items-center gap-2">
           <a href="{{ route('business.customers.export') }}" class="text-sm font-semibold text-slate-600 hover:text-slate-900">Export CSV</a>
-          <button @click="compose=!compose" class="rounded-lg bg-emerald-600 text-white text-sm font-semibold px-4 py-2 hover:bg-emerald-700">Email customers</button>
+          <button @click="compose=!compose" class="text-sm font-semibold text-slate-600 hover:text-slate-900">Quick email</button>
+          <a href="{{ route('business.messaging') }}" class="rounded-lg bg-emerald-600 text-white text-sm font-semibold px-4 py-2 hover:bg-emerald-700 inline-flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+            Messaging Studio
+          </a>
         </div>
       </div>
       <p class="text-sm text-slate-500 mb-4">Every shopper who redeems an offer is captured here - <span class="font-semibold text-slate-700">your own customer list to market to</span>, something the big chains have always had and independents never did. {{ $customers->count() }} captured · {{ $customers->where('opt_in',true)->count() }} opted in to marketing.</p>

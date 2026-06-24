@@ -1,0 +1,28 @@
+{
+  "appId": "com.locolie.app",
+  "appName": "Locolie",
+  "webDir": "www",
+  "server": {
+    "url": "https://roger-ferulaceous-nonpermissively.ngrok-free.dev/app",
+    "cleartext": false,
+    "allowNavigation": [
+      "*.ngrok-free.dev",
+      "locolie.com",
+      "*.locolie.com"
+    ]
+  },
+  "ios": {
+    "contentInset": "always",
+    "backgroundColor": "#0a0a0a"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1200,
+      "backgroundColor": "#0a0a0a",
+      "showSpinner": false
+    },
+    "PushNotifications": {
+      "presentationOptions": ["badge", "sound", "alert"]
+    }
+  }
+}

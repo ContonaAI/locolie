@@ -238,7 +238,7 @@
 
 {{-- ============================================================ BADGE OF HONOUR --}}
 @php
-    $pinPath = 'M12 2C7.58 2 4 5.58 4 10c0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 12 12.5 2.5 2.5 0 0 0 12 7.5Z';
+    $pinPath = 'M12 1.6C7.3 1.6 3.5 5.4 3.5 10.1c0 5.6 8.5 12.3 8.5 12.3s8.5-6.7 8.5-12.3C20.5 5.4 16.7 1.6 12 1.6Zm0 5.9a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4Z';
 
     // Deterministic decorative QR (looks the part for a mockup).
     $n = 21; $c = 96 / $n; $o = 2; $mods = '';
@@ -259,19 +259,8 @@
     };
     $qr = '<svg viewBox="0 0 100 100" class="h-full w-full"><rect width="100" height="100" rx="8" fill="#fff"/><g fill="#0a0a0a">'.$mods.'</g>'.$fp(0, 0).$fp(0, $n - 7).$fp($n - 7, 0).'</svg>';
 
-    // Round "Badge of Honour" seal.
-    $seal = '<svg viewBox="0 0 200 200" class="h-full w-full" aria-hidden="true">'
-        .'<defs><path id="loco-seal-top" d="M22 100 A78 78 0 0 1 178 100"/><path id="loco-seal-bot" d="M24 100 A76 76 0 0 0 176 100"/></defs>'
-        .'<circle cx="100" cy="100" r="97" fill="#0a0a0a"/>'
-        .'<circle cx="100" cy="100" r="97" fill="none" stroke="#059669" stroke-width="3"/>'
-        .'<circle cx="100" cy="100" r="89" fill="none" stroke="#1f3b32" stroke-width="1"/>'
-        .'<circle cx="100" cy="100" r="61" fill="#fff"/>'
-        .'<text font-family="Inter,sans-serif" font-size="10.5" font-weight="800" letter-spacing="1.6" fill="#d1fae5" text-anchor="middle"><textPath href="#loco-seal-top" startOffset="50%">PROUD LOCAL INDEPENDENT</textPath></text>'
-        .'<text font-family="Inter,sans-serif" font-size="9.5" font-weight="700" letter-spacing="1.8" fill="#6ee7b7" text-anchor="middle"><textPath href="#loco-seal-bot" startOffset="50%">★ BACKED BY LOCOLIE ★</textPath></text>'
-        .'<g transform="translate(84.5,44) scale(1.3)"><path d="'.$pinPath.'" fill="#059669"/></g>'
-        .'<text x="100" y="118" text-anchor="middle" font-family="Inter,sans-serif" font-size="21" font-weight="800" fill="#0a0a0a" letter-spacing="-0.5">locolie</text>'
-        .'<text x="100" y="135" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="700" letter-spacing="2" fill="#737373">EST. 2026 · NE1</text>'
-        .'</svg>';
+    // The "verified local" mark: a solid pin with a white tick - local + approved.
+    // The "verified local" seal is now the reusable <x-seal> component.
 @endphp
 <section class="border-t border-hair bg-[#f5f5f5] py-20 sm:py-28">
     <div class="mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
@@ -293,7 +282,7 @@
                     <div class="pointer-events-none absolute inset-0 opacity-70" style="background:linear-gradient(115deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,0) 35%,rgba(255,255,255,0) 60%,rgba(255,255,255,.35) 78%,rgba(255,255,255,0) 100%)"></div>
                     {{-- the decal, stuck on at a slight angle --}}
                     <div class="absolute inset-0 flex -rotate-2 flex-col items-center justify-center gap-3 p-5">
-                        <div class="h-32 w-32 drop-shadow-lg">{!! $seal !!}</div>
+                        <x-seal class="h-32 w-32 drop-shadow-lg" />
                         <div class="w-[170px] rounded-2xl bg-ink p-4 text-center shadow-xl">
                             <div class="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-soft">Scan for our offers</div>
                             <div class="mx-auto mt-2.5 h-24 w-24">{!! $qr !!}</div>

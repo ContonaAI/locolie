@@ -47,8 +47,11 @@ class SiteController extends Controller
     {
         $category = Category::where('slug', $slug)->firstOr(fn () => abort(404));
 
+        // A parent category lists every business across its sub-categories.
+        $ids = $this->categoryAndDescendantIds($category);
+
         $businesses = Business::live()->ranked()
-            ->where('category_id', $category->id)
+            ->whereIn('category_id', $ids)
             ->with(['category', 'activeOffers'])
             ->get();
 
@@ -57,6 +60,17 @@ class SiteController extends Controller
             'businesses' => $businesses,
             'categories' => $this->categoriesWithCounts(),
         ]);
+    }
+
+    /** This category id plus every descendant id (handles parent → sub → sub-trade). */
+    protected function categoryAndDescendantIds(Category $category): array
+    {
+        $ids = [$category->id];
+        foreach (Category::where('parent_id', $category->id)->get() as $child) {
+            $ids = array_merge($ids, $this->categoryAndDescendantIds($child));
+        }
+
+        return $ids;
     }
 
     /** SEO landing page for a single business — great for local search. */

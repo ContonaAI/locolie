@@ -116,7 +116,7 @@ class GooglePlacesSeeder extends Seeder
                         'priority' => $planCfg['priority'],
                         'onboarded' => true, // MVP: treat all seeded businesses as onboarded
                         'claimed_at' => now(),
-                        'owner_email' => 'owner+'.\Illuminate\Support\Str::slug($name).'@golocal.test',
+                        'owner_email' => 'owner+'.\Illuminate\Support\Str::slug($name).'@locolie.test',
                         'status' => 'active',
                     ]
                 );

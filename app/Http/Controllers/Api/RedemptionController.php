@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Business;
 use App\Models\Offer;
 use App\Models\Redemption;
+use App\Models\Subscription;
 use App\Services\RedemptionService;
 use Illuminate\Http\Request;
 
@@ -19,7 +20,9 @@ class RedemptionController extends Controller
         $data = $request->validate([
             'customer_name' => ['nullable', 'string', 'max:80'],
             'customer_email' => ['nullable', 'email', 'max:160'],
+            'customer_phone' => ['nullable', 'string', 'max:32'],
             'marketing_opt_in' => ['nullable', 'boolean'],
+            'sms_opt_in' => ['nullable', 'boolean'],
         ]);
 
         abort_unless($offer->status === 'active', 422, 'This offer is no longer active.');
@@ -32,6 +35,22 @@ class RedemptionController extends Controller
             email: $data['customer_email'] ?? null,
             optIn: (bool) ($data['marketing_opt_in'] ?? false),
         );
+
+        // Sync the shopper's marketing/SMS consent into the subscription ledger.
+        if (! empty($data['customer_email'])) {
+            Subscription::setTopic($data['customer_email'], 'offers', (bool) ($data['marketing_opt_in'] ?? false), [
+                'source' => 'redemption',
+                'phone' => $data['customer_phone'] ?? null,
+                'ip_address' => $request->ip(),
+            ]);
+            if (array_key_exists('sms_opt_in', $data) && ! empty($data['customer_phone'])) {
+                Subscription::setTopic($data['customer_email'], 'sms_alerts', (bool) $data['sms_opt_in'], [
+                    'source' => 'redemption',
+                    'phone' => $data['customer_phone'],
+                    'ip_address' => $request->ip(),
+                ]);
+            }
+        }
 
         return response()->json([
             'code' => $redemption->code,

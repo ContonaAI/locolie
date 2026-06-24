@@ -6,7 +6,7 @@
 
 @php
     // Reusable map-pin glyph (donut hole via even-odd) that scales with font-size.
-    $pin = fn ($c, $h = '0.78em') => '<svg style="height:'.$h.';width:auto;display:inline-block;vertical-align:-0.05em;margin:0 -0.01em" viewBox="0 0 24 24" fill="'.$c.'" fill-rule="evenodd" clip-rule="evenodd" aria-hidden="true"><path d="M12 2C7.58 2 4 5.58 4 10c0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 12 12.5 2.5 2.5 0 0 0 12 7.5Z"/></svg>';
+    $pin = fn ($c, $h = '0.78em') => '<svg style="height:'.$h.';width:auto;display:inline-block;vertical-align:-0.05em;margin:0 -0.01em" viewBox="0 0 24 24" fill="'.$c.'" fill-rule="evenodd" clip-rule="evenodd" aria-hidden="true"><path d="M12 1.6C7.3 1.6 3.5 5.4 3.5 10.1c0 5.6 8.5 12.3 8.5 12.3s8.5-6.7 8.5-12.3C20.5 5.4 16.7 1.6 12 1.6Zm0 5.9a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4Z"/></svg>';
 
     // "locolie" wordmark with both o's rendered as pins of $pinColor; letters take $textClass.
     $wm = fn ($pinColor, $textClass = 'text-slate-900') => '<span class="font-extrabold lowercase tracking-tight '.$textClass.'">l'.$pin($pinColor).'c'.$pin($pinColor).'lie</span>';
@@ -64,7 +64,7 @@
     <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
         <div class="flex items-center gap-4">
             <div class="h-14 w-14 rounded-2xl shadow-md flex items-center justify-center" style="background:linear-gradient(135deg,#6366f1,#4f46e5)">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 2C7.58 2 4 5.58 4 10c0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 12 12.5 2.5 2.5 0 0 0 12 7.5Z"/></svg>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 1.6C7.3 1.6 3.5 5.4 3.5 10.1c0 5.6 8.5 12.3 8.5 12.3s8.5-6.7 8.5-12.3C20.5 5.4 16.7 1.6 12 1.6Zm0 5.9a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4Z"/></svg>
             </div>
             <div>
                 <div class="text-2xl">{!! $wm('#4f46e5') !!}</div>
@@ -94,7 +94,7 @@
     <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
         <div class="flex items-center gap-4">
             <div class="h-14 w-14 rounded-2xl flex items-center justify-center" style="background:#f43f5e;box-shadow:3px 3px 0 #881337">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 2C7.58 2 4 5.58 4 10c0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 12 12.5 2.5 2.5 0 0 0 12 7.5Z"/></svg>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 1.6C7.3 1.6 3.5 5.4 3.5 10.1c0 5.6 8.5 12.3 8.5 12.3s8.5-6.7 8.5-12.3C20.5 5.4 16.7 1.6 12 1.6Zm0 5.9a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4Z"/></svg>
             </div>
             <div>
                 <div class="text-2xl">{!! $wm('#e11d48') !!}</div>
@@ -109,7 +109,7 @@
     <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
         <div class="flex items-center gap-4">
             <div class="h-14 w-14 rounded-2xl shadow-md flex items-center justify-center" style="background:linear-gradient(135deg,#f97316,#ec4899)">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 2C7.58 2 4 5.58 4 10c0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 12 12.5 2.5 2.5 0 0 0 12 7.5Z"/></svg>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 1.6C7.3 1.6 3.5 5.4 3.5 10.1c0 5.6 8.5 12.3 8.5 12.3s8.5-6.7 8.5-12.3C20.5 5.4 16.7 1.6 12 1.6Zm0 5.9a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4Z"/></svg>
             </div>
             <div>
                 <div class="text-2xl">{!! $wm('#ea580c') !!}</div>
@@ -184,17 +184,38 @@
 
 {{-- App icon row --}}
 <div class="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white/60 p-6 shadow-sm">
-    <div class="text-xs text-slate-400 mb-3">App icon - the primary mark across colour, knockout and light variants</div>
+    <div class="text-xs text-slate-400 mb-3">App icon - the pin-with-tick mark ("verified local") across ink, colour and light</div>
     <div class="flex items-center gap-3 flex-wrap">
-        <div class="h-14 w-14 rounded-2xl shadow-md flex items-center justify-center" style="background:linear-gradient(135deg,#059669,#0d9488)">
-            <svg width="34" height="34" viewBox="0 0 48 24" fill="#fff" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 0C7.58 0 4 3.58 4 8c0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 12 10.5 2.5 2.5 0 0 0 12 5.5Z"/><path d="M36 0c-4.42 0-8 3.58-8 8 0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 36 10.5 2.5 2.5 0 0 0 36 5.5Z"/></svg>
+        <div class="h-14 w-14 rounded-2xl shadow-md flex items-center justify-center" style="background:#0a0a0a">
+            <svg width="32" height="32" viewBox="0 0 24 24"><path d="M12 1.6C7.3 1.6 3.5 5.4 3.5 10.1c0 5.6 8.5 12.3 8.5 12.3s8.5-6.7 8.5-12.3C20.5 5.4 16.7 1.6 12 1.6Z" fill="#059669"/><path d="M8.4 10 11 12.6 15.7 7.2" fill="none" stroke="#fff" stroke-width="2.05" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
-        <div class="h-14 w-14 rounded-2xl shadow-md flex items-center justify-center" style="background:#064e3b">
-            <svg width="34" height="34" viewBox="0 0 48 24" fill="#34d399" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 0C7.58 0 4 3.58 4 8c0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 12 10.5 2.5 2.5 0 0 0 12 5.5Z"/><path d="M36 0c-4.42 0-8 3.58-8 8 0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 36 10.5 2.5 2.5 0 0 0 36 5.5Z"/></svg>
+        <div class="h-14 w-14 rounded-2xl shadow-md flex items-center justify-center" style="background:#059669">
+            <svg width="32" height="32" viewBox="0 0 24 24"><path d="M12 1.6C7.3 1.6 3.5 5.4 3.5 10.1c0 5.6 8.5 12.3 8.5 12.3s8.5-6.7 8.5-12.3C20.5 5.4 16.7 1.6 12 1.6Z" fill="#fff"/><path d="M8.4 10 11 12.6 15.7 7.2" fill="none" stroke="#059669" stroke-width="2.05" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
         <div class="h-14 w-14 rounded-2xl shadow-md bg-white border border-slate-200 flex items-center justify-center">
-            <svg width="34" height="34" viewBox="0 0 48 24" fill="#059669" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 0C7.58 0 4 3.58 4 8c0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 12 10.5 2.5 2.5 0 0 0 12 5.5Z"/><path d="M36 0c-4.42 0-8 3.58-8 8 0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 36 10.5 2.5 2.5 0 0 0 36 5.5Z"/></svg>
+            <svg width="32" height="32" viewBox="0 0 24 24"><path d="M12 1.6C7.3 1.6 3.5 5.4 3.5 10.1c0 5.6 8.5 12.3 8.5 12.3s8.5-6.7 8.5-12.3C20.5 5.4 16.7 1.6 12 1.6Z" fill="#059669"/><path d="M8.4 10 11 12.6 15.7 7.2" fill="none" stroke="#fff" stroke-width="2.05" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
+    </div>
+</div>
+
+{{-- ============================ THE SEAL ============================ --}}
+<h2 id="seal" class="scroll-mt-24 text-xs font-semibold uppercase tracking-wider text-emerald-700 mt-12 mb-4">The seal - our trust-mark</h2>
+<p class="text-slate-500 -mt-2 mb-5 max-w-2xl text-sm">A map pin says <em>local</em>; a tick inside it says <em>approved</em> - one ownable mark, the job the Red Tractor does for farms but built sharp and modern. Every verified shop gets it for the window and the till. Reusable as <code class="rounded bg-slate-100 px-1.5 py-0.5 text-[11px]">&lt;x-seal&gt;</code> in any view.</p>
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div class="flex flex-col items-center gap-3 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <x-seal class="h-36 w-36" />
+        <span class="text-xs font-semibold text-slate-500">primary · the canonical mark</span>
+        <code class="text-[11px] text-slate-400">&lt;x-seal /&gt;</code>
+    </div>
+    <div class="flex flex-col items-center gap-3 rounded-2xl border border-slate-200 p-6 shadow-sm" style="background:#f1f0ea">
+        <x-seal variant="light" class="h-36 w-36" />
+        <span class="text-xs font-semibold text-slate-500">inverse · light surfaces</span>
+        <code class="text-[11px] text-slate-400">variant="light"</code>
+    </div>
+    <div class="flex flex-col items-center gap-3 rounded-2xl border border-slate-800 p-6 shadow-sm" style="background:#0a0a0a">
+        <x-seal variant="mono" class="h-36 w-36" />
+        <span class="text-xs font-semibold text-slate-400">one-colour · emboss / etch</span>
+        <code class="text-[11px] text-slate-500">variant="mono"</code>
     </div>
 </div>
 

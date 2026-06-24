@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Business;
+use App\Models\ConsentLog;
 use App\Models\Offer;
+use App\Models\Subscription;
 use App\Services\PlacesService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -35,6 +37,9 @@ class BusinessController extends Controller
             'email' => ['nullable', 'email', 'max:160'],
             'description' => ['nullable', 'string', 'max:500'],
             'place_id' => ['nullable', 'string', 'max:300'],
+            // You can't list a business without agreeing to the terms.
+            'terms_accepted' => ['accepted'],
+            'marketing_opt_in' => ['nullable', 'boolean'],
         ]);
 
         $attrs = [
@@ -43,6 +48,8 @@ class BusinessController extends Controller
             'postcode' => $data['postcode'] ?? null,
             'description' => $data['description'] ?? null,
             'status' => 'active',
+            'terms_accepted_at' => now(),
+            'privacy_version' => config('legal.privacy_version'),
         ];
 
         // Pull the full Google listing so it matches the customer-facing data.
@@ -59,6 +66,18 @@ class BusinessController extends Controller
         }
 
         $business = Business::create($attrs);
+
+        // Record consent + set up the owner's subscription preferences.
+        if (! empty($data['email'])) {
+            ConsentLog::record('terms_accepted', $data['email'], [
+                'source' => 'business_signup',
+                'document_version' => config('legal.terms_version'),
+                'meta' => ['business_id' => $business->id],
+            ]);
+            // Owners get account/business emails by default; offers per their opt-in.
+            Subscription::setTopic($data['email'], 'business_updates', true, ['source' => 'business_signup', 'ip_address' => $request->ip()]);
+            Subscription::setTopic($data['email'], 'offers', (bool) ($data['marketing_opt_in'] ?? true), ['source' => 'business_signup', 'ip_address' => $request->ip()]);
+        }
 
         if ($place) {
             if ($url = $this->places->downloadPhoto(data_get($place, 'photos.0.name'), $business->id)) {

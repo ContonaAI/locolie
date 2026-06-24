@@ -21,7 +21,7 @@ class BusinessPortalController extends Controller
         }
 
         // A known demo account so the login can be shown live.
-        $demo = Business::where('owner_email', 'demo@golocal.test')->first();
+        $demo = Business::where('owner_email', 'demo@locolie.test')->first();
 
         return view('business.login', ['demo' => $demo]);
     }
@@ -125,6 +125,161 @@ class BusinessPortalController extends Controller
         ]);
 
         return back()->with('status', "Email queued to {$recipients} opted-in customers.");
+    }
+
+    /**
+     * Retailer self-serve Messaging Studio - send branded email / SMS / push to
+     * their own captured customers. Same channels + previews as the team studio,
+     * scoped to this one brand.
+     */
+    public function messaging(\App\Services\Messaging\MessagingService $messaging)
+    {
+        $business = Auth::guard('business')->user();
+        $customers = $this->customersFor($business);
+
+        return view('business.messaging', [
+            'business' => $business,
+            'overview' => $messaging->overview(),
+            'channels' => config('messaging.channels'),
+            'campaigns' => \App\Models\Campaign::where('business_id', $business->id)->latest('id')->limit(10)->get(),
+            'samples' => [
+                'email' => $this->sampleMessage('email'),
+                'sms' => $this->sampleMessage('sms'),
+                'push' => $this->sampleMessage('push'),
+            ],
+            'previews' => [
+                'email' => $messaging->channel('email')->previewData($this->sampleMessage('email'), $business),
+                'sms' => $messaging->channel('sms')->previewData($this->sampleMessage('sms'), $business),
+                'push' => $messaging->channel('push')->previewData($this->sampleMessage('push'), $business),
+            ],
+            'audience' => [
+                'email' => $customers->where('opt_in', true)->count(),
+                'sms' => $this->smsCustomersFor($business)->count(),
+                'push' => \App\Models\PushSubscription::count() + \App\Models\DeviceToken::count(),
+            ],
+        ]);
+    }
+
+    /** Save this business's own brand identity (logo, colour, sender names). */
+    public function saveBrand(Request $request)
+    {
+        $business = Auth::guard('business')->user();
+        $data = $request->validate([
+            'brand_color' => ['nullable', 'string', 'regex:/^#?[0-9A-Fa-f]{3,8}$/'],
+            'email_from_name' => ['nullable', 'string', 'max:80'],
+            'reply_to_email' => ['nullable', 'email', 'max:160'],
+            'sms_sender_id' => ['nullable', 'string', 'max:11', 'regex:/^[A-Za-z0-9 ]+$/'],
+            'logo' => ['nullable', 'image', 'mimes:png,jpg,jpeg,svg,webp', 'max:2048'],
+        ]);
+
+        if (! empty($data['brand_color']) && ! str_starts_with($data['brand_color'], '#')) {
+            $data['brand_color'] = '#'.$data['brand_color'];
+        }
+        if ($request->hasFile('logo')) {
+            $data['logo_path'] = $request->file('logo')->store("brands/{$business->id}", 'public');
+        }
+        unset($data['logo']);
+
+        $business->update(array_filter($data, fn ($v) => $v !== null));
+
+        return back()->with('status', 'Brand identity saved.');
+    }
+
+    /** Live preview of one channel for this brand (AJAX). */
+    public function messagingPreview(Request $request, \App\Services\Messaging\MessagingService $messaging)
+    {
+        $business = Auth::guard('business')->user();
+        $channel = $request->validate(['channel' => ['required', Rule::in(['email', 'sms', 'push'])]])['channel'];
+        $message = $request->only(['subject', 'preheader', 'body', 'title', 'cta_label', 'cta_url']);
+
+        $preview = $messaging->channel($channel)->previewData($message, $business);
+
+        return response()->json([
+            'html' => view("messaging.previews.$channel", ['preview' => $preview])->render(),
+        ]);
+    }
+
+    /** Send a branded message to this brand's own opted-in customers. */
+    public function messagingSend(Request $request, \App\Services\Messaging\MessagingService $messaging)
+    {
+        $business = Auth::guard('business')->user();
+        $data = $request->validate([
+            'channel' => ['required', Rule::in(['email', 'sms', 'push'])],
+            'subject' => ['nullable', 'string', 'max:160'],
+            'title' => ['nullable', 'string', 'max:120'],
+            'body' => ['required', 'string', 'max:2000'],
+            'cta_label' => ['nullable', 'string', 'max:40'],
+            'cta_url' => ['nullable', 'string', 'max:300'],
+        ]);
+
+        $recipients = match ($data['channel']) {
+            'email' => $this->customersFor($business)->where('opt_in', true)
+                ->map(fn ($c) => ['email' => $c->email, 'name' => $c->name])->all(),
+            'sms' => $this->smsCustomersFor($business)
+                ->map(fn ($c) => ['phone' => $c->phone, 'name' => $c->name])->all(),
+            'push' => [], // broadcast to subscribed shoppers + app devices
+        };
+
+        $result = $messaging->dispatch($data['channel'], $data, $recipients, $business);
+
+        $label = ['email' => 'Email', 'sms' => 'SMS', 'push' => 'Push'][$data['channel']];
+
+        return back()->with('status', "{$label} sent to {$result->sent} recipients ({$result->status}).");
+    }
+
+    /** Retailer reporting suite - this brand's own performance, dynamically. */
+    public function reports(Request $request, \App\Services\ReportingService $reporting)
+    {
+        $business = Auth::guard('business')->user();
+        $days = (int) $request->integer('days', 30);
+        $days = in_array($days, [7, 14, 30, 90], true) ? $days : 30;
+
+        return view('business.reports', [
+            'business' => $business,
+            'report' => $reporting->forBusiness($business, $days),
+            'days' => $days,
+        ]);
+    }
+
+    /** Download the report's customer + offer tables as CSV. */
+    public function reportsExport(\App\Services\ReportingService $reporting)
+    {
+        $business = Auth::guard('business')->user();
+        $report = $reporting->forBusiness($business, 90);
+
+        $csv = "Offer,Badge,Status,Redemptions,Issued,Redemption rate %,Est. value\n";
+        foreach ($report['top_offers'] as $o) {
+            $csv .= '"'.str_replace('"', '""', (string) $o['title']).'","'.$o['badge'].'","'.$o['status'].'",'.$o['redemptions'].','.$o['issued'].','.$o['rate'].','.$o['value']."\n";
+        }
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="locolie-report.csv"',
+        ]);
+    }
+
+    /** Opted-in SMS customers for a business (distinct by phone). */
+    protected function smsCustomersFor(Business $business)
+    {
+        return $this->redemptionsFor($business)
+            ->filter(fn ($r) => $r->customer_phone && $r->sms_opt_in)
+            ->groupBy('customer_phone')
+            ->map(fn ($g) => (object) [
+                'phone' => $g->first()->customer_phone,
+                'name' => $g->first()->customer_name ?: 'Customer',
+            ])->values();
+    }
+
+    /** A sample message per channel so the initial preview is never empty. */
+    protected function sampleMessage(string $channel): array
+    {
+        $business = Auth::guard('business')->user();
+
+        return match ($channel) {
+            'email' => ['subject' => "A treat from {$business->name}", 'preheader' => 'Just for our regulars', 'body' => "Thanks for being a regular. Here is 20% off your next visit - show this email at the till.", 'cta_label' => 'View the offer', 'cta_url' => url('/')],
+            'sms' => ['body' => "{$business->name}: 20% off your next visit this week. Show this text at the till."],
+            'push' => ['title' => $business->name, 'body' => '20% off your next visit - tap to see the offer'],
+        };
     }
 
     public function updateListing(Request $request)
