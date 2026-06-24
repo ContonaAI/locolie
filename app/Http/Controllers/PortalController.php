@@ -18,6 +18,7 @@ class PortalController extends Controller
         return view('portal.home', [
             'mockupCount' => $this->mockupFiles()->count(),
             'mapsKey' => config('services.google.maps_key'),
+            'mapsId' => config('services.google.maps_id'),
             'vapidKey' => config('services.vapid.public'),
         ]);
     }
@@ -30,6 +31,7 @@ class PortalController extends Controller
         return view('portal.home', [
             'mockupCount' => 0,
             'mapsKey' => config('services.google.maps_key'),
+            'mapsId' => config('services.google.maps_id'),
             'vapidKey' => config('services.vapid.public'),
             'solo' => true,
             'soloRole' => $request->query('as') === 'business' ? 'business' : 'shopper',

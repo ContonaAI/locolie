@@ -4,9 +4,9 @@
     $big = $big ?? false;
     $plans = \App\Models\Business::PLANS;
     $blurbs = [
-        'free' => 'Everything you need to show up on the map and start running offers.',
-        'featured' => 'Stand out in the feed and search, with a monthly email feature.',
-        'premium' => 'Maximum reach - top placement, push notifications and analytics.',
+        'free' => 'Everything you need to get found and start posting offers.',
+        'featured' => 'Stand out in the feed and search, plus a monthly email feature.',
+        'premium' => 'Maximum reach: top placement, push notifications and analytics.',
     ];
 @endphp
 <div class="mx-auto mt-12 grid max-w-5xl gap-6 lg:grid-cols-3 {{ $big ? 'lg:gap-7' : '' }}">
@@ -33,7 +33,7 @@
             <a href="/business/login"
                class="mt-7 inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition
                       {{ $highlight ? 'bg-emerald text-white hover:bg-ink' : 'border border-hair text-ink hover:border-ink' }}">
-                {{ $key === 'free' ? 'Start free' : 'Choose '.$plan['label'] }}
+                {{ $key === 'free' ? 'List my shop free' : 'Choose '.$plan['label'] }}
             </a>
         </div>
     @endforeach

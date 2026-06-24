@@ -17,7 +17,7 @@
     <div class="h-64 w-full overflow-hidden bg-[#e2e8f0] sm:h-80">
         @if($img)<img src="{{ $img }}" alt="{{ $business->name }} - {{ $business->category?->name }} in Newcastle" class="h-full w-full object-cover">@else<div class="h-full w-full bg-gradient-to-br from-emerald-soft to-[#e2e8f0]"></div>@endif
     </div>
-    <div class="mx-auto max-w-5xl px-5 sm:px-6">
+    <div class="mx-auto max-w-5xl 2xl:max-w-6xl px-5 sm:px-6">
         <div class="-mt-16 rounded-card border border-hair bg-white p-6 shadow-xl sm:p-8">
             <nav class="mb-3 flex flex-wrap items-center gap-2 text-sm text-muted" aria-label="Breadcrumb">
                 <a href="/" class="hover:text-ink">Home</a><span>/</span>
@@ -47,7 +47,7 @@
     </div>
 </section>
 
-<div class="mx-auto max-w-5xl px-5 py-12 sm:px-6">
+<div class="mx-auto max-w-5xl 2xl:max-w-6xl px-5 py-12 sm:px-6">
     <div class="grid gap-10 lg:grid-cols-3">
         <div class="lg:col-span-2 space-y-10">
             {{-- Offers --}}
@@ -58,7 +58,7 @@
                         @foreach($business->activeOffers as $o)
                             <div class="flex items-center gap-4 rounded-card border border-hair bg-white p-4">
                                 <span class="flex-shrink-0 rounded-lg bg-emerald px-3 py-2 text-sm font-extrabold text-white">{{ $o->badge }}</span>
-                                <div><div class="font-semibold text-ink">{{ $o->title }}</div><div class="text-sm text-muted">{{ $o->terms ?: 'Redeem in the app at the till' }}</div></div>
+                                <div><div class="font-semibold text-ink">{{ $o->title }}</div><div class="text-sm text-muted">{{ $o->terms ?: 'Open it in the locolie app and show your code at the till' }}</div></div>
                             </div>
                         @endforeach
                     </div>
@@ -88,13 +88,18 @@
                 <p class="mt-2 text-sm text-muted">{{ $business->address ?: 'Newcastle '.$business->postcode }}</p>
                 <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($business->name.' '.$business->postcode) }}" target="_blank" rel="noopener" class="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald hover:text-ink">Get directions <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
             </div>
+            <div class="rounded-card border border-hair bg-emerald-soft p-5">
+                <h3 class="font-bold text-ink">Is this your shop?</h3>
+                <p class="mt-2 text-sm text-muted">Claim your free listing, post offers that bring in real footfall, and message your regulars by email, SMS and push.</p>
+                <a href="/for-business" class="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald hover:text-ink">Claim it free <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+            </div>
         </div>
     </div>
 
     {{-- Related --}}
     @if($related->count())
         <div class="mt-16">
-            <h2 class="mb-4 text-xl font-bold">More {{ $business->category?->name }} nearby</h2>
+            <h2 class="mb-4 text-xl font-bold">More indie {{ $business->category?->name }} nearby</h2>
             <div class="grid gap-5 sm:grid-cols-3">
                 @foreach($related as $b)
                     <a href="/shop/{{ $b->slug }}" class="card-hover group overflow-hidden rounded-card border border-hair bg-white">

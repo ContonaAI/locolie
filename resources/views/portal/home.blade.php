@@ -2,12 +2,8 @@
 @section('title', 'Home')
 
 @push('head')
-{{-- Map: Leaflet + OpenStreetMap (free, no key/billing) + marker clustering. cdnjs (unpkg unreliable here). --}}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.min.css" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.min.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
+{{-- Map: Google Maps JavaScript API (AdvancedMarkerElement + marker clustering). --}}
+@include('partials.google-maps', ['key' => $mapsKey ?? null])
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   .gl-app{ --radius:18px; --radius-sm:12px; }
@@ -155,7 +151,9 @@
   .timer.live{ background:var(--accent-soft); color:var(--accent); } .timer.done{ background:#dcfce7; color:#15803d; } .timer.expired{ background:#fee2e2; color:#dc2626; }
 
   .mapel{ flex:1; min-height:260px; }
-  .leaflet-container{ background:var(--surface-2); font-family:inherit; height:100%; width:100%; }
+  #cmap, #bizmap{ background:var(--surface-2); }
+  /* User's current-location dot. */
+  .user-dot{ width:16px; height:16px; border-radius:50%; background:#2563eb; border:3px solid #fff; box-shadow:0 0 0 3px rgba(37,99,235,.28); }
   /* Shop-name caption under a pin (Google marker label, shown only when zoomed in). */
   /* ===== Styled map pins (dot + name/category card). Card shows when zoomed in (.labels-on). ===== */
   .pin-wrap{ background:none; border:0; }
@@ -170,7 +168,9 @@
   .pin-cat{ font-size:9.5px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:var(--accent); }
   .pin-badge{ background:var(--accent); color:#fff; font-size:8.5px; font-weight:800; padding:2px 5px; border-radius:5px; }
   .labels-on .pin-card{ display:flex; }
-  .leaflet-popup-content{ margin:11px 13px; } .leaflet-popup-content-wrapper{ border-radius:13px; }
+  /* Google Maps AdvancedMarkerElement content sits in a wrapper; strip default gmp styling. */
+  gmp-advanced-marker .pin{ cursor:pointer; }
+  .gm-style-iw{ border-radius:13px; } .gm-style-iw-d{ overflow:hidden !important; }
   .map-pop{ text-align:left; min-width:170px; }
   .map-pop .po-name{ font-weight:800; font-size:14px; color:#111; }
   .map-pop .po-sec{ font-size:11px; color:#6b7280; text-transform:uppercase; letter-spacing:.04em; margin-top:1px; }
@@ -792,7 +792,7 @@ function goLocalApp() {
     tab:'home', view:'none', btab:'home', cCat:null, cSub:null, cSub2:null, active:null, activeOffer:null, focus:null,
     lastCode:null, countdown:'', codeExpired:false, loading:false,
     verifyMsg:'', verifyOk:false, bizError:'',
-    mapsKey: @json($mapsKey ?? ''), mapsReady:false,
+    mapsKey: @json($mapsKey ?? ''), mapsId: @json($mapsId ?? 'DEMO_MAP_ID'), mapsReady:false, _gmaps:null,
     vapidKey: @json($vapidKey ?? ''),
     brand:'locolie', themeKey:'mono', location:'NE',
     brandNames:['locolie','Vicinity','Patch','TownLoop','Mooch','Highstreet'],
@@ -1066,69 +1066,101 @@ function goLocalApp() {
     },
     openNotifs(){ this.notifOpen=!this.notifOpen; this.unread=0; },
 
-    // Map - Leaflet + OpenStreetMap (free, no key/billing).
-    // Build the styled pin: coloured dot + a card showing the business name & category.
-    pinIcon(b){
+    // Map - Google Maps JavaScript API (AdvancedMarkerElement + clustering).
+    // Build the styled pin element (coloured dot + name/category card) for a marker.
+    pinEl(b){
       const esc=s=>String(s||'').replace(/</g,'&lt;');
       const off=b.offers&&b.offers[0];
       const badge = off ? '<span class="pin-badge">'+esc(off.badge)+'</span>' : '';
-      const html='<div class="pin">'
-        +'<span class="pin-dot"></span>'
+      const el=document.createElement('div');
+      el.className='pin';
+      el.innerHTML='<span class="pin-dot"></span>'
         +'<span class="pin-card">'
           +'<span class="pin-top"><span class="pin-name">'+esc(b.name)+'</span>'+badge+'</span>'
           +'<span class="pin-cat">'+esc(b.category||'')+'</span>'
-        +'</span></div>';
-      return L.divIcon({ className:'pin-wrap', html, iconSize:null, iconAnchor:[13,24] });
+        +'</span>';
+      return el;
     },
-    initMap(n){
+    // Load the Maps + Marker libraries once (async).
+    async ensureMaps(){
+      if(this.mapsReady) return true;
+      if(!this.mapsKey || !(window.google && google.maps && google.maps.importLibrary)) return false;
+      try{
+        const [maps, marker] = await Promise.all([
+          google.maps.importLibrary('maps'),
+          google.maps.importLibrary('marker'),
+        ]);
+        this._gmaps = { Map: maps.Map, InfoWindow: maps.InfoWindow, AdvancedMarkerElement: marker.AdvancedMarkerElement };
+        this.mapsReady = true;
+        return true;
+      }catch(e){ console.error('Google Maps failed to load', e); return false; }
+    },
+    async initMap(n){
       n = n || 0;
       const el = document.getElementById('cmap');
-      // Wait until Leaflet is loaded AND the container has height (the usual "blank map" cause).
-      if(!window.L || !el || el.clientHeight < 40){ if(n<80){ setTimeout(()=>this.initMap(n+1), 120); } return; }
+      // Wait until the container is visible (has height) - the usual "blank map" cause.
+      if(!el || el.clientHeight < 40){ if(n<80){ setTimeout(()=>this.initMap(n+1), 120); } return; }
+      if(!await this.ensureMaps()) return;
       if(!this.map){
-        this.map = L.map(el, { zoomControl:true, attributionControl:false }).setView([54.9733,-1.6122], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, crossOrigin:true }).addTo(this.map);
-        this.map.on('zoomend', ()=>this.updateMapLabels());
+        this.map = new this._gmaps.Map(el, {
+          center:{lat:54.9733, lng:-1.6122}, zoom:13, mapId:this.mapsId,
+          disableDefaultUI:true, zoomControl:true, clickableIcons:false, gestureHandling:'greedy',
+        });
+        this.infoWin = new this._gmaps.InfoWindow();
+        this.map.addListener('zoom_changed', ()=>this.updateMapLabels());
       }
-      this.map.invalidateSize(); this.renderMarkers(); this.recenter();
-      [150, 450, 900].forEach(d => setTimeout(()=>{ if(this.map){ this.map.invalidateSize(); this.recenter(); } }, d));
+      this.renderMarkers(); this.recenter();
     },
-    recenter(){ if(!this.map) return; const pts=this.visible.filter(b=>b.lat).map(b=>[+b.lat,+b.lng]); if(this.userLat) pts.push([this.userLat,this.userLng]); if(pts.length) this.map.fitBounds(pts, {padding:[50,50], maxZoom:15}); },
+    recenter(){
+      if(!this.map) return;
+      const bounds = new google.maps.LatLngBounds();
+      let any=false;
+      this.visible.filter(b=>b.lat).forEach(b=>{ bounds.extend({lat:+b.lat, lng:+b.lng}); any=true; });
+      if(this.userLat){ bounds.extend({lat:this.userLat, lng:this.userLng}); any=true; }
+      if(any){ this.map.fitBounds(bounds, 50); google.maps.event.addListenerOnce(this.map,'idle',()=>{ if(this.map.getZoom()>15) this.map.setZoom(15); }); }
+    },
     mapRefresh(){ if(this.map){ this.renderMarkers(); this.recenter(); } },
     renderMarkers(){
-      if(!this.map || !window.L) return;
+      if(!this.map || !this.mapsReady) return;
       const esc=s=>String(s||'').replace(/</g,'&lt;');
-      // Clustered group: dense pins collapse into a count bubble, split as you zoom in.
-      if(!this.cluster){
-        this.cluster = L.markerClusterGroup ? L.markerClusterGroup({ maxClusterRadius:54, showCoverageOnHover:false, spiderfyOnMaxZoom:true }) : L.layerGroup();
-        this.map.addLayer(this.cluster);
-      } else { this.cluster.clearLayers(); }
-      if(this._userMarker){ this.map.removeLayer(this._userMarker); this._userMarker=null; }
-      if(this.userLat){ this._userMarker = L.circleMarker([this.userLat,this.userLng], {radius:7,color:'#fff',weight:3,fillColor:'#2563eb',fillOpacity:1}).addTo(this.map).bindTooltip('You'); }
+      const AME = this._gmaps.AdvancedMarkerElement;
+      // Clear previous markers.
+      (this.markers||[]).forEach(m=>m.map=null);
       this.markers=[];
+      if(this._userMarker){ this._userMarker.map=null; this._userMarker=null; }
+      if(this.userLat){
+        const u=document.createElement('div'); u.className='user-dot'; u.title='You';
+        this._userMarker = new AME({ map:this.map, position:{lat:this.userLat, lng:this.userLng}, content:u });
+      }
       this.visible.filter(b=>b.lat).forEach(b=>{
         const off=b.offers&&b.offers[0];
-        const m=L.marker([+b.lat,+b.lng],{icon:this.pinIcon(b), riseOnHover:true});
-        const pop='<div class="map-pop"><div class="po-name">'+esc(b.name)+'</div><div class="po-sec">'+esc(b.category)+'</div>'+(off?'<div class="po-off">'+esc(off.badge)+' - '+esc(off.title)+'</div>':'')+'<button class="pv" type="button">View offers</button></div>';
-        m.bindPopup(pop,{closeButton:false,minWidth:190});
-        m.on('popupopen',()=>{ const el=document.querySelector('.leaflet-popup .pv'); if(el) el.onclick=()=>{ this.map.closePopup(); this.openBusiness(b); }; });
-        this.cluster.addLayer(m);
+        const m = new AME({ position:{lat:+b.lat, lng:+b.lng}, content:this.pinEl(b) });
+        m.content.addEventListener('click', ()=>{
+          const pop=document.createElement('div'); pop.className='map-pop';
+          pop.innerHTML='<div class="po-name">'+esc(b.name)+'</div><div class="po-sec">'+esc(b.category)+'</div>'+(off?'<div class="po-off">'+esc(off.badge)+' - '+esc(off.title)+'</div>':'')+'<button class="pv" type="button">View offers</button>';
+          pop.querySelector('.pv').onclick=()=>{ this.infoWin.close(); this.openBusiness(b); };
+          this.infoWin.setContent(pop); this.infoWin.open({ map:this.map, anchor:m });
+        });
         this.markers.push(m);
       });
+      // Clustered group: dense pins collapse into a count bubble, split as you zoom in.
+      if(this.cluster){ this.cluster.clearMarkers(); this.cluster.addMarkers(this.markers); }
+      else { this.cluster = new markerClusterer.MarkerClusterer({ map:this.map, markers:this.markers }); }
       this.updateMapLabels();
     },
     // Show the name/category cards only when zoomed in (≥14); zoomed out stays as clean dots + clusters.
-    updateMapLabels(){ if(!this.map) return; const el=document.getElementById('cmap'); if(el) el.classList.toggle('labels-on', this.map.getZoom()>=14); },
+    updateMapLabels(){ if(!this.map) return; const el=document.getElementById('cmap'); if(el) el.classList.toggle('labels-on', (this.map.getZoom()||0)>=14); },
     // Small map inside a business profile.
-    initBizMap(b){
-      if(!window.L || !b || !b.lat) return;
+    async initBizMap(b){
+      if(!b || !b.lat) return;
+      if(!await this.ensureMaps()) return;
+      const AME = this._gmaps.AdvancedMarkerElement;
       this.$nextTick(()=>{ setTimeout(()=>{
         const el=document.getElementById('bizmap'); if(!el) return;
-        if(!this.bizMap){ this.bizMap=L.map('bizmap',{zoomControl:false,attributionControl:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false}).setView([+b.lat,+b.lng],15); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(this.bizMap); }
-        else { this.bizMap.setView([+b.lat,+b.lng],15); }
-        this.bizMap.invalidateSize();
-        if(this._bizMarker) this.bizMap.removeLayer(this._bizMarker);
-        this._bizMarker=L.marker([+b.lat,+b.lng],{icon:this.pinIcon(b)}).addTo(this.bizMap);
+        if(!this.bizMap){ this.bizMap = new this._gmaps.Map(el, { center:{lat:+b.lat, lng:+b.lng}, zoom:15, mapId:this.mapsId, disableDefaultUI:true, gestureHandling:'none', clickableIcons:false }); }
+        else { this.bizMap.setCenter({lat:+b.lat, lng:+b.lng}); }
+        if(this._bizMarker) this._bizMarker.map=null;
+        this._bizMarker = new AME({ map:this.bizMap, position:{lat:+b.lat, lng:+b.lng}, content:this.pinEl(b) });
       }, 90); });
     },
     // Haversine distance (miles) from the user's location; falls back to seed distance.

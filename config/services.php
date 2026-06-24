@@ -35,9 +35,12 @@ return [
         ],
     ],
 
-    // Google Maps / Places. Stored but not yet used — see note in .env.
+    // Google Maps / Places. Used by the app + marketing maps (Maps JavaScript API)
+    // and server-side Places lookups. maps_id powers AdvancedMarkerElement styling;
+    // defaults to Google's DEMO_MAP_ID so maps work without a cloud Map ID configured.
     'google' => [
         'maps_key' => env('GOOGLE_MAPS_API_KEY'),
+        'maps_id' => env('GOOGLE_MAPS_MAP_ID', 'DEMO_MAP_ID'),
     ],
 
     // Web-push VAPID keypair (self-generated, no third-party account needed).

@@ -1,13 +1,10 @@
 @extends('site.layout')
-@section('title', 'locolie - Discover independent shops near you in Newcastle')
-@section('meta_description', 'locolie is the app for discovering independent shops, pubs and makers in Newcastle NE1. Reveal exclusive offers, redeem at the till, and help local businesses own their customers with email, push & SMS marketing.')
+@section('title', 'locolie - back your high street and bag real local discounts')
+@section('meta_description', 'locolie helps you back the indies. Shoppers discover real discounts from independent shops near you in Newcastle NE1. Retailers list free, post offers that drive footfall, and message customers in real time by email, SMS and push.')
 
 @push('head')
 <script>window.FL_CITIES = @json($cityData); window.FL_POINTS = @json($mapPoints);</script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.min.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
+@include('partials.google-maps', ['key' => $mapsKey ?? null])
 @endpush
 
 @section('content')
@@ -16,7 +13,7 @@
 <section class="relative overflow-hidden hero-grid">
     <div class="mesh" aria-hidden="true" data-parallax="0.12"><i class="b1"></i><i class="b2"></i><i class="b3"></i></div>
 
-    <div class="relative z-10 mx-auto grid max-w-6xl items-center gap-12 px-5 pb-20 pt-32 sm:px-6 lg:grid-cols-2 lg:gap-8 lg:pb-28 lg:pt-40">
+    <div class="relative z-10 mx-auto grid max-w-7xl 2xl:max-w-[1500px] items-center gap-12 px-5 pb-20 pt-32 sm:px-6 lg:grid-cols-2 lg:gap-8 lg:pb-28 lg:pt-40">
         <div class="reveal" x-data="geoArea({{ $stats['businesses'] }})" x-init="detect()">
             <span :class="live ? 'text-emerald' : 'text-amber-600'"
                   class="inline-flex items-center gap-2 rounded-full border border-hair bg-white/70 glass px-3.5 py-1.5 text-xs font-semibold shadow-sm">
@@ -24,14 +21,14 @@
                 <span x-text="label">Now live in Newcastle NE1</span>
             </span>
             <h1 class="mt-6 text-4xl font-extrabold leading-[1.02] tracking-tight text-balance sm:text-5xl lg:text-[4.1rem]">
-                Your high street, <span class="gradient-text">reimagined</span>.
+                Back the indies. <span class="gradient-text">Bag the deals</span>.
             </h1>
             <p class="mt-5 max-w-lg text-lg leading-relaxed text-muted">
-                locolie knows your town and surfaces the independents near you - reveal exclusive offers, redeem them with a tap at the till, and help your high street thrive. <span class="font-semibold text-ink">Live in Newcastle now</span>, rolling out to every UK high street next.
+                locolie brings back your high street. Find real discounts from independents near you, tap to reveal the offer and redeem it at the till - and keep the corner cafe, the family butcher and the indie salon thriving. <span class="font-semibold text-ink">Live in Newcastle now</span>, rolling out across the UK next.
             </p>
             <div class="mt-8 flex flex-col gap-3 sm:flex-row">
                 <a href="/app" class="group inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-ink/10 transition hover:bg-emerald hover:shadow-emerald/25">
-                    Launch the app
+                    Find local deals
                     <svg class="h-4 w-4 transition group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
                 </a>
                 <a href="/for-business" class="inline-flex items-center justify-center gap-2 rounded-full border border-hair bg-white/70 glass px-6 py-3.5 text-sm font-semibold text-ink transition hover:border-ink">
@@ -48,9 +45,9 @@
                 @endforeach
             </div>
             <div class="mt-8 flex items-center gap-6 text-sm text-muted">
-                <div><span class="text-xl font-extrabold text-ink" x-text="count">{{ $stats['businesses'] }}</span> <span class="block text-xs">independents <span x-text="'in '+place" class="text-emerald">in Newcastle</span></span></div>
+                <div><span class="text-xl font-extrabold text-ink" x-text="count">{{ $stats['businesses'] }}</span> <span class="block text-xs">indies <span x-text="'in '+place" class="text-emerald">in Newcastle</span></span></div>
                 <span class="h-8 w-px bg-hair"></span>
-                <div><span class="text-xl font-extrabold text-ink" data-count="{{ $stats['offers'] }}">{{ $stats['offers'] }}</span> <span class="block text-xs">live offers</span></div>
+                <div><span class="text-xl font-extrabold text-ink" data-count="{{ $stats['offers'] }}">{{ $stats['offers'] }}</span> <span class="block text-xs">live deals</span></div>
                 <span class="h-8 w-px bg-hair"></span>
                 <div><span class="text-xl font-extrabold text-ink" data-count="{{ $stats['categories'] }}">{{ $stats['categories'] }}</span> <span class="block text-xs">categories</span></div>
             </div>
@@ -64,10 +61,10 @@
             </div>
             {{-- Floating feature chips - the marketing tools businesses get --}}
             @php $heroChips = [
-                ['-left-6 top-10', '-1.5s', '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/>', 'Email campaign', 'sent to 94 regulars'],
-                ['-left-4 bottom-28', '-3s', '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>', 'SMS blast', '“2-for-1 tonight 🍔”'],
+                ['-left-6 top-10', '-1.5s', '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/>', 'Email sent', 'to 94 regulars'],
+                ['-left-4 bottom-28', '-3s', '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>', 'SMS sent', '“2-for-1 tonight 🍔”'],
                 ['-right-6 top-24', '-0.6s', '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>', 'Push sent', 'to shoppers nearby'],
-                ['-right-3 bottom-16', '-2.2s', '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>', '+ Customer captured', 'added to your list'],
+                ['-right-3 bottom-16', '-2.2s', '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>', '+ New customer', 'added to your list'],
             ]; @endphp
             @foreach ($heroChips as $chip)
                 <div class="absolute {{ $chip[0] }} hidden glass-card rounded-2xl px-3.5 py-2.5 lg:block animate-floaty2" style="animation-delay:{{ $chip[1] }}">
@@ -93,16 +90,16 @@
 
 {{-- ============================================================ TWO-SIDED VALUE --}}
 <section class="relative z-10 -mt-6 pb-8 sm:pb-12">
-    <div class="mx-auto max-w-6xl px-5 sm:px-6">
+    <div class="mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
         <div class="grid gap-5 md:grid-cols-2">
             {{-- Shoppers --}}
             <div class="reveal card-hover rounded-card border border-hair bg-white p-7">
                 <div class="flex items-center gap-3">
                     <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-soft text-emerald"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>
-                    <div><div class="text-xs font-semibold uppercase tracking-wider text-emerald">For shoppers</div><h3 class="text-lg font-bold">Find the good stuff nearby</h3></div>
+                    <div><div class="text-xs font-semibold uppercase tracking-wider text-emerald">For shoppers</div><h3 class="text-lg font-bold">Real discounts on your doorstep</h3></div>
                 </div>
-                <p class="mt-3 text-sm leading-relaxed text-muted">Discover independents on a live map, reveal exclusive offer codes, redeem at the till, save favourites and get notified about deals near you.</p>
-                <a href="/app" class="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald hover:text-ink">Launch the app <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <p class="mt-3 text-sm leading-relaxed text-muted">Find independents on a live map, reveal real discount codes, redeem at the till, save your favourites and get a nudge when there's a deal near you.</p>
+                <a href="/app" class="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald hover:text-ink">Find local deals <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
             </div>
             {{-- Businesses --}}
             <div class="reveal card-hover relative overflow-hidden rounded-card bg-ink p-7 text-white" data-d="1">
@@ -110,9 +107,9 @@
                 <div class="relative z-10">
                     <div class="flex items-center gap-3">
                         <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 text-emerald-soft"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9 12 3l9 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 21V12h6v9"/></svg></span>
-                        <div><div class="text-xs font-semibold uppercase tracking-wider text-emerald-soft">For businesses</div><h3 class="text-lg font-bold">Own your customers - and market to them</h3></div>
+                        <div><div class="text-xs font-semibold uppercase tracking-wider text-emerald-soft">For retailers</div><h3 class="text-lg font-bold">Drive footfall, then keep them coming back</h3></div>
                     </div>
-                    <p class="mt-3 text-sm leading-relaxed text-white/70">Every redemption captures a real customer. Build a list you own, then bring them back through the channels the chains use - all from one dashboard.</p>
+                    <p class="mt-3 text-sm leading-relaxed text-white/70">List free and post offers that pull real footfall through your door. Every redemption captures a customer you own, so you can message them in real time by email, SMS and push - all from one dashboard.</p>
                     <div class="mt-4 flex flex-wrap gap-2">
                         @php $chips = [
                             ['Customer data', '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>'],
@@ -127,7 +124,7 @@
                             </span>
                         @endforeach
                     </div>
-                    <a href="/for-business" class="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-soft hover:text-white">See what businesses get <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                    <a href="/for-business" class="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-soft hover:text-white">See what retailers get <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
                 </div>
             </div>
         </div>
@@ -136,8 +133,8 @@
         <div class="reveal mt-5 overflow-hidden rounded-card border border-hair bg-white">
             <div class="flex flex-wrap items-center justify-between gap-3 px-6 pt-5">
                 <div>
-                    <div class="text-xs font-semibold uppercase tracking-wider text-emerald">Our reach</div>
-                    <h3 class="text-lg font-bold">Live in Newcastle, scouting the UK</h3>
+                    <div class="text-xs font-semibold uppercase tracking-wider text-emerald">Where we're at</div>
+                    <h3 class="text-lg font-bold">Live in Newcastle, coming to your town next</h3>
                 </div>
                 <div class="flex items-center gap-4 text-xs font-medium text-muted">
                     <span class="inline-flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-emerald"></span> Live now</span>
@@ -150,33 +147,38 @@
 </section>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener('DOMContentLoaded', async function () {
     var el = document.getElementById('reachmap');
-    if (!el || !window.L) return;
-    var map = L.map(el, { zoomControl: true, attributionControl: false, scrollWheelZoom: false }).setView([54.4, -3.2], 5);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
-    var group = (window.L && L.markerClusterGroup) ? L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 45 }) : L.layerGroup();
-    (window.FL_POINTS || []).forEach(function (p) {
-      group.addLayer(L.circleMarker([p.lat, p.lng], { radius: 5, color: '#fff', weight: 1.5, fillColor: p.live ? '#059669' : '#f59e0b', fillOpacity: 1 }));
+    if (!el || !(window.google && google.maps && google.maps.importLibrary)) return;
+    const { Map } = await google.maps.importLibrary('maps');
+    const { AdvancedMarkerElement } = await google.maps.importLibrary('marker');
+    const map = new Map(el, {
+      center: { lat: 54.4, lng: -3.2 }, zoom: 5,
+      mapId: @json($mapsId ?? 'DEMO_MAP_ID'),
+      disableDefaultUI: true, zoomControl: true, gestureHandling: 'cooperative', clickableIcons: false,
     });
-    map.addLayer(group);
-    setTimeout(function () { map.invalidateSize(); }, 300);
+    const markers = (window.FL_POINTS || []).map(function (p) {
+      const dot = document.createElement('div');
+      dot.style.cssText = 'width:11px;height:11px;border-radius:50%;border:1.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.35);background:' + (p.live ? '#059669' : '#f59e0b');
+      return new AdvancedMarkerElement({ position: { lat: p.lat, lng: p.lng }, content: dot });
+    });
+    new markerClusterer.MarkerClusterer({ map: map, markers: markers });
   });
 </script>
 
 {{-- ============================================================ PROBLEM / WHY --}}
 <section class="relative border-y border-hair bg-[#fafafa] py-20 sm:py-28">
-    <div class="mx-auto max-w-6xl px-5 sm:px-6">
+    <div class="mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
         <div class="mx-auto max-w-3xl text-center reveal">
             <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald">The problem</h2>
-            <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-balance">Independents are brilliant. Getting noticed isn’t.</p>
-            <p class="mt-4 text-lg text-muted">The chains have apps, loyalty cards and ad budgets. The independent down the road - better coffee, fairer prices, more character - has a chalkboard and hope. locolie levels the playing field.</p>
+            <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-balance">Indies are brilliant. Getting noticed isn't.</p>
+            <p class="mt-4 text-lg text-muted">The chains and online giants have apps, loyalty cards and ad budgets. The indie down the road - better coffee, fairer prices, bags more character - has a chalkboard and a lot of hope. locolie evens things up.</p>
         </div>
         <div class="mt-14 grid gap-6 md:grid-cols-3">
             @php
                 $probs = [
-                    ['stat' => '1 in 7', 'label' => 'high-street shops sit empty', 'body' => 'Footfall drifts to chains and out-of-town retail. Independents lose the discovery game before they start.'],
-                    ['stat' => '£0', 'label' => 'marketing budget, typically', 'body' => 'Most independents can’t afford ads or an app - so loyal locals never even hear about their offers.'],
+                    ['stat' => '1 in 7', 'label' => 'high-street shops sit empty', 'body' => 'Footfall drifts to the chains and out-of-town retail. Indies lose the discovery game before they start.'],
+                    ['stat' => '£0', 'label' => 'marketing budget, typically', 'body' => 'Most indies can\'t stretch to ads or an app, so loyal locals never even hear about their offers.'],
                     ['stat' => '0%', 'label' => 'of their customers, owned', 'body' => 'They serve hundreds a week but capture none of them - no way to bring a single one back.'],
                 ];
             @endphp
@@ -193,26 +195,26 @@
 
 {{-- ============================================================ USP GRID --}}
 <section id="how" class="py-20 sm:py-28">
-    <div class="mx-auto max-w-6xl px-5 sm:px-6">
+    <div class="mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
         <div class="mx-auto max-w-2xl text-center reveal">
             <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald">Why locolie</h2>
-            <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-balance">One app. The whole independent high street.</p>
-            <p class="mt-4 text-muted">Built for the way people actually discover and the way small shops actually run.</p>
+            <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-balance">One app. Your whole independent high street.</p>
+            <p class="mt-4 text-muted">Built for the way people really discover, and the way small shops really run.</p>
         </div>
         <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             @php
                 $usps = [
-                    ['t' => 'Live local map', 'b' => 'A clean map of every independent near you - names, categories and offers on the pin. No chains cluttering it up.',
+                    ['t' => 'Live local map', 'b' => 'A clean map of every indie near you - names, categories and offers on the pin. No chains cluttering it up.',
                      'i' => '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/>'],
-                    ['t' => 'Real, redeemable offers', 'b' => 'Tap to reveal a one-time code, scan at the till. Every redemption is tracked - proof an offer actually drove footfall.',
+                    ['t' => 'Real, redeemable discounts', 'b' => 'Tap to reveal a one-time code, scan at the till. Every redemption is tracked - proof a deal really drove footfall.',
                      'i' => '<path d="M20.59 13.41 13.42 20.6a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82Z"/><line x1="7" y1="7" x2="7.01" y2="7"/>'],
-                    ['t' => 'Own your customers', 'b' => 'Every redemption captures a real customer the business can market to again - the loyalty data chains have, finally for independents.',
+                    ['t' => 'Customers you own', 'b' => 'Every redemption captures a real customer you can market to again - the loyalty data the chains have, finally for indies.',
                      'i' => '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>'],
-                    ['t' => 'Smart, instant search', 'b' => 'Filter by distance, category, rating, open-now and offer type. Find exactly what’s near you, right now.',
+                    ['t' => 'Smart, instant search', 'b' => 'Filter by distance, category, rating, open-now and offer type. Find exactly what\'s near you, right now.',
                      'i' => '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>'],
-                    ['t' => 'Push & email that work', 'b' => 'Nearby shoppers get notified of fresh offers; businesses bring regulars back. Reach without renting it from Big Tech.',
+                    ['t' => 'Email, SMS and push that land', 'b' => 'Nearby shoppers get pinged about fresh offers; retailers bring regulars back in real time. Reach you don\'t rent from Big Tech.',
                      'i' => '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>'],
-                    ['t' => 'Free to start, fair to scale', 'b' => 'Businesses list free forever. Upgrade only for more reach - no contracts, cancel anytime.',
+                    ['t' => 'Free to start, fair to grow', 'b' => 'Retailers list free, forever. Upgrade only for more reach - no contracts, cancel anytime.',
                      'i' => '<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>'],
                 ];
             @endphp
@@ -231,10 +233,10 @@
 
 {{-- ============================================================ FIND SOMETHING FOR... (outcome-first) --}}
 <section class="border-t border-hair py-16 sm:py-20">
-    <div class="mx-auto max-w-6xl px-5 sm:px-6">
+    <div class="mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
         <div class="reveal">
             <h2 class="text-2xl font-extrabold tracking-tight sm:text-3xl">Find something for...</h2>
-            <p class="mt-2 text-muted">Tell us the occasion, we'll point you at the right independents.</p>
+            <p class="mt-2 text-muted">Tell us the occasion and we'll point you at the right indies.</p>
         </div>
         <div class="mt-8 flex flex-wrap gap-3 reveal">
             @php $occasions = [
@@ -257,10 +259,10 @@
 
 {{-- ============================================================ BROWSE BY CATEGORY --}}
 <section id="categories" class="border-t border-hair py-20 sm:py-28">
-    <div class="mx-auto max-w-6xl px-5 sm:px-6">
+    <div class="mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
         <div class="mx-auto max-w-2xl text-center reveal">
             <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald">Explore</h2>
-            <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Every kind of independent.</p>
+            <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Every kind of indie.</p>
             <p class="mt-4 text-muted">From your morning coffee to your MOT - browse the categories we cover in Newcastle NE1.</p>
         </div>
         <div class="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
@@ -282,11 +284,11 @@
 {{-- ============================================================ FEATURED INDEPENDENTS (real data) --}}
 @if ($featured->count())
 <section class="border-t border-hair bg-[#fafafa] py-20 sm:py-28">
-    <div class="mx-auto max-w-6xl px-5 sm:px-6">
+    <div class="mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
         <div class="mx-auto max-w-2xl text-center reveal">
             <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald">On locolie now</h2>
-            <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Real independents, real offers.</p>
-            <p class="mt-4 text-muted">A few of the {{ number_format($stats['businesses']) }} Newcastle businesses already live in the app.</p>
+            <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Real indies, real discounts.</p>
+            <p class="mt-4 text-muted">A few of the {{ number_format($stats['businesses']) }} Newcastle indies already live in the app.</p>
         </div>
         <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             @foreach ($featured as $i => $b)
@@ -322,11 +324,11 @@
 {{-- ============================================================ LIVE DEMO --}}
 <section id="demo" class="relative overflow-hidden border-y border-hair bg-ink py-20 text-white sm:py-28">
     <div class="mesh" aria-hidden="true" style="opacity:.18" data-parallax="0.08"><i class="b1"></i><i class="b2"></i><i class="b3"></i></div>
-    <div class="relative z-10 mx-auto max-w-6xl px-5 sm:px-6">
+    <div class="relative z-10 mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
         <div class="mx-auto max-w-2xl text-center reveal">
             <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald-soft">See it live</h2>
-            <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">A real, fast, responsive app.</p>
-            <p class="mt-4 text-white/60">{{ number_format($stats['businesses']) }} real Newcastle businesses, live right now. Open it full-screen and it works beautifully on any device.</p>
+            <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">A real, fast, properly handy app.</p>
+            <p class="mt-4 text-white/60">{{ number_format($stats['businesses']) }} real Newcastle indies, live right now. Open it full-screen and it works a treat on any device.</p>
         </div>
 
         <div class="mt-12 grid items-center gap-10 reveal lg:grid-cols-2">
@@ -336,7 +338,7 @@
             <div>
                 <ul class="space-y-4">
                     @php $live = [
-                        ['Live map &amp; feed', 'Every independent near you - names, categories and offers on the pin.'],
+                        ['Live map &amp; feed', 'Every indie near you - names, categories and offers on the pin.'],
                         ['One-tap redemptions', 'Reveal a code, scan at the till, saving applied instantly.'],
                         ['Fast &amp; lightweight', 'Optimised images and lazy loading - it flies, even on mobile data.'],
                     ]; @endphp
@@ -364,19 +366,19 @@
 
 {{-- ============================================================ OWN YOUR CUSTOMERS --}}
 <section id="data" class="py-20 sm:py-28">
-    <div class="mx-auto max-w-6xl px-5 sm:px-6">
+    <div class="mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
         <div class="grid items-center gap-12 lg:grid-cols-2">
             <div class="reveal">
-                <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald">The unfair advantage</h2>
-                <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-balance">The customer data the chains have - <span class="gradient-text">finally for independents</span>.</p>
+                <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald">The secret weapon</h2>
+                <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-balance">The customer data the chains have - <span class="gradient-text">finally for the indies</span>.</p>
                 <p class="mt-5 text-lg leading-relaxed text-muted">
-                    Every time a shopper redeems your offer, locolie captures them as <span class="font-semibold text-ink">your customer</span> - name, email, how often they visit. It’s the first-party data the chains built loyalty empires on, that independents have <span class="font-semibold text-ink">never been able to get</span>.
+                    Every time a shopper redeems your offer, locolie captures them as <span class="font-semibold text-ink">your customer</span> - name, email, how often they pop in. It's the first-party data the chains built loyalty empires on, that indies have <span class="font-semibold text-ink">never been able to get</span>. Now you can reach them in real time by email, SMS and push.
                 </p>
                 <div class="mt-8 space-y-4">
                     @php $perks = [
                         ['Capture every customer', 'No clipboards - each redemption builds your list automatically.'],
-                        ['Market to them directly', 'Send email & push offers to opted-in regulars in a couple of taps.'],
-                        ['Own the relationship', 'Export your list anytime. It’s yours - no middleman owning your customers.'],
+                        ['Message them in real time', 'Fire off email, SMS and push offers to opted-in regulars in a couple of taps.'],
+                        ['Own the relationship', 'Export your list anytime. It\'s yours - no middleman owning your customers.'],
                     ]; @endphp
                     @foreach ($perks as $p)
                         <div class="flex gap-3">
@@ -385,7 +387,7 @@
                         </div>
                     @endforeach
                 </div>
-                <a href="/for-business" class="mt-8 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald hover:text-ink">See how it works for business <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="/for-business" class="mt-8 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald hover:text-ink">See how it works for retailers <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
             </div>
 
             <div class="relative reveal" data-d="2">
@@ -411,23 +413,23 @@
 
 {{-- ============================================================ CASE STUDIES --}}
 <section id="stories" class="py-20 sm:py-28">
-    <div class="mx-auto max-w-6xl px-5 sm:px-6">
+    <div class="mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
         <div class="mx-auto max-w-2xl text-center reveal">
             <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald">Case studies</h2>
-            <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Independents, winning.</p>
-            <p class="mt-4 text-muted">How real NE1 businesses use locolie to pull in footfall and keep customers coming back.</p>
+            <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Indies, winning.</p>
+            <p class="mt-4 text-muted">How real NE1 indies use locolie to pull in footfall and keep customers coming back.</p>
         </div>
         <div class="mt-14 grid gap-6 lg:grid-cols-3">
             @php
                 $stories = [
                     ['cat' => 'Food & Drink', 'icon' => 'food-drink', 'name' => 'A Quayside café',
-                     'quote' => 'A “20% off before noon” offer filled our quietest hours. We captured 140 regulars in a month - now we just text them when the cakes come out.',
+                     'quote' => 'A “20% off before noon” offer filled our quietest hours. We captured 140 regulars in a month - now we just text them when the cakes come out of the oven.',
                      'stat' => '+38%', 'statlabel' => 'weekday morning covers'],
                     ['cat' => 'Hairdressers', 'icon' => 'hairdressers', 'name' => 'A Grainger St barber',
                      'quote' => 'New-client cuts via the app, then automated win-back texts at the 5-week mark. Our chairs are full and the rebookings run themselves.',
                      'stat' => '210', 'statlabel' => 'customers on their list'],
                     ['cat' => 'Fitness', 'icon' => 'fitness', 'name' => 'An independent gym',
-                     'quote' => 'Free class taster on locolie, push notification to anyone within a mile. We converted taster sign-ups into members for the price of zero ad spend.',
+                     'quote' => 'Free class taster on locolie, push notification to anyone within a mile. We turned taster sign-ups into members for the price of zero ad spend.',
                      'stat' => '£0', 'statlabel' => 'spent on ads'],
                 ];
             @endphp
@@ -445,7 +447,7 @@
                 </figure>
             @endforeach
         </div>
-        <p class="mt-6 text-center text-xs text-muted">Illustrative results from early locolie pilots in Newcastle NE1.</p>
+        <p class="mt-6 text-center text-xs text-muted">Illustrative results from early locolie pilots with indies in Newcastle NE1.</p>
     </div>
 </section>
 
@@ -454,17 +456,17 @@
     <div class="mx-auto max-w-4xl px-5 sm:px-6">
         <div class="mx-auto max-w-2xl text-center reveal">
             <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald">The difference</h2>
-            <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-balance">Everything the chains have - without becoming one.</p>
+            <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-balance">Everything the chains have, without becoming one.</p>
         </div>
         <div class="mt-12 overflow-hidden rounded-card border border-hair bg-white reveal">
             @php
                 $compare = [
                     ['Get discovered by nearby shoppers', true, false],
                     ['Run trackable offers & redemptions', true, false],
-                    ['Own & market to your customer list', true, false],
-                    ['Push notifications to locals', true, false],
+                    ['Own your customer list', true, false],
+                    ['Message customers by email, SMS & push', true, false],
                     ['No ad agency or app to build', true, false],
-                    ['Keeps money in the local economy', true, false],
+                    ['Keeps money on the high street', true, false],
                 ];
             @endphp
             <div class="grid grid-cols-[1fr_auto_auto] items-center gap-x-4 sm:gap-x-8">
@@ -487,16 +489,16 @@
 
 {{-- ============================================================ HOW IT WORKS (shoppers) --}}
 <section class="py-20 sm:py-28">
-    <div class="mx-auto max-w-6xl px-5 sm:px-6">
+    <div class="mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
         <div class="mx-auto max-w-2xl text-center reveal">
             <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald">For shoppers</h2>
-            <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Three taps to a local deal.</p>
+            <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Three taps to a real local discount.</p>
         </div>
         <div class="mt-14 grid gap-6 md:grid-cols-3">
             @php $steps = [
-                ['n'=>'01','t'=>'Discover','b'=>'Browse a live map and feed of independents near you - by category, distance and offer.','i'=>'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/>'],
-                ['n'=>'02','t'=>'Reveal the code','b'=>'Tap an offer to reveal its one-time code. Exclusive deals from the shops, not the chains.','i'=>'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'],
-                ['n'=>'03','t'=>'Redeem at the till','b'=>'Show your code, the business scans the QR, the saving applies instantly. Done.','i'=>'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 21v.01M17 21h.01M21 17h.01"/>'],
+                ['n'=>'01','t'=>'Discover','b'=>'Browse a live map and feed of indies near you - by category, distance and offer.','i'=>'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/>'],
+                ['n'=>'02','t'=>'Reveal the code','b'=>'Tap an offer to reveal its one-time code. Real discounts from the indies, not the chains.','i'=>'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'],
+                ['n'=>'03','t'=>'Redeem at the till','b'=>'Show your code, the shop scans the QR, the saving applies instantly. Done.','i'=>'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 21v.01M17 21h.01M21 17h.01"/>'],
             ]; @endphp
             @foreach ($steps as $i => $s)
                 <div class="reveal card-hover relative rounded-card border border-hair bg-white p-7" data-d="{{ $i+1 }}">
@@ -513,9 +515,9 @@
 {{-- ============================================================ STATS BAND --}}
 <section class="relative overflow-hidden bg-ink py-16 text-white">
     <div class="mesh" aria-hidden="true" style="opacity:.16"><i class="b1"></i><i class="b2"></i></div>
-    <div class="relative z-10 mx-auto max-w-6xl px-5 sm:px-6">
+    <div class="relative z-10 mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
         <div class="grid gap-8 text-center sm:grid-cols-3">
-            <div class="reveal"><div class="text-5xl font-extrabold tracking-tight"><span data-count="{{ $stats['businesses'] }}">{{ $stats['businesses'] }}</span></div><div class="mt-2 text-sm font-medium text-white/60">Independent businesses</div></div>
+            <div class="reveal"><div class="text-5xl font-extrabold tracking-tight"><span data-count="{{ $stats['businesses'] }}">{{ $stats['businesses'] }}</span></div><div class="mt-2 text-sm font-medium text-white/60">Independent shops</div></div>
             <div class="reveal" data-d="1"><div class="text-5xl font-extrabold tracking-tight"><span data-count="{{ $stats['categories'] }}">{{ $stats['categories'] }}</span></div><div class="mt-2 text-sm font-medium text-white/60">Categories</div></div>
             <div class="reveal" data-d="2"><div class="text-5xl font-extrabold tracking-tight gradient-text">NE1</div><div class="mt-2 text-sm font-medium text-white/60">Newcastle city centre</div></div>
         </div>
@@ -524,32 +526,32 @@
 
 {{-- ============================================================ PRICING --}}
 <section id="pricing" class="py-20 sm:py-28">
-    <div class="mx-auto max-w-6xl px-5 sm:px-6">
+    <div class="mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
         <div class="mx-auto max-w-2xl text-center reveal">
-            <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald">For business</h2>
+            <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald">For retailers</h2>
             <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Get found by locals. Start free.</p>
-            <p class="mt-4 text-muted">Claim your free listing in minutes, upgrade only when you want more reach. No contracts.</p>
+            <p class="mt-4 text-muted">Claim your free listing in minutes and upgrade only when you want more reach. No contracts.</p>
         </div>
         <div class="reveal">@include('site._pricing')</div>
         <div class="mt-10 text-center reveal">
-            <a href="/for-business" class="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald hover:text-ink">See everything businesses get <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            <a href="/for-business" class="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald hover:text-ink">See everything retailers get <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
         </div>
     </div>
 </section>
 
 {{-- ============================================================ FOUNDERS --}}
 <section id="founders" class="border-y border-hair bg-[#fafafa] py-20 sm:py-28">
-    <div class="mx-auto max-w-6xl px-5 sm:px-6">
+    <div class="mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
         <div class="mx-auto max-w-2xl text-center reveal">
             <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald">The team</h2>
             <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Three founders who love their high street.</p>
-            <p class="mt-4 text-muted">Equal partners, one mission: keep independent businesses thriving.</p>
+            <p class="mt-4 text-muted">Equal partners, one mission: bring back the indies and keep them thriving.</p>
         </div>
         <div class="mx-auto mt-14 grid max-w-4xl gap-6 sm:grid-cols-3">
             @php $founders = [
                 ['name'=>'Tom','initials'=>'T','role'=>'Co-founder','line'=>'Product & engineering - building the app shoppers actually want to open.'],
                 ['name'=>'Joe','initials'=>'J','role'=>'Co-founder','line'=>'Growth & business - getting locolie into every NE1 shop window.'],
-                ['name'=>'Roddy','initials'=>'R','role'=>'Co-founder','line'=>'Operations & partnerships - keeping local businesses on side and onboarded.'],
+                ['name'=>'Roddy','initials'=>'R','role'=>'Co-founder','line'=>'Operations & partnerships - keeping local indies on side and onboarded.'],
             ]; @endphp
             @foreach ($founders as $i => $f)
                 <div class="reveal card-hover rounded-card border border-hair bg-white p-7 text-center" data-d="{{ $i+1 }}">
@@ -565,13 +567,13 @@
 
 {{-- ============================================================ APP DOWNLOAD --}}
 <section id="download" class="py-20 sm:py-28">
-    <div class="mx-auto max-w-6xl px-5 sm:px-6">
+    <div class="mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
         <div class="relative overflow-hidden rounded-[2rem] bg-ink px-8 py-14 text-white sm:px-14 lg:py-20">
             <div class="mesh" aria-hidden="true" style="opacity:.2"><i class="b1"></i><i class="b2"></i></div>
             <div class="relative z-10 grid items-center gap-10 lg:grid-cols-2">
                 <div class="reveal">
                     <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Your high street, in your pocket.</h2>
-                    <p class="mt-4 max-w-md text-white/70">Coming soon to the App Store and Google Play. Try the full experience in your browser right now.</p>
+                    <p class="mt-4 max-w-md text-white/70">Coming soon to the App Store and Google Play. Have a proper go in your browser right now.</p>
                     <div class="mt-8 flex flex-wrap items-center gap-3">
                         <a href="#" class="inline-flex items-center gap-3 rounded-xl border border-white/15 bg-white/5 px-5 py-3 transition hover:bg-white/10" aria-label="Download on the App Store (coming soon)">
                             <svg class="h-7 w-7" viewBox="0 0 24 24" fill="white"><path d="M17.05 12.04c-.02-2.06 1.68-3.06 1.76-3.1-.96-1.4-2.46-1.6-2.99-1.62-1.27-.13-2.49.75-3.13.75-.65 0-1.65-.73-2.71-.71-1.39.02-2.68.81-3.4 2.06-1.45 2.52-.37 6.25 1.04 8.29.69 1 1.51 2.12 2.58 2.08 1.04-.04 1.43-.67 2.69-.67 1.25 0 1.6.67 2.7.65 1.11-.02 1.82-1.02 2.5-2.02.79-1.16 1.11-2.28 1.13-2.34-.02-.01-2.17-.83-2.19-3.3zM15 6.2c.57-.69.96-1.65.85-2.6-.82.03-1.82.55-2.41 1.24-.53.61-.99 1.58-.87 2.51.92.07 1.86-.47 2.43-1.15z"/></svg>
@@ -595,10 +597,10 @@
 {{-- ============================================================ FINAL CTA --}}
 <section class="border-t border-hair py-20 text-center sm:py-28">
     <div class="mx-auto max-w-2xl px-5 sm:px-6 reveal">
-        <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl text-balance">Ready to shop local - or get listed?</h2>
-        <p class="mt-4 text-muted">Join the shoppers and businesses reviving Newcastle’s independent high street.</p>
+        <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl text-balance">Ready to back the indies?</h2>
+        <p class="mt-4 text-muted">Join the shoppers and retailers bringing Newcastle's independent high street back to life.</p>
         <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <a href="/app" class="inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-emerald">Launch the app</a>
+            <a href="/app" class="inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-emerald">Find local deals</a>
             <a href="/for-business" class="inline-flex items-center justify-center rounded-full border border-hair bg-white px-6 py-3.5 text-sm font-semibold text-ink transition hover:border-ink">List your business - free</a>
         </div>
     </div>

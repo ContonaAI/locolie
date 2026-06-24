@@ -3,25 +3,25 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'locolie') - Discover the independents on your high street</title>
-    <meta name="description" content="@yield('meta_description', 'locolie helps shoppers discover, reveal and redeem offers from independent local businesses in Newcastle NE1. Free listings for businesses, priority placement from £19/mo.')">
+    <title>@yield('title', 'locolie') - Back your high street. Discover the indies near you</title>
+    <meta name="description" content="@yield('meta_description', 'locolie helps you discover real discounts from independent shops near you - and helps the indies fight back against the chains. Free listings for businesses, priority placement from £19/mo. Launching in Newcastle NE1.')">
     <link rel="canonical" href="{{ url()->current() }}">
     <meta name="theme-color" content="#0a0a0a">
     <meta property="og:site_name" content="locolie">
     <meta property="og:title" content="@yield('title', 'locolie')">
-    <meta property="og:description" content="Discover the independents on your high street. Launching in Newcastle NE1.">
+    <meta property="og:description" content="Back your high street. Discover real discounts from the independents near you. Launching in Newcastle NE1.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="@yield('title', 'locolie')">
-    <meta name="twitter:description" content="Discover the independents on your high street.">
+    <meta name="twitter:description" content="Back your high street. Discover real discounts from the independents near you.">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <script type="application/ld+json">
     {
       "@@context": "https://schema.org",
       "@@type": "Organization",
       "name": "locolie",
-      "description": "Discover, reveal and redeem offers from independent local businesses in Newcastle NE1.",
+      "description": "Discover real discounts from independent local businesses near you, and help bring back the indies. Launching in Newcastle NE1.",
       "url": "{{ url('/') }}",
       "areaServed": "Newcastle upon Tyne, NE1",
       "founders": [{"@@type":"Person","name":"Tom"},{"@@type":"Person","name":"Joe"},{"@@type":"Person","name":"Roddy"}]
@@ -173,7 +173,7 @@
     class="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-5 sm:pt-4">
     <nav aria-label="Primary"
         :class="scrolled ? 'bg-white/85 shadow-xl shadow-black/[0.07]' : 'bg-white/55 shadow-lg shadow-black/[0.04]'"
-        class="glass mx-auto flex max-w-6xl items-center justify-between gap-2 rounded-full border border-white/60 px-2.5 py-2 transition-all duration-300 sm:px-3">
+        class="glass mx-auto flex max-w-7xl 2xl:max-w-[1500px] items-center justify-between gap-2 rounded-full border border-white/60 px-2.5 py-2 transition-all duration-300 sm:px-3">
         <a href="/" class="pl-2 text-lg sm:text-xl">{!! $wordmark !!}</a>
 
         {{-- Center links --}}
@@ -222,7 +222,7 @@
                 <div x-show="o" x-cloak x-transition class="absolute right-0 top-full pt-2">
                     <div class="w-[340px] rounded-2xl border border-white/60 bg-white/95 glass p-4 shadow-2xl">
                         {{-- Location --}}
-                        <div class="mb-1 text-[11px] font-bold uppercase tracking-wider text-muted">Choose your area</div>
+                        <div class="mb-1 text-[11px] font-bold uppercase tracking-wider text-muted">Back your high street</div>
                         @foreach ($regions as $country => $places)
                             <div class="mb-2">
                                 <div class="px-1 py-1 text-xs font-semibold text-ink/50">{{ $country }}</div>
@@ -249,7 +249,7 @@
                                         class="rounded-lg px-2 py-1.5 text-left text-xs">{{ $label }}</button>
                                 @endforeach
                             </div>
-                            <p class="mt-2 text-[10px] text-muted">More languages rolling out as we expand.</p>
+                            <p class="mt-2 text-[10px] text-muted">More languages as we back more high streets.</p>
                         </div>
                     </div>
                 </div>
@@ -330,14 +330,14 @@
 
 {{-- ===================== FOOTER ===================== --}}
 <footer class="border-t border-hair bg-[#f5f5f5]">
-    <div class="mx-auto max-w-6xl px-5 py-14 sm:px-6">
+    <div class="mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 py-14 sm:px-6">
         <div class="grid gap-10 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
             <div>
                 <a href="/" class="text-xl">{!! $wordmark !!}</a>
-                <p class="mt-3 max-w-xs text-sm leading-relaxed text-muted">Discover, reveal and redeem offers from the independent shops, pubs and makers on your high street.</p>
+                <p class="mt-3 max-w-xs text-sm leading-relaxed text-muted">Bringing back the indies. Discover real discounts from the independent shops, pubs and makers on your high street.</p>
                 <p class="mt-4 inline-flex items-center gap-2 rounded-full bg-emerald-soft px-3 py-1.5 text-xs font-semibold text-emerald">
                     <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C7.58 2 4 5.58 4 10c0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 12 12.5 2.5 2.5 0 0 0 12 7.5Z"/></svg>
-                    Newcastle NE1 · independents only
+                    Newcastle NE1 · indies only, always
                 </p>
             </div>
             <div>
@@ -366,7 +366,7 @@
         </div>
         <div class="mt-12 flex flex-col items-center justify-between gap-3 border-t border-hair pt-6 text-xs text-muted sm:flex-row">
             <p>© locolie 2026. All rights reserved.</p>
-            <p>Built for independent UK local businesses.</p>
+            <p>Proudly built to back the UK's independents.</p>
         </div>
     </div>
 </footer>
@@ -376,7 +376,7 @@
   // recognise the town/postcode they're in. Falls back gracefully if denied.
   function geoArea(initialCount){
     return {
-      label: 'Now live in Newcastle NE1',
+      label: 'Now backing the indies in Newcastle NE1',
       place: 'Newcastle',
       count: initialCount,
       live: true,
@@ -404,13 +404,13 @@
               this.count = cities[key].count;
               this.live = cities[key].live;
               this.label = cities[key].live
-                ? `We see you're in ${outward || key} - we're live here`
-                : `We see you're in ${key} - ${cities[key].count} independents scouted, launching soon`;
+                ? `Looks like you're in ${outward || key} - we're live and backing the indies here`
+                : `Looks like you're in ${key} - ${cities[key].count} independents scouted, launching soon`;
             } else {
               this.live = liveHere;
               this.label = liveHere
-                ? `We see you're in ${outward || town} - we're live here`
-                : `We see you're in ${town || outward} - coming soon to your high street`;
+                ? `Looks like you're in ${outward || town} - we're live and backing the indies here`
+                : `Looks like you're in ${town || outward} - coming soon to back your high street`;
             }
           } catch (e) { /* keep default */ }
         }, () => {}, { timeout: 8000, maximumAge: 600000 });

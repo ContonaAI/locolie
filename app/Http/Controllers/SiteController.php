@@ -11,6 +11,8 @@ class SiteController extends Controller
     public function home()
     {
         return view('site.home', [
+            'mapsKey' => config('services.google.maps_key'),
+            'mapsId' => config('services.google.maps_id'),
             'stats' => [
                 'businesses' => Business::live()->count(),
                 'categories' => Category::supportsHierarchy() ? Category::leaves()->count() : Category::count(),

@@ -7,7 +7,7 @@
 {{-- Hero --}}
 <section class="relative overflow-hidden hero-grid">
     <div class="mesh" aria-hidden="true" data-parallax="0.1"><i class="b1"></i><i class="b2"></i></div>
-    <div class="relative z-10 mx-auto max-w-6xl px-5 pb-10 pt-32 sm:px-6 lg:pt-40">
+    <div class="relative z-10 mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 pb-10 pt-32 sm:px-6 lg:pt-40">
         <nav class="mb-5 flex items-center gap-2 text-sm text-muted" aria-label="Breadcrumb">
             <a href="/" class="hover:text-ink">Home</a><span>/</span>
             <a href="/#categories" class="hover:text-ink">Categories</a><span>/</span>
@@ -22,12 +22,13 @@
                 <p class="mt-1 text-muted">{{ $businesses->count() }} independent {{ \Illuminate\Support\Str::plural('business', $businesses->count()) }} in Newcastle NE1</p>
             </div>
         </div>
+        <p class="mt-6 max-w-2xl text-base leading-relaxed text-muted">Skip the chains and back your high street. These are real, independent {{ strtolower($category->name) }} near you - with live offers you redeem at the till on locolie.</p>
     </div>
 </section>
 
 {{-- Businesses --}}
 <section class="pb-24">
-    <div class="mx-auto max-w-6xl px-5 sm:px-6">
+    <div class="mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
         @if ($businesses->count())
             <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($businesses as $b)
@@ -52,14 +53,14 @@
             </div>
         @else
             <div class="rounded-card border border-hair bg-white py-16 text-center">
-                <p class="text-muted">No live {{ strtolower($category->name) }} yet - check back soon.</p>
-                <a href="/for-business" class="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald hover:text-ink">Run a {{ strtolower($category->name) }} business? List it free →</a>
+                <p class="text-muted">No independent {{ strtolower($category->name) }} on locolie just yet. We are adding new local spots every week, so pop back soon.</p>
+                <a href="/for-business" class="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald hover:text-ink">Run an independent {{ strtolower($category->name) }} business? Be the first to list it, free →</a>
             </div>
         @endif
 
         {{-- Other categories --}}
         <div class="mt-16">
-            <h2 class="mb-4 text-sm font-semibold uppercase tracking-wider text-muted">Other categories</h2>
+            <h2 class="mb-4 text-sm font-semibold uppercase tracking-wider text-muted">Back more indies</h2>
             <div class="flex flex-wrap gap-2">
                 @foreach ($categories->where('slug', '!=', $category->slug) as $c)
                     <a href="/category/{{ $c->slug }}" class="inline-flex items-center gap-1.5 rounded-full border border-hair bg-white px-4 py-2 text-sm font-medium text-ink transition hover:border-emerald hover:text-emerald">

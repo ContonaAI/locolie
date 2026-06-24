@@ -94,9 +94,9 @@
 
             <div class="mt-3 overflow-hidden rounded-2xl bg-gradient-to-r from-[#2563eb] to-[#1e40af] p-3 text-white">
                 <div class="text-[8px] font-bold uppercase tracking-wider text-white/60">Sponsored</div>
-                <div class="text-[12px] font-extrabold">Grow your local business</div>
-                <div class="mt-0.5 text-[9px] text-white/70">Reach thousands of shoppers nearby.</div>
-                <div class="mt-2 inline-block rounded-md bg-white px-2.5 py-1 text-[9px] font-bold text-ink">Learn more</div>
+                <div class="text-[12px] font-extrabold">Back your high street</div>
+                <div class="mt-0.5 text-[9px] text-white/70">List free and bring shoppers through your door.</div>
+                <div class="mt-2 inline-block rounded-md bg-white px-2.5 py-1 text-[9px] font-bold text-ink">List free</div>
             </div>
         </div>
 
