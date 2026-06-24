@@ -1,0 +1,3398 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>locolie - Brand &amp; App Exploration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0F2D38;
+    --ink-2: #1E4654;
+    --ink-3: #3E5C68;
+    --accent: #D9603B;
+    --accent-dark: #B14920;
+    --accent-soft: #FDEBE0;
+    --star: #FFA41C;
+    --sage: #6FA286;
+    --sage-soft: #E3EBE3;
+    --bg: #FFFFFF;
+    --bg-2: #F7F8FA;
+    --bg-3: #EEF0F4;
+    --line: #E4E6EB;
+    --line-2: #F0F2F5;
+    --text: #131A22;
+    --text-2: #4A5560;
+    --muted: #6B7480;
+    --muted-2: #8A93A0;
+    --shadow-xs: 0 1px 2px rgba(15,26,34,.05);
+    --shadow-sm: 0 1px 3px rgba(15,26,34,.06), 0 2px 8px rgba(15,26,34,.04);
+    --shadow-md: 0 2px 6px rgba(15,26,34,.06), 0 12px 28px rgba(15,26,34,.08);
+    --shadow-lg: 0 4px 12px rgba(15,26,34,.06), 0 28px 56px rgba(15,26,34,.12);
+  }
+  * { box-sizing: border-box; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 56px 48px 80px;
+    letter-spacing: -0.005em;
+  }
+  .wrap { max-width: 1400px; margin: 0 auto; }
+
+  /* SVG icon defaults */
+  svg.ic { width: 16px; height: 16px; stroke: currentColor; stroke-width: 1.75; fill: none; stroke-linecap: round; stroke-linejoin: round; display: inline-block; vertical-align: middle; flex-shrink: 0; }
+  svg.ic-sm { width: 12px; height: 12px; }
+  svg.ic-lg { width: 20px; height: 20px; }
+  svg.ic-xl { width: 24px; height: 24px; }
+  svg.ic-filled { fill: currentColor; stroke: none; }
+
+  /* ============ MASTHEAD ============ */
+  .masthead {
+    border-top: 2px solid var(--text);
+    padding-top: 18px;
+    margin-bottom: 56px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .mast-brand {
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: -0.03em;
+    color: var(--text);
+  }
+  .mast-brand .pin-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    margin: 0 1px 0 2px;
+  }
+  .mast-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    text-align: right;
+    line-height: 1.9;
+  }
+  .mast-meta strong { color: var(--text); font-weight: 600; }
+
+  /* ============ HERO ============ */
+  .hero { margin-bottom: 80px; max-width: 920px; }
+  .hero-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    margin-bottom: 22px;
+    font-weight: 500;
+  }
+  .hero h1 {
+    font-weight: 800;
+    font-size: clamp(40px, 7vw, 76px);
+    line-height: 1;
+    letter-spacing: -0.035em;
+    color: var(--text);
+    margin: 0 0 24px;
+  }
+  .hero h1 .accent { color: var(--accent); }
+  .hero-sub {
+    font-size: clamp(15px, 1.4vw, 18px);
+    line-height: 1.55;
+    color: var(--text-2);
+    max-width: 720px;
+    font-weight: 400;
+  }
+
+  /* ============ SECTION HEADS ============ */
+  .section { margin-bottom: 96px; }
+  .sec-head {
+    border-top: 1.5px solid var(--text);
+    padding-top: 14px;
+    margin-bottom: 36px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .sec-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .sec-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+  }
+  .sec-title {
+    font-weight: 800;
+    font-size: clamp(28px, 4vw, 40px);
+    line-height: 1.1;
+    margin: 0 0 12px;
+    letter-spacing: -0.03em;
+  }
+  .sec-lede {
+    font-size: 16px;
+    color: var(--text-2);
+    max-width: 720px;
+    line-height: 1.55;
+    margin: 0 0 36px;
+  }
+
+  /* ============================================================
+     LOGOS - 10 CONCEPTS
+     ============================================================ */
+  .logo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+  }
+  .logo-tile {
+    background: var(--bg-2);
+    border-radius: 16px;
+    aspect-ratio: 5/3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    transition: transform 0.2s;
+  }
+  .logo-tile-label {
+    position: absolute;
+    top: 12px;
+    left: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .logo-tile-num {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+  }
+  .logo-tile-name {
+    position: absolute;
+    bottom: 12px;
+    left: 16px;
+    font-size: 11px;
+    color: var(--text-2);
+    font-weight: 500;
+  }
+  .logo-tile.dark { background: var(--ink); }
+  .logo-tile.dark .logo-tile-label { color: rgba(255,255,255,0.45); }
+  .logo-tile.dark .logo-tile-name { color: rgba(255,255,255,0.7); }
+  .logo-tile.dark .logo-tile-num { color: var(--accent); }
+
+  /* === Logo 1: Editorial Serif with pin === */
+  .lg-1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 50px;
+    color: var(--text);
+    letter-spacing: -0.025em;
+    line-height: 1;
+    display: inline-flex;
+    align-items: baseline;
+  }
+  .lg-1 .pin {
+    display: inline-block;
+    width: 0.6em; height: 0.6em;
+    border-radius: 50% 50% 50% 0;
+    background: var(--accent);
+    transform: rotate(-45deg) translateY(-0.05em);
+    margin: 0 0.005em;
+  }
+
+  /* === Logo 2: Bold Marketplace with swoosh === */
+  .lg-2 {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .lg-2 .text {
+    font-weight: 900;
+    font-size: 38px;
+    color: var(--text);
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+  .lg-2 svg.arc {
+    display: block;
+    margin-top: 4px;
+  }
+
+  /* === Logo 3: Pin Monogram === */
+  .lg-3 {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .lg-3 .badge {
+    width: 64px; height: 64px;
+    background: var(--accent);
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(217,96,59,0.3);
+  }
+  .lg-3 .badge span {
+    transform: rotate(45deg);
+    color: var(--bg);
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: -0.05em;
+  }
+  .lg-3 .word {
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+  }
+
+  /* === Logo 4: Stamp Badge === */
+  .lg-4 {
+    width: 130px; height: 130px;
+    border: 2px solid var(--text);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: var(--bg);
+  }
+  .lg-4::before {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border: 1px solid var(--text);
+    border-radius: 50%;
+  }
+  .lg-4 .top {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.22em;
+    color: var(--text);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .lg-4 .main {
+    font-weight: 900;
+    font-size: 18px;
+    color: var(--text);
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+  .lg-4 .pin {
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    margin: 6px 0 4px;
+  }
+  .lg-4 .bot {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7px;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  /* === Logo 5: Lowercase URL === */
+  .lg-5 {
+    font-weight: 700;
+    font-size: 42px;
+    color: var(--text);
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+  .lg-5 .slash {
+    color: var(--accent);
+    font-weight: 400;
+    margin: 0 0.05em;
+  }
+
+  /* === Logo 6: Arrow G === */
+  .lg-6 {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .lg-6 .gmark {
+    width: 56px; height: 56px;
+    background: var(--text);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .lg-6 .gmark svg { color: var(--accent); }
+  .lg-6 .word {
+    font-weight: 800;
+    font-size: 30px;
+    color: var(--text);
+    letter-spacing: -0.035em;
+  }
+
+  /* === Logo 7: GO·LOCAL all caps === */
+  .lg-7 {
+    text-align: center;
+  }
+  .lg-7 .row {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    font-size: 24px;
+    color: var(--text);
+    letter-spacing: 0.06em;
+  }
+  .lg-7 .dot {
+    width: 7px; height: 7px;
+    background: var(--accent);
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+  }
+  .lg-7 .rule {
+    width: 90px;
+    height: 2px;
+    background: var(--text);
+    margin: 8px auto 6px;
+  }
+  .lg-7 .sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: var(--muted);
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  /* === Logo 8: Bracket Pin === */
+  .lg-8 {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 800;
+    font-size: 36px;
+    color: var(--text);
+    letter-spacing: -0.035em;
+  }
+  .lg-8 .bracket {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 44px;
+    line-height: 1;
+  }
+
+  /* === Logo 9: Pin tag === */
+  .lg-9 {
+    background: var(--accent);
+    color: var(--bg);
+    padding: 14px 20px 14px 22px;
+    border-radius: 8px 8px 8px 0;
+    position: relative;
+    font-weight: 800;
+    font-size: 28px;
+    letter-spacing: -0.035em;
+    box-shadow: 0 6px 16px rgba(217,96,59,0.3);
+  }
+  .lg-9::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 12px 8px 0;
+    border-color: transparent var(--accent-dark) transparent transparent;
+  }
+
+  /* === Logo 10: Combined wordmark + symbol === */
+  .lg-10 {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .lg-10 .pin-symbol {
+    width: 42px; height: 42px;
+    background: var(--accent);
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    box-shadow: 0 3px 10px rgba(217,96,59,0.3);
+    position: relative;
+  }
+  .lg-10 .pin-symbol::after {
+    content: '';
+    position: absolute;
+    inset: 30%;
+    background: var(--bg);
+    border-radius: 50%;
+  }
+  .lg-10 .word {
+    font-weight: 800;
+    font-size: 30px;
+    color: var(--text);
+    letter-spacing: -0.035em;
+  }
+
+  /* Dark mode variants */
+  .logo-tile.dark .lg-1 { color: var(--bg); }
+  .logo-tile.dark .lg-2 .text,
+  .logo-tile.dark .lg-3 .word,
+  .logo-tile.dark .lg-5,
+  .logo-tile.dark .lg-6 .word,
+  .logo-tile.dark .lg-7 .row,
+  .logo-tile.dark .lg-8,
+  .logo-tile.dark .lg-10 .word { color: var(--bg); }
+  .logo-tile.dark .lg-7 .rule { background: var(--bg); }
+  .logo-tile.dark .lg-6 .gmark { background: var(--bg); }
+  .logo-tile.dark .lg-6 .gmark svg { color: var(--accent); }
+  .logo-tile.dark .lg-4 { background: transparent; border-color: var(--bg); }
+  .logo-tile.dark .lg-4::before { border-color: var(--bg); }
+  .logo-tile.dark .lg-4 .top,
+  .logo-tile.dark .lg-4 .main { color: var(--bg); }
+  .logo-tile.dark .lg-4 .bot { color: rgba(255,255,255,0.6); }
+
+  /* ============ SYSTEM ============ */
+  .system-row {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 24px;
+  }
+  @media (max-width: 880px) { .system-row { grid-template-columns: 1fr; } }
+  .palette {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+  }
+  .swatch {
+    aspect-ratio: 1/1;
+    border-radius: 14px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    color: var(--bg);
+  }
+  .swatch-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 2px;
+    opacity: 0.85;
+    font-weight: 500;
+  }
+  .swatch-hex {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    opacity: 0.95;
+  }
+  .sw-ink { background: var(--ink); }
+  .sw-accent { background: var(--accent); }
+  .sw-star { background: var(--star); color: var(--text); }
+  .sw-star .swatch-name, .sw-star .swatch-hex { color: var(--text); opacity: 0.7; }
+  .sw-sage { background: var(--sage); }
+  .sw-bg { background: var(--bg); color: var(--text); border: 1px solid var(--line); }
+  .sw-bg .swatch-name, .sw-bg .swatch-hex { color: var(--text); opacity: 0.65; }
+  .sw-line { background: var(--bg-2); color: var(--text); border: 1px solid var(--line); }
+  .sw-line .swatch-name, .sw-line .swatch-hex { color: var(--text); opacity: 0.65; }
+
+  .typography {
+    background: var(--bg-2);
+    border-radius: 16px;
+    padding: 24px 28px;
+    border: 1px solid var(--line);
+  }
+  .type-row { margin-bottom: 18px; }
+  .type-row:last-child { margin-bottom: 0; }
+  .type-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .type-display {
+    font-weight: 800;
+    font-size: 32px;
+    line-height: 1.05;
+    color: var(--text);
+    letter-spacing: -0.035em;
+  }
+  .type-body {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .type-mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+  }
+
+  /* ============================================================
+     PHONE MOCKUPS - Amazon-style commercial
+     ============================================================ */
+  .screen-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 36px 28px;
+  }
+  .screen-wrap { display: flex; flex-direction: column; align-items: center; }
+  .screen-label { margin-top: 22px; text-align: center; max-width: 260px; }
+  .screen-label .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .screen-label .name {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--text);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+  .screen-label .desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 5px;
+    line-height: 1.45;
+  }
+
+  .phone {
+    width: 280px;
+    height: 580px;
+    background: #0A1620;
+    border-radius: 42px;
+    padding: 7px;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    flex-shrink: 0;
+  }
+  .phone-screen {
+    width: 100%;
+    height: 100%;
+    background: var(--bg);
+    border-radius: 35px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  .phone::after {
+    content: '';
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 88px;
+    height: 24px;
+    background: #000;
+    border-radius: 100px;
+    z-index: 10;
+  }
+  /* Status bar */
+  .sb {
+    height: 38px;
+    padding: 12px 22px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+  }
+  .sb-right { display: flex; gap: 5px; align-items: center; }
+  .sb-bars { display: inline-flex; align-items: flex-end; gap: 1.5px; height: 9px; }
+  .sb-bars i { display: block; width: 2.5px; background: currentColor; border-radius: 0.5px; }
+  .sb-bars i:nth-child(1) { height: 25%; }
+  .sb-bars i:nth-child(2) { height: 50%; }
+  .sb-bars i:nth-child(3) { height: 75%; }
+  .sb-bars i:nth-child(4) { height: 100%; }
+  .sb-bat {
+    width: 23px; height: 11px;
+    border: 1px solid currentColor;
+    border-radius: 3px;
+    position: relative;
+    opacity: 0.95;
+  }
+  .sb-bat::before {
+    content: ''; position: absolute;
+    right: -3px; top: 3px;
+    width: 1.5px; height: 5px;
+    background: currentColor;
+    border-radius: 0 1.5px 1.5px 0;
+    opacity: 0.7;
+  }
+  .sb-bat::after {
+    content: ''; position: absolute;
+    inset: 1.5px;
+    background: currentColor;
+    border-radius: 1.5px;
+    width: 70%;
+  }
+  .sb-wifi {
+    width: 13px; height: 9px;
+    position: relative;
+  }
+  .sb-wifi::before, .sb-wifi::after {
+    content: ''; position: absolute; left: 50%;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+    border-bottom: none; border-left: none; border-right: none;
+  }
+  .sb-wifi::before { width: 11px; height: 5.5px; top: 0; transform: translateX(-50%); }
+  .sb-wifi::after { width: 6px; height: 3px; top: 3.5px; transform: translateX(-50%); }
+
+  .scr { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* App top header (Amazon-style navy bar) */
+  .app-header {
+    background: var(--ink);
+    padding: 6px 14px 12px;
+    flex-shrink: 0;
+  }
+  .app-header-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--bg);
+    margin-bottom: 10px;
+  }
+  .app-header-brand {
+    font-weight: 800;
+    font-size: 17px;
+    letter-spacing: -0.03em;
+    color: var(--bg);
+    display: inline-flex;
+    align-items: baseline;
+  }
+  .app-header-brand .pin-dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    margin: 0 1px;
+    display: inline-block;
+  }
+  .app-header-loc {
+    margin-left: auto;
+    font-size: 10px;
+    color: rgba(255,255,255,0.85);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .app-header-loc strong { color: var(--bg); font-weight: 600; font-size: 11px; }
+  .app-header-loc svg { color: var(--accent); }
+  .app-search-bar {
+    background: var(--bg);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+  .app-search-input {
+    flex: 1;
+    padding: 9px 12px;
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .app-search-input svg { color: var(--text); }
+  .app-search-btn {
+    background: var(--star);
+    width: 38px;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text);
+  }
+
+  /* Tab bar */
+  .tabbar {
+    background: var(--bg);
+    border-top: 0.5px solid var(--line);
+    padding: 8px 0 14px;
+    display: flex;
+    justify-content: space-around;
+    flex-shrink: 0;
+  }
+  .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-size: 9px;
+    color: var(--muted);
+    flex: 1;
+    font-weight: 500;
+  }
+  .tab svg { width: 19px; height: 19px; stroke-width: 1.75; }
+  .tab.active { color: var(--accent); }
+
+  /* Buttons */
+  .btn-fill {
+    background: var(--text);
+    color: var(--bg);
+    padding: 13px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    letter-spacing: -0.01em;
+  }
+  .btn-yellow {
+    background: var(--star);
+    color: var(--text);
+    padding: 13px 16px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .btn-coral {
+    background: var(--accent);
+    color: var(--bg);
+    padding: 13px 16px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-shadow: 0 4px 12px rgba(217,96,59,0.25);
+  }
+
+  /* Star rating helper */
+  .stars {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    color: var(--star);
+    font-weight: 600;
+    font-size: 11px;
+  }
+  .stars-count { color: var(--ink-2); font-weight: 500; }
+
+  /* =====================================================
+     SCREEN 1 - WELCOME
+     ===================================================== */
+  .s1-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 18px 20px 24px;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(217,96,59,0.12) 0%, transparent 50%),
+      var(--bg);
+  }
+  .s1-brand {
+    margin-top: 50px;
+    margin-bottom: 14px;
+    font-weight: 900;
+    font-size: 48px;
+    color: var(--text);
+    letter-spacing: -0.045em;
+    display: inline-flex;
+    align-items: baseline;
+    line-height: 1;
+  }
+  .s1-brand .pin-dot {
+    display: inline-block;
+    width: 0.55em; height: 0.55em;
+    background: var(--accent);
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg) translateY(-0.04em);
+    margin: 0 0.005em;
+  }
+  .s1-tagline {
+    font-size: 16px;
+    color: var(--text-2);
+    line-height: 1.4;
+    max-width: 90%;
+    margin-bottom: 22px;
+    font-weight: 400;
+  }
+  .s1-bullets {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: auto;
+  }
+  .s1-bullet {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 12px;
+    color: var(--text-2);
+    line-height: 1.4;
+  }
+  .s1-bullet .ic-wrap {
+    width: 28px; height: 28px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .s1-bullet strong { color: var(--text); font-weight: 600; display: block; margin-bottom: 1px; }
+  .s1-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .s1-signin {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    padding: 4px;
+  }
+  .s1-signin strong { color: var(--text); font-weight: 600; }
+
+  /* =====================================================
+     SCREEN 2 - ONBOARDING / CATEGORIES
+     ===================================================== */
+  .s2-top { padding: 4px 18px 14px; }
+  .s2-step-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .s2-step {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .s2-skip {
+    font-size: 12px;
+    color: var(--ink-2);
+    font-weight: 500;
+  }
+  .s2-progress {
+    height: 4px;
+    background: var(--bg-3);
+    border-radius: 100px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .s2-progress span {
+    display: block;
+    width: 50%;
+    height: 100%;
+    background: var(--accent);
+    border-radius: 100px;
+  }
+  .s2-h {
+    font-weight: 800;
+    font-size: 24px;
+    color: var(--text);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    margin-bottom: 5px;
+  }
+  .s2-p {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+  .s2-grid {
+    padding: 4px 18px 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    flex: 1;
+    align-content: start;
+    overflow: hidden;
+  }
+  .cat {
+    background: var(--bg);
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    font-size: 12px;
+    color: var(--text);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  .cat.on {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+  }
+  .cat .ic-wrap {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: var(--bg-2);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text);
+  }
+  .cat.on .ic-wrap { background: rgba(255,255,255,0.1); color: var(--accent); }
+  .s2-foot { padding: 12px 18px 16px; }
+  .s2-foot .btn-coral { box-shadow: none; }
+
+  /* =====================================================
+     SCREEN 3 - HOME / DISCOVER
+     ===================================================== */
+  .home-scroll {
+    flex: 1;
+    overflow: hidden;
+    background: var(--bg-2);
+  }
+  .home-pill-row {
+    padding: 10px 14px;
+    display: flex;
+    gap: 6px;
+    background: var(--bg);
+    border-bottom: 0.5px solid var(--line);
+    overflow: hidden;
+  }
+  .home-pill {
+    padding: 5px 11px;
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text);
+    background: var(--bg);
+    white-space: nowrap;
+  }
+  .home-pill.on {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+  }
+  .home-section { padding: 12px 14px 0; }
+  .home-section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+  }
+  .home-section-title {
+    font-weight: 800;
+    font-size: 15px;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+  .home-section-link {
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  /* Featured carousel */
+  .featured-card {
+    background: var(--bg);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow-xs);
+    border: 0.5px solid var(--line);
+  }
+  .featured-img {
+    height: 100px;
+    background: linear-gradient(135deg, #C4A98C 0%, #8C6E4F 100%);
+    position: relative;
+  }
+  .featured-tag {
+    position: absolute;
+    top: 8px; left: 8px;
+    background: var(--accent);
+    color: var(--bg);
+    font-size: 9px;
+    font-weight: 700;
+    padding: 3px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .featured-info { padding: 9px 11px 11px; }
+  .featured-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    margin-bottom: 3px;
+  }
+  .featured-meta {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10.5px;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+  .featured-offer {
+    display: inline-block;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 3px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+  }
+  /* Compact list */
+  .compact-list { display: flex; flex-direction: column; gap: 6px; }
+  .compact-row {
+    display: flex;
+    gap: 9px;
+    padding: 8px;
+    background: var(--bg);
+    border-radius: 10px;
+    align-items: center;
+    border: 0.5px solid var(--line);
+  }
+  .compact-row .img {
+    width: 38px; height: 38px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  .img-tile1 { background: linear-gradient(135deg, #C4A98C, #8C6E4F); }
+  .img-tile2 { background: linear-gradient(135deg, #5C8270, #2F4D40); }
+  .img-tile3 { background: linear-gradient(135deg, #D9603B, #8E3A1F); }
+  .img-tile4 { background: linear-gradient(135deg, #4B6478, #243441); }
+  .img-tile5 { background: linear-gradient(135deg, #8B3A3A, #4D1F1F); }
+  .compact-row .info { flex: 1; min-width: 0; }
+  .compact-row .name {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+  }
+  .compact-row .meta {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .compact-row .meta .star { color: var(--star); font-weight: 600; display: inline-flex; align-items: center; gap: 2px; }
+  .compact-row .offer-pill {
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5px;
+    font-weight: 700;
+    padding: 3px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+
+  /* =====================================================
+     SCREEN 4 - SEARCH / FILTERS (replaces AI for now)
+     ===================================================== */
+  .s4-bar {
+    padding: 10px 14px;
+    background: var(--bg);
+    border-bottom: 0.5px solid var(--line);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .s4-input-real {
+    flex: 1;
+    background: var(--bg-2);
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .s4-input-real svg { color: var(--muted); }
+  .s4-input-real .cursor {
+    width: 1px;
+    height: 14px;
+    background: var(--accent);
+    margin-left: 2px;
+  }
+  .s4-cancel {
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .s4-recent {
+    padding: 12px 14px 0;
+  }
+  .s4-recent-h {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .s4-recent-row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 0;
+    border-bottom: 0.5px solid var(--line-2);
+    font-size: 13px;
+    color: var(--text);
+  }
+  .s4-recent-row svg { color: var(--muted); flex-shrink: 0; }
+  .s4-recent-row .text { flex: 1; }
+  .s4-recent-row .text strong { color: var(--accent); font-weight: 600; }
+  .s4-trending {
+    padding: 16px 14px 0;
+  }
+  .s4-trending-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .s4-trending-tags .tag {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    padding: 5px 10px;
+    font-size: 11.5px;
+    color: var(--text);
+    font-weight: 500;
+  }
+  .s4-trending-tags .tag.hot {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-color: var(--accent-soft);
+    font-weight: 600;
+  }
+
+  /* =====================================================
+     SCREEN 5 - LIST VIEW (Amazon-style cards)
+     ===================================================== */
+  .s5-head { padding: 4px 14px 12px; background: var(--bg); border-bottom: 0.5px solid var(--line); }
+  .s5-loc {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .s5-loc svg { color: var(--accent); }
+  .s5-h {
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--text);
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    margin-bottom: 3px;
+  }
+  .s5-meta {
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+  .s5-meta strong { color: var(--text); font-weight: 600; }
+  .s5-sort-row {
+    padding: 10px 14px;
+    display: flex;
+    gap: 6px;
+    overflow: hidden;
+    background: var(--bg);
+    border-bottom: 0.5px solid var(--line);
+  }
+  .s5-sort-row .pill {
+    padding: 5px 11px;
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    font-size: 11px;
+    color: var(--text);
+    background: var(--bg);
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+  }
+  .s5-sort-row .pill.on { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .s5-sort-row .pill svg { width: 11px; height: 11px; }
+  .s5-list {
+    flex: 1;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow: hidden;
+    background: var(--bg-2);
+  }
+  .biz-card {
+    display: flex;
+    gap: 12px;
+    padding: 10px;
+    background: var(--bg);
+    border-radius: 12px;
+    border: 0.5px solid var(--line);
+  }
+  .biz-card .img {
+    width: 78px; height: 78px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  .biz-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .biz-name {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 3px;
+    letter-spacing: -0.02em;
+  }
+  .biz-rating-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
+    font-size: 11px;
+  }
+  .biz-rating-row .stars-vis { display: inline-flex; color: var(--star); gap: 1px; }
+  .biz-rating-row .count { color: var(--ink-2); }
+  .biz-cat {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .biz-offer-tag {
+    align-self: flex-start;
+    background: var(--accent);
+    color: var(--bg);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+    margin-top: auto;
+  }
+
+  /* =====================================================
+     SCREEN 6 - BUSINESS PROFILE
+     ===================================================== */
+  .s6-hero {
+    height: 150px;
+    background:
+      linear-gradient(180deg, transparent 50%, rgba(15,26,34,0.3) 100%),
+      linear-gradient(135deg, #C4A98C 0%, #8C6E4F 50%, #6B4F38 100%);
+    position: relative;
+    flex-shrink: 0;
+  }
+  .s6-photos-pill {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(15,26,34,0.7);
+    backdrop-filter: blur(8px);
+    color: var(--bg);
+    font-size: 10px;
+    padding: 4px 9px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 600;
+  }
+  .s6-photo-dots {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 4px;
+  }
+  .s6-photo-dots i {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+  }
+  .s6-photo-dots i.on { background: var(--bg); width: 14px; border-radius: 100px; }
+  .s6-back, .s6-save, .s6-share {
+    position: absolute;
+    top: 10px;
+    width: 32px; height: 32px;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(8px);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text);
+    box-shadow: var(--shadow-xs);
+  }
+  .s6-back { left: 12px; }
+  .s6-share { right: 54px; }
+  .s6-save { right: 12px; color: var(--accent); }
+  .s6-body {
+    flex: 1;
+    padding: 12px 16px 8px;
+    overflow: hidden;
+  }
+  .s6-name {
+    font-weight: 800;
+    font-size: 20px;
+    color: var(--text);
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    margin-bottom: 5px;
+  }
+  .s6-rating-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 4px;
+    font-size: 11.5px;
+  }
+  .s6-rating-row .num { font-weight: 700; color: var(--text); }
+  .s6-rating-row .stars-vis { display: inline-flex; color: var(--star); gap: 1px; }
+  .s6-rating-row .count { color: var(--accent); font-weight: 500; }
+  .s6-cat-meta {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+  .s6-cat-meta .dot-sep { width: 2px; height: 2px; background: var(--muted); border-radius: 50%; }
+  .s6-cat-meta .open { color: var(--sage); font-weight: 600; }
+  .s6-quick {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+    margin-bottom: 12px;
+  }
+  .qa {
+    background: var(--bg-2);
+    border-radius: 10px;
+    padding: 8px 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    font-size: 9.5px;
+    color: var(--text);
+    font-weight: 600;
+  }
+  .qa svg { color: var(--text); width: 16px; height: 16px; }
+  .s6-offer-card {
+    background: linear-gradient(135deg, var(--ink) 0%, #082028 100%);
+    border-radius: 14px;
+    padding: 14px 16px;
+    color: var(--bg);
+    position: relative;
+    overflow: hidden;
+  }
+  .s6-offer-card::after {
+    content: '';
+    position: absolute;
+    right: -25px; top: -25px;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.18;
+  }
+  .s6-offer-eb {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--star);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 600;
+  }
+  .s6-offer-eb .live {
+    width: 5px; height: 5px;
+    background: var(--star);
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(255,164,28,0.25);
+  }
+  .s6-offer-title {
+    font-weight: 800;
+    font-size: 18px;
+    line-height: 1.15;
+    margin-bottom: 6px;
+    letter-spacing: -0.025em;
+  }
+  .s6-offer-meta {
+    font-size: 10.5px;
+    color: rgba(255,255,255,0.65);
+    margin-bottom: 12px;
+  }
+  .s6-claim-btn {
+    background: var(--star);
+    color: var(--text);
+    text-align: center;
+    padding: 11px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  /* =====================================================
+     SCREEN 7 - OFFER DETAIL
+     ===================================================== */
+  .s7-content {
+    flex: 1;
+    padding: 0 18px 14px;
+    display: flex;
+    flex-direction: column;
+  }
+  .s7-navback {
+    padding: 4px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 600;
+  }
+  .s7-eb {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    color: var(--accent);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 600;
+  }
+  .s7-eb .live {
+    width: 5px; height: 5px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(217,96,59,0.25);
+  }
+  .s7-h {
+    font-weight: 800;
+    font-size: 28px;
+    color: var(--text);
+    letter-spacing: -0.035em;
+    line-height: 1.02;
+    margin-bottom: 12px;
+  }
+  .s7-h .accent { color: var(--accent); }
+  .s7-biz-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding: 9px;
+    background: var(--bg-2);
+    border-radius: 10px;
+  }
+  .s7-biz-img {
+    width: 38px; height: 38px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #C4A98C, #8C6E4F);
+    flex-shrink: 0;
+  }
+  .s7-biz-info { flex: 1; min-width: 0; }
+  .s7-biz-name { font-size: 12.5px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
+  .s7-biz-meta { font-size: 10.5px; color: var(--muted); display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+  .s7-biz-meta .star { color: var(--star); display: inline-flex; align-items: center; gap: 2px; font-weight: 600; }
+  .s7-desc {
+    font-size: 12.5px;
+    color: var(--text-2);
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+  .s7-terms {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: auto;
+  }
+  .s7-terms-h {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5px;
+    color: var(--muted);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .s7-terms-list {
+    font-size: 11.5px;
+    color: var(--text);
+    line-height: 1.7;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  .s7-terms-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .s7-terms-list li::before {
+    content: '';
+    width: 4px; height: 4px;
+    background: var(--accent);
+    border-radius: 50%;
+    margin-top: 8px;
+    flex-shrink: 0;
+  }
+  .s7-cta {
+    background: var(--star);
+    color: var(--text);
+    text-align: center;
+    padding: 15px;
+    border-radius: 100px;
+    font-size: 14px;
+    font-weight: 700;
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 6px 16px rgba(255,164,28,0.3);
+  }
+
+  /* =====================================================
+     SCREEN 8 - QR SCANNER
+     ===================================================== */
+  .s8 { background: #08161C; }
+  .s8 .sb { color: var(--bg); }
+  .s8-content {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 22px 26px;
+  }
+  .s8-top {
+    align-self: stretch;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .s8-cancel {
+    color: rgba(255,255,255,0.9);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .s8-flash {
+    width: 34px; height: 34px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--bg);
+    backdrop-filter: blur(8px);
+  }
+  .s8-center { display: flex; flex-direction: column; align-items: center; gap: 24px; }
+  .s8-frame {
+    width: 200px; height: 200px;
+    position: relative;
+  }
+  .s8-frame .corner { position: absolute; width: 26px; height: 26px; }
+  .s8-frame .corner::before, .s8-frame .corner::after {
+    content: ''; position: absolute; background: var(--star);
+  }
+  .s8-frame .corner.tl::before { top: 0; left: 0; width: 26px; height: 3px; border-radius: 2px; }
+  .s8-frame .corner.tl::after { top: 0; left: 0; width: 3px; height: 26px; border-radius: 2px; }
+  .s8-frame .corner.tl { top: 0; left: 0; }
+  .s8-frame .corner.tr::before { top: 0; right: 0; width: 26px; height: 3px; border-radius: 2px; }
+  .s8-frame .corner.tr::after { top: 0; right: 0; width: 3px; height: 26px; border-radius: 2px; }
+  .s8-frame .corner.tr { top: 0; right: 0; }
+  .s8-frame .corner.bl::before { bottom: 0; left: 0; width: 26px; height: 3px; border-radius: 2px; }
+  .s8-frame .corner.bl::after { bottom: 0; left: 0; width: 3px; height: 26px; border-radius: 2px; }
+  .s8-frame .corner.bl { bottom: 0; left: 0; }
+  .s8-frame .corner.br::before { bottom: 0; right: 0; width: 26px; height: 3px; border-radius: 2px; }
+  .s8-frame .corner.br::after { bottom: 0; right: 0; width: 3px; height: 26px; border-radius: 2px; }
+  .s8-frame .corner.br { bottom: 0; right: 0; }
+  .s8-qr {
+    position: absolute;
+    inset: 26px;
+    display: grid;
+    grid-template-columns: repeat(11, 1fr);
+    grid-template-rows: repeat(11, 1fr);
+    gap: 1px;
+    opacity: 0.35;
+  }
+  .s8-qr i { background: rgba(255,255,255,0.5); border-radius: 1px; }
+  .s8-qr i.off { background: transparent; }
+  .s8-scanline {
+    position: absolute;
+    left: 16px; right: 16px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--star), transparent);
+    top: 50%;
+    box-shadow: 0 0 12px rgba(255,164,28,0.7);
+    border-radius: 2px;
+  }
+  .s8-prompt { text-align: center; }
+  .s8-prompt .h {
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--bg);
+    line-height: 1.15;
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+  }
+  .s8-prompt .p {
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.5;
+    max-width: 220px;
+    margin: 0 auto;
+  }
+  .s8-tip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    text-align: center;
+    font-weight: 500;
+  }
+
+  /* =====================================================
+     SCREEN 9 - CODE REVEALED
+     ===================================================== */
+  .s9-content {
+    flex: 1;
+    padding: 6px 20px 18px;
+    display: flex;
+    flex-direction: column;
+  }
+  .s9-success {
+    margin: 4px auto 14px;
+    width: 56px; height: 56px;
+    background: var(--sage-soft);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--sage);
+  }
+  .s9-h {
+    text-align: center;
+    font-weight: 800;
+    font-size: 24px;
+    color: var(--text);
+    margin-bottom: 5px;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+  }
+  .s9-sub {
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    line-height: 1.45;
+    padding: 0 8px;
+  }
+  .s9-card {
+    background: var(--bg);
+    border-radius: 18px;
+    padding: 20px 18px 18px;
+    text-align: center;
+    border: 1.5px dashed var(--line);
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .s9-card::before, .s9-card::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 18px; height: 18px;
+    background: var(--bg);
+    border: 1.5px dashed var(--line);
+    border-radius: 50%;
+    transform: translateY(-50%);
+  }
+  .s9-card::before { left: -10px; border-right: none; border-top: none; }
+  .s9-card::after { right: -10px; border-left: none; border-top: none; }
+  .s9-card-eb {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  .s9-code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.12em;
+    margin-bottom: 14px;
+  }
+  .s9-card-divider {
+    height: 1px;
+    background: var(--line);
+    margin: 0 -8px 12px;
+  }
+  .s9-biz {
+    font-size: 12px;
+    color: var(--text);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .s9-offer {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    margin-top: 3px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .s9-timer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: auto;
+  }
+  .s9-timer-dot {
+    width: 7px; height: 7px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(217,96,59,0.25);
+  }
+  .s9-instructions {
+    background: var(--bg-2);
+    border-radius: 10px;
+    padding: 11px 13px;
+    font-size: 11.5px;
+    color: var(--text-2);
+    line-height: 1.5;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 9px;
+    align-items: flex-start;
+  }
+  .s9-instructions svg { color: var(--accent); flex-shrink: 0; margin-top: 1px; }
+  .s9-done {
+    background: var(--text);
+    color: var(--bg);
+    text-align: center;
+    padding: 14px;
+    border-radius: 100px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  /* =====================================================
+     SCREEN 10 - ACCOUNT
+     ===================================================== */
+  .s10-head {
+    padding: 4px 18px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .s10-avatar {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent) 0%, #8E3A1F 100%);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--bg);
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    box-shadow: var(--shadow-sm);
+  }
+  .s10-name {
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--text);
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+  .s10-loc {
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-top: 3px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .s10-loc svg { color: var(--accent); width: 11px; height: 11px; }
+  .s10-stats {
+    margin: 0 14px 14px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .stat-box {
+    background: var(--bg-2);
+    border-radius: 12px;
+    padding: 12px 6px;
+    text-align: center;
+  }
+  .stat-box .v {
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 4px;
+    letter-spacing: -0.025em;
+  }
+  .stat-box .v.accent { color: var(--accent); }
+  .stat-box .v.sage { color: var(--sage); }
+  .stat-box .l {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .s10-tabs {
+    margin: 0 18px 10px;
+    display: flex;
+    background: var(--bg-2);
+    padding: 3px;
+    border-radius: 10px;
+  }
+  .s10-tabs .t {
+    flex: 1;
+    text-align: center;
+    padding: 7px 0;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    border-radius: 8px;
+  }
+  .s10-tabs .t.on {
+    background: var(--bg);
+    color: var(--text);
+    box-shadow: var(--shadow-xs);
+  }
+  .s10-history {
+    padding: 4px 18px 0;
+    flex: 1;
+    overflow: hidden;
+  }
+  .hist-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 0.5px solid var(--line);
+    gap: 10px;
+  }
+  .hist-row:last-child { border-bottom: none; }
+  .hist-img {
+    width: 38px; height: 38px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  .hist-info { flex: 1; min-width: 0; }
+  .hist-biz {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 2px;
+    letter-spacing: -0.015em;
+  }
+  .hist-offer {
+    font-size: 10.5px;
+    color: var(--muted);
+    line-height: 1.3;
+  }
+  .hist-amt { text-align: right; flex-shrink: 0; }
+  .hist-saved {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--sage);
+  }
+  .hist-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 2px;
+    font-weight: 500;
+  }
+
+  /* ============================================================
+     GOOGLE INTEGRATION SPEC
+     ============================================================ */
+  .gspec-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 880px) { .gspec-grid { grid-template-columns: 1fr; } }
+  .gspec-card {
+    background: var(--bg-2);
+    border-radius: 16px;
+    padding: 24px 26px;
+    border: 1px solid var(--line);
+  }
+  .gspec-card h4 {
+    font-weight: 800;
+    font-size: 20px;
+    color: var(--text);
+    margin: 0 0 10px;
+    letter-spacing: -0.025em;
+  }
+  .gspec-card .eb {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--accent);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: block;
+    font-weight: 600;
+  }
+  .gspec-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .gspec-list li {
+    padding: 8px 0;
+    border-bottom: 0.5px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: baseline;
+    font-size: 12.5px;
+    color: var(--text);
+  }
+  .gspec-list li:last-child { border-bottom: none; }
+  .gspec-list li strong { font-weight: 600; letter-spacing: -0.005em; }
+  .gspec-list li code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    padding: 2px 7px;
+    border-radius: 5px;
+    white-space: nowrap;
+  }
+  .data-flow {
+    background: var(--ink);
+    color: var(--bg);
+    border-radius: 18px;
+    padding: 28px 28px;
+  }
+  .data-flow h4 {
+    font-weight: 800;
+    font-size: 22px;
+    margin: 0 0 8px;
+    color: var(--bg);
+    letter-spacing: -0.025em;
+  }
+  .data-flow .eb {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--star);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: block;
+    font-weight: 600;
+  }
+  .data-flow > p {
+    color: rgba(255,255,255,0.7);
+    font-size: 13.5px;
+    line-height: 1.55;
+    max-width: 700px;
+    margin: 0 0 24px;
+  }
+  .flow-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 880px) { .flow-row { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 480px) { .flow-row { grid-template-columns: 1fr; } }
+  .flow-step {
+    background: rgba(255,255,255,0.05);
+    border: 0.5px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .flow-step-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--star);
+    letter-spacing: 0.18em;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .flow-step h5 {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--bg);
+    margin: 0 0 5px;
+    letter-spacing: -0.015em;
+  }
+  .flow-step p {
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* ============================================================
+     BUSINESS PLAN (CONCISE)
+     ============================================================ */
+  .plan-thesis {
+    background: var(--ink);
+    color: var(--bg);
+    border-radius: 18px;
+    padding: 32px 36px;
+    margin-bottom: 24px;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 30px;
+  }
+  @media (max-width: 880px) { .plan-thesis { grid-template-columns: 1fr; } }
+  .plan-thesis-text h4 {
+    font-weight: 800;
+    font-size: 24px;
+    margin: 0 0 12px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    color: var(--bg);
+  }
+  .plan-thesis-text .eb {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--star);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: block;
+    font-weight: 600;
+  }
+  .plan-thesis-text p {
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.75);
+    margin: 0;
+  }
+  .plan-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    align-content: start;
+  }
+  .plan-stat {
+    border-left: 2px solid var(--accent);
+    padding: 4px 0 4px 12px;
+  }
+  .plan-stat-v {
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--bg);
+    line-height: 1;
+    margin-bottom: 4px;
+    letter-spacing: -0.025em;
+  }
+  .plan-stat-l {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5px;
+    color: rgba(255,255,255,0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+  .plan-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+  }
+  .plan-card {
+    background: var(--bg-2);
+    border-radius: 14px;
+    padding: 22px 24px;
+    border: 1px solid var(--line);
+  }
+  .plan-card .eb {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--accent);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: block;
+    font-weight: 600;
+  }
+  .plan-card h5 {
+    font-weight: 800;
+    font-size: 17px;
+    color: var(--text);
+    margin: 0 0 10px;
+    letter-spacing: -0.022em;
+  }
+  .plan-card p {
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.55;
+    margin: 0 0 8px;
+  }
+  .plan-card p:last-child { margin-bottom: 0; }
+  .plan-card ul {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 12.5px;
+    color: var(--text-2);
+    line-height: 1.65;
+  }
+  .plan-card ul li::marker { color: var(--accent); }
+  .plan-card ul li strong { color: var(--text); font-weight: 600; }
+
+  /* ============================================================
+     OPEN QUESTIONS
+     ============================================================ */
+  .q-groups {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px;
+  }
+  .q-group {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px 24px;
+  }
+  .q-group-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .q-group h5 {
+    font-weight: 800;
+    font-size: 15px;
+    color: var(--text);
+    margin: 0;
+    letter-spacing: -0.02em;
+  }
+  .q-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    font-weight: 600;
+    background: var(--accent-soft);
+    padding: 2px 8px;
+    border-radius: 100px;
+    letter-spacing: 0.06em;
+  }
+  .q-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: q;
+  }
+  .q-list li {
+    counter-increment: q;
+    padding: 9px 0 9px 28px;
+    border-bottom: 0.5px solid var(--line);
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--text);
+    position: relative;
+  }
+  .q-list li:last-child { border-bottom: none; }
+  .q-list li::before {
+    content: counter(q, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+  .q-list li strong { font-weight: 600; }
+
+  /* ============ FOOTER ============ */
+  .endnote {
+    margin-top: 72px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+
+  @media (max-width: 768px) {
+    body { padding: 28px 18px 60px; }
+    .masthead { padding-top: 14px; margin-bottom: 36px; }
+    .mast-meta { text-align: left; }
+    .hero { margin-bottom: 56px; }
+    .section { margin-bottom: 60px; }
+    .plan-thesis { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- =============== MASTHEAD =============== -->
+<div class="masthead">
+  <div class="mast-brand">GoLoca<span class="pin-dot"></span>l</div>
+  <div class="mast-meta">
+    <strong>Brand &amp; App Exploration</strong><br>
+    V0.3 · June 2026<br>
+    Logo · UI · Plan · Questions
+  </div>
+</div>
+
+<!-- =============== HERO =============== -->
+<div class="hero">
+  <div class="hero-eyebrow">Full Exploration</div>
+  <h1>A local marketplace, <span class="accent">built for the high street.</span></h1>
+  <p class="hero-sub">Ten logo concepts to react to. A commercial, marketplace-feel app redesign with the QR-to-data-capture mechanic at its core. A concise business plan and the open questions still on the table.</p>
+</div>
+
+<!-- ============================================================
+     § 01 - LOGO CONCEPTS
+     ============================================================ -->
+<div class="section">
+  <div class="sec-head">
+    <span class="sec-num">§ 01 · Logo Concepts</span>
+    <span class="sec-meta">10 directions</span>
+  </div>
+  <h2 class="sec-title">Pick a direction.</h2>
+  <p class="sec-lede">Ten distinct concepts spanning editorial, marketplace, monogram, and stamp aesthetics. Each works at app-icon size as well as on packaging or shop stickers. Tell me which lands and I'll develop it across the full system.</p>
+
+  <div class="logo-grid">
+
+    <!-- 1: Editorial Serif -->
+    <div class="logo-tile">
+      <span class="logo-tile-label">Editorial Serif</span>
+      <span class="logo-tile-num">01</span>
+      <div class="lg-1">GoLoca<span class="pin"></span>l</div>
+      <span class="logo-tile-name">Pin replaces second "o"</span>
+    </div>
+
+    <!-- 2: Bold Marketplace with arc -->
+    <div class="logo-tile">
+      <span class="logo-tile-label">Marketplace Swoosh</span>
+      <span class="logo-tile-num">02</span>
+      <div class="lg-2">
+        <div class="text">locolie</div>
+        <svg class="arc" width="120" height="14" viewBox="0 0 120 14" fill="none">
+          <path d="M2 4 Q60 18 118 4" stroke="#D9603B" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <path d="M114 1 L118 4 L114 7" stroke="#D9603B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </div>
+      <span class="logo-tile-name">Coral arrow underline</span>
+    </div>
+
+    <!-- 3: Pin Badge + wordmark -->
+    <div class="logo-tile">
+      <span class="logo-tile-label">Pin Monogram</span>
+      <span class="logo-tile-num">03</span>
+      <div class="lg-3">
+        <div class="badge"><span>gL</span></div>
+        <div class="word">locolie</div>
+      </div>
+      <span class="logo-tile-name">Pin-shape with monogram</span>
+    </div>
+
+    <!-- 4: Stamp Badge -->
+    <div class="logo-tile dark">
+      <span class="logo-tile-label">Stamp Badge</span>
+      <span class="logo-tile-num">04</span>
+      <div class="lg-4">
+        <div class="top">SUPPORT</div>
+        <div class="main">locolie</div>
+        <div class="pin"></div>
+        <div class="bot">EST · 2026</div>
+      </div>
+      <span class="logo-tile-name">Window-sticker friendly</span>
+    </div>
+
+    <!-- 5: Lowercase URL -->
+    <div class="logo-tile">
+      <span class="logo-tile-label">Lowercase URL</span>
+      <span class="logo-tile-num">05</span>
+      <div class="lg-5">go<span class="slash">/</span>local</div>
+      <span class="logo-tile-name">Modern, technical</span>
+    </div>
+
+    <!-- 6: Arrow G -->
+    <div class="logo-tile">
+      <span class="logo-tile-label">Arrow Mark</span>
+      <span class="logo-tile-num">06</span>
+      <div class="lg-6">
+        <div class="gmark">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <path d="M22 11 H11 a5 5 0 0 0 0 10 h5 v-5 h-3" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M19 8 L23 11 L19 14" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+        </div>
+        <div class="word">locolie</div>
+      </div>
+      <span class="logo-tile-name">App-icon ready</span>
+    </div>
+
+    <!-- 7: GO·LOCAL all caps -->
+    <div class="logo-tile">
+      <span class="logo-tile-label">Spaced Caps</span>
+      <span class="logo-tile-num">07</span>
+      <div class="lg-7">
+        <div class="row">GO<span class="dot"></span>LOCAL</div>
+        <div class="rule"></div>
+        <div class="sub">Discover · Save · Belong</div>
+      </div>
+      <span class="logo-tile-name">Editorial confidence</span>
+    </div>
+
+    <!-- 8: Bracket Pin -->
+    <div class="logo-tile">
+      <span class="logo-tile-label">Bracket Mark</span>
+      <span class="logo-tile-num">08</span>
+      <div class="lg-8">
+        <span class="bracket">[</span>locolie<span class="bracket">]</span>
+      </div>
+      <span class="logo-tile-name">Code-feel, modern</span>
+    </div>
+
+    <!-- 9: Sticker / Tag -->
+    <div class="logo-tile">
+      <span class="logo-tile-label">Window Sticker</span>
+      <span class="logo-tile-num">09</span>
+      <div class="lg-9">locolie</div>
+      <span class="logo-tile-name">Physical-first feel</span>
+    </div>
+
+    <!-- 10: Combined symbol + wordmark -->
+    <div class="logo-tile dark">
+      <span class="logo-tile-label">Symbol + Word</span>
+      <span class="logo-tile-num">10</span>
+      <div class="lg-10">
+        <div class="pin-symbol"></div>
+        <div class="word">locolie</div>
+      </div>
+      <span class="logo-tile-name">Classic combination</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================
+     § 02 - BRAND SYSTEM
+     ============================================================ -->
+<div class="section">
+  <div class="sec-head">
+    <span class="sec-num">§ 02 · Brand System</span>
+    <span class="sec-meta">Palette · Typography</span>
+  </div>
+  <h2 class="sec-title">Bold, warm, commercial.</h2>
+  <p class="sec-lede">Deep navy anchors the system. Coral handles offers and the brand personality. Marketplace yellow does ratings - universal language for trust. All set in Inter for an iOS-native, e-commerce feel.</p>
+
+  <div class="system-row">
+    <div class="palette">
+      <div class="swatch sw-ink"><div class="swatch-name">Ink</div><div class="swatch-hex">#0F2D38</div></div>
+      <div class="swatch sw-accent"><div class="swatch-name">Coral</div><div class="swatch-hex">#D9603B</div></div>
+      <div class="swatch sw-star"><div class="swatch-name">Star</div><div class="swatch-hex">#FFA41C</div></div>
+      <div class="swatch sw-sage"><div class="swatch-name">Sage</div><div class="swatch-hex">#6FA286</div></div>
+      <div class="swatch sw-bg"><div class="swatch-name">White</div><div class="swatch-hex">#FFFFFF</div></div>
+      <div class="swatch sw-line"><div class="swatch-name">Grey 1</div><div class="swatch-hex">#F7F8FA</div></div>
+    </div>
+    <div class="typography">
+      <div class="type-row">
+        <div class="type-label">Display · Inter Black</div>
+        <div class="type-display">Local offers.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">Body · Inter Regular</div>
+        <div class="type-body">The quick brown fox jumps over the lazy dog - Inter at body weight, optimised for product UI and long-form reading alike.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">Mono · JetBrains Mono</div>
+        <div class="type-mono">Codes · Labels · 01234</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     § 03 - APP SCREENS
+     ============================================================ -->
+<div class="section">
+  <div class="sec-head">
+    <span class="sec-num">§ 03 · The App</span>
+    <span class="sec-meta">10 screens · Marketplace UX</span>
+  </div>
+  <h2 class="sec-title">Commercial polish, every screen.</h2>
+  <p class="sec-lede">Dense info, prominent ratings, bright CTAs - the conventions that make marketplace apps trustworthy and quick to scan. Bottom-anchored on the QR redemption flow that captures customer data for the business.</p>
+
+  <div class="screen-grid">
+
+    <!-- ============= 1: WELCOME ============= -->
+    <div class="screen-wrap">
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="sb"><span>9:41</span><span class="sb-right"><span class="sb-bars"><i></i><i></i><i></i><i></i></span><span class="sb-wifi"></span><span class="sb-bat"></span></span></div>
+          <div class="scr s1-content">
+            <div class="s1-brand">GoLoca<span class="pin-dot"></span>l</div>
+            <div class="s1-tagline">Discover offers from independent local businesses near you.</div>
+            <div class="s1-bullets">
+              <div class="s1-bullet">
+                <div class="ic-wrap"><svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M20 10c0 7-8 13-8 13s-8-6-8-13a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div>
+                <div><strong>Local businesses</strong>Find indies near you on a map.</div>
+              </div>
+              <div class="s1-bullet">
+                <div class="ic-wrap"><svg class="ic ic-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+                <div><strong>Real reviews</strong>Star ratings from Google.</div>
+              </div>
+              <div class="s1-bullet">
+                <div class="ic-wrap"><svg class="ic ic-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>
+                <div><strong>Scan &amp; save</strong>Scan in-store, get a discount code.</div>
+              </div>
+            </div>
+            <div class="s1-bottom">
+              <div class="btn-coral">Get started</div>
+              <div class="s1-signin">Already a member? <strong>Sign in</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label">
+        <div class="num">01</div>
+        <div class="name">Welcome</div>
+        <div class="desc">Three-point value prop. Bold mark, clear CTAs.</div>
+      </div>
+    </div>
+
+    <!-- ============= 2: ONBOARDING ============= -->
+    <div class="screen-wrap">
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="sb"><span>9:41</span><span class="sb-right"><span class="sb-bars"><i></i><i></i><i></i><i></i></span><span class="sb-wifi"></span><span class="sb-bat"></span></span></div>
+          <div class="scr">
+            <div class="s2-top">
+              <div class="s2-step-row">
+                <div class="s2-step">Step 02 · of 04</div>
+                <div class="s2-skip">Skip</div>
+              </div>
+              <div class="s2-progress"><span></span></div>
+              <div class="s2-h">What are you<br>into?</div>
+              <div class="s2-p">Pick a few. We'll prioritise these.</div>
+            </div>
+            <div class="s2-grid">
+              <div class="cat on">
+                <div class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4Z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></div>
+                Cafés &amp; Food
+              </div>
+              <div class="cat">
+                <div class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><path d="M8 22h8M12 11v11M19 3H5l3 8h8l3-8z"/></svg></div>
+                Pubs &amp; Bars
+              </div>
+              <div class="cat on">
+                <div class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></div>
+                Hair &amp; Beauty
+              </div>
+              <div class="cat">
+                <div class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
+                Retail
+              </div>
+              <div class="cat">
+                <div class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76Z"/></svg></div>
+                Trades
+              </div>
+              <div class="cat on">
+                <div class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><path d="M6.5 6.5h11v11h-11z"/><path d="M21 12h-3M6 12H3M12 6V3M12 21v-3"/></svg></div>
+                Fitness
+              </div>
+            </div>
+            <div class="s2-foot"><div class="btn-coral">Continue</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label">
+        <div class="num">02</div>
+        <div class="name">Onboarding</div>
+        <div class="desc">Category picker. Bold, fast, four steps total.</div>
+      </div>
+    </div>
+
+    <!-- ============= 3: HOME / DISCOVER ============= -->
+    <div class="screen-wrap">
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="sb"><span>9:41</span><span class="sb-right"><span class="sb-bars"><i></i><i></i><i></i><i></i></span><span class="sb-wifi"></span><span class="sb-bat"></span></span></div>
+          <div class="scr">
+            <div class="app-header">
+              <div class="app-header-row">
+                <span class="app-header-brand">GoLoca<span class="pin-dot"></span>l</span>
+                <div class="app-header-loc">
+                  <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M20 10c0 7-8 13-8 13s-8-6-8-13a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <span><strong>Wokingham</strong></span>
+                </div>
+              </div>
+              <div class="app-search-bar">
+                <div class="app-search-input">
+                  <svg class="ic ic-sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                  <span>Search shops &amp; offers</span>
+                </div>
+                <div class="app-search-btn">
+                  <svg class="ic ic-sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                </div>
+              </div>
+            </div>
+            <div class="home-scroll">
+              <div class="home-pill-row">
+                <div class="home-pill on">All</div>
+                <div class="home-pill">Open now</div>
+                <div class="home-pill">Top rated</div>
+                <div class="home-pill">New</div>
+              </div>
+              <div class="home-section">
+                <div class="home-section-head">
+                  <div class="home-section-title">Featured today</div>
+                  <div class="home-section-link">See all</div>
+                </div>
+                <div class="featured-card">
+                  <div class="featured-img">
+                    <div class="featured-tag">20% OFF</div>
+                  </div>
+                  <div class="featured-info">
+                    <div class="featured-name">The Workshop Café</div>
+                    <div class="featured-meta">
+                      <span style="color: var(--star); display:inline-flex; align-items:center; gap:2px; font-weight:600;">
+                        <svg class="ic ic-sm ic-filled" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        4.8
+                      </span>
+                      <span>(247)</span>
+                      <span>·</span>
+                      <span>0.3 mi</span>
+                    </div>
+                    <div class="featured-offer">20% OFF · MON-FRI</div>
+                  </div>
+                </div>
+              </div>
+              <div class="home-section">
+                <div class="home-section-head">
+                  <div class="home-section-title">Near you</div>
+                  <div class="home-section-link">See all</div>
+                </div>
+                <div class="compact-list">
+                  <div class="compact-row">
+                    <div class="img img-tile2"></div>
+                    <div class="info">
+                      <div class="name">The Bramble Bistro</div>
+                      <div class="meta">
+                        <span class="star"><svg class="ic ic-sm ic-filled" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>4.9</span>
+                        <span>·</span><span>French · 0.4 mi</span>
+                      </div>
+                    </div>
+                    <div class="offer-pill">2-FOR-1</div>
+                  </div>
+                  <div class="compact-row">
+                    <div class="img img-tile3"></div>
+                    <div class="info">
+                      <div class="name">Salon Loft</div>
+                      <div class="meta">
+                        <span class="star"><svg class="ic ic-sm ic-filled" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>4.7</span>
+                        <span>·</span><span>Hair · 0.5 mi</span>
+                      </div>
+                    </div>
+                    <div class="offer-pill">15% OFF</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="tabbar">
+            <div class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><div>Home</div></div>
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><div>Search</div></div>
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><div>Scan</div></div>
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><div>Saved</div></div>
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2"/></svg><div>You</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label">
+        <div class="num">03</div>
+        <div class="name">Home</div>
+        <div class="desc">Navy header, yellow search button, "Featured today" + "Near you" feeds.</div>
+      </div>
+    </div>
+
+    <!-- ============= 4: SEARCH ============= -->
+    <div class="screen-wrap">
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="sb"><span>9:41</span><span class="sb-right"><span class="sb-bars"><i></i><i></i><i></i><i></i></span><span class="sb-wifi"></span><span class="sb-bat"></span></span></div>
+          <div class="scr">
+            <div class="s4-bar">
+              <div class="s4-input-real">
+                <svg class="ic ic-sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <span>haircut<span class="cursor"></span></span>
+              </div>
+              <div class="s4-cancel">Cancel</div>
+            </div>
+            <div class="s4-recent">
+              <div class="s4-recent-h">Recent</div>
+              <div class="s4-recent-row">
+                <svg class="ic ic-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <div class="text">brunch wokingham</div>
+                <svg class="ic ic-sm" viewBox="0 0 24 24" style="color: var(--muted)"><path d="m17 7-10 10"/><path d="M7 7h10v10"/></svg>
+              </div>
+              <div class="s4-recent-row">
+                <svg class="ic ic-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <div class="text">mot near me</div>
+                <svg class="ic ic-sm" viewBox="0 0 24 24" style="color: var(--muted)"><path d="m17 7-10 10"/><path d="M7 7h10v10"/></svg>
+              </div>
+              <div class="s4-recent-row">
+                <svg class="ic ic-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <div class="text">date night dinner</div>
+                <svg class="ic ic-sm" viewBox="0 0 24 24" style="color: var(--muted)"><path d="m17 7-10 10"/><path d="M7 7h10v10"/></svg>
+              </div>
+            </div>
+            <div class="s4-trending">
+              <div class="s4-recent-h">Trending in Wokingham</div>
+              <div class="s4-trending-tags">
+                <div class="tag hot">🔥 Sunday roast</div>
+                <div class="tag">Coffee</div>
+                <div class="tag">Pizza</div>
+                <div class="tag">Yoga</div>
+                <div class="tag">Florist</div>
+                <div class="tag">Tattoo</div>
+                <div class="tag">Pet groomer</div>
+                <div class="tag">Bike repair</div>
+              </div>
+            </div>
+          </div>
+          <div class="tabbar">
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><div>Home</div></div>
+            <div class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><div>Search</div></div>
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><div>Scan</div></div>
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><div>Saved</div></div>
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2"/></svg><div>You</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label">
+        <div class="num">04</div>
+        <div class="name">Search</div>
+        <div class="desc">Recent queries + trending tags. Fast retrieval, no AI required.</div>
+      </div>
+    </div>
+
+    <!-- ============= 5: LIST ============= -->
+    <div class="screen-wrap">
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="sb"><span>9:41</span><span class="sb-right"><span class="sb-bars"><i></i><i></i><i></i><i></i></span><span class="sb-wifi"></span><span class="sb-bat"></span></span></div>
+          <div class="scr">
+            <div class="s5-head">
+              <div class="s5-loc"><svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M20 10c0 7-8 13-8 13s-8-6-8-13a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Wokingham · RG40</div>
+              <div class="s5-h">Cafés &amp; Food</div>
+              <div class="s5-meta"><strong>28 places</strong> with live offers</div>
+            </div>
+            <div class="s5-sort-row">
+              <div class="pill on">
+                <svg class="ic ic-sm" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Distance
+              </div>
+              <div class="pill">Top rated</div>
+              <div class="pill">Open now</div>
+              <div class="pill">
+                <svg class="ic ic-sm" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+                Filter
+              </div>
+            </div>
+            <div class="s5-list">
+              <div class="biz-card">
+                <div class="img img-tile1"></div>
+                <div class="biz-info">
+                  <div class="biz-name">The Workshop Café</div>
+                  <div class="biz-rating-row">
+                    <span class="stars-vis">
+                      <svg class="ic ic-sm ic-filled" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <svg class="ic ic-sm ic-filled" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <svg class="ic ic-sm ic-filled" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <svg class="ic ic-sm ic-filled" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <svg class="ic ic-sm ic-filled" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    </span>
+                    <span class="count">4.8 (247)</span>
+                  </div>
+                  <div class="biz-cat">Café · ££ · 0.3 mi · Open</div>
+                  <div class="biz-offer-tag">20% OFF · MON-FRI</div>
+                </div>
+              </div>
+              <div class="biz-card">
+                <div class="img img-tile2"></div>
+                <div class="biz-info">
+                  <div class="biz-name">The Bramble Bistro</div>
+                  <div class="biz-rating-row">
+                    <span class="stars-vis">
+                      <svg class="ic ic-sm ic-filled" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <svg class="ic ic-sm ic-filled" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <svg class="ic ic-sm ic-filled" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <svg class="ic ic-sm ic-filled" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <svg class="ic ic-sm ic-filled" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    </span>
+                    <span class="count">4.9 (412)</span>
+                  </div>
+                  <div class="biz-cat">French · £££ · 0.4 mi · Open</div>
+                  <div class="biz-offer-tag">2-FOR-1 MAINS</div>
+                </div>
+              </div>
+              <div class="biz-card">
+                <div class="img img-tile5"></div>
+                <div class="biz-info">
+                  <div class="biz-name">Penrose &amp; Wright</div>
+                  <div class="biz-rating-row">
+                    <span class="stars-vis">
+                      <svg class="ic ic-sm ic-filled" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <svg class="ic ic-sm ic-filled" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <svg class="ic ic-sm ic-filled" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <svg class="ic ic-sm ic-filled" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <svg class="ic ic-sm ic-filled" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    </span>
+                    <span class="count">4.7 (138)</span>
+                  </div>
+                  <div class="biz-cat">Wine bar · ££ · 0.2 mi</div>
+                  <div class="biz-offer-tag">25% OFF PLATES</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label">
+        <div class="num">05</div>
+        <div class="name">Category list</div>
+        <div class="desc">5-star visual rating, count in parens, offer tag on every card.</div>
+      </div>
+    </div>
+
+    <!-- ============= 6: BUSINESS PROFILE ============= -->
+    <div class="screen-wrap">
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="sb"><span>9:41</span><span class="sb-right"><span class="sb-bars"><i></i><i></i><i></i><i></i></span><span class="sb-wifi"></span><span class="sb-bat"></span></span></div>
+          <div class="scr">
+            <div class="s6-hero">
+              <div class="s6-back"><svg class="ic" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+              <div class="s6-share"><svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/></svg></div>
+              <div class="s6-save"><svg class="ic ic-sm ic-filled" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+              <div class="s6-photos-pill">
+                <svg class="ic ic-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                12 photos
+              </div>
+              <div class="s6-photo-dots"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+            </div>
+            <div class="s6-body">
+              <div class="s6-name">The Workshop Café</div>
+              <div class="s6-rating-row">
+                <span class="num">4.8</span>
+                <span class="stars-vis">
+                  <svg class="ic ic-sm ic-filled" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  <svg class="ic ic-sm ic-filled" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  <svg class="ic ic-sm ic-filled" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  <svg class="ic ic-sm ic-filled" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  <svg class="ic ic-sm ic-filled" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </span>
+                <span class="count">247 Google reviews ›</span>
+              </div>
+              <div class="s6-cat-meta">
+                <span>Café</span>
+                <span class="dot-sep"></span>
+                <span>££</span>
+                <span class="dot-sep"></span>
+                <span>0.3 mi</span>
+                <span class="dot-sep"></span>
+                <span class="open">Open until 5pm</span>
+              </div>
+              <div class="s6-quick">
+                <div class="qa">
+                  <svg class="ic" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
+                  Call
+                </div>
+                <div class="qa">
+                  <svg class="ic" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                  Directions
+                </div>
+                <div class="qa">
+                  <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                  Website
+                </div>
+                <div class="qa">
+                  <svg class="ic" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                  Share
+                </div>
+              </div>
+              <div class="s6-offer-card">
+                <div class="s6-offer-eb"><span class="live"></span> Live offer · Ends 30 Jun</div>
+                <div class="s6-offer-title">20% off everything,<br>Monday to Friday</div>
+                <div class="s6-offer-meta">Eat-in only · One per customer</div>
+                <div class="s6-claim-btn">
+                  <svg class="ic ic-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                  Scan to claim
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label">
+        <div class="num">06</div>
+        <div class="name">Business profile</div>
+        <div class="desc">Google photos, 5-star visual rating, call/directions/website/share, yellow CTA.</div>
+      </div>
+    </div>
+
+    <!-- ============= 7: OFFER DETAIL ============= -->
+    <div class="screen-wrap">
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="sb"><span>9:41</span><span class="sb-right"><span class="sb-bars"><i></i><i></i><i></i><i></i></span><span class="sb-wifi"></span><span class="sb-bat"></span></span></div>
+          <div class="scr">
+            <div class="s7-content">
+              <div class="s7-navback">
+                <svg class="ic ic-sm" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+                <span>Back</span>
+              </div>
+              <div class="s7-eb"><span class="live"></span> Live · Ends 30 Jun</div>
+              <div class="s7-h">20% off <span class="accent">everything.</span></div>
+              <div class="s7-biz-row">
+                <div class="s7-biz-img"></div>
+                <div class="s7-biz-info">
+                  <div class="s7-biz-name">The Workshop Café</div>
+                  <div class="s7-biz-meta">
+                    <span class="star"><svg class="ic ic-sm ic-filled" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+                    <span>4.8 (247) · Wokingham</span>
+                  </div>
+                </div>
+                <svg class="ic ic-sm" viewBox="0 0 24 24" style="color: var(--muted)"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+              <p class="s7-desc">Twenty per cent off your entire bill, Monday to Friday. Brunch, lunch, coffee, the lot.</p>
+              <div class="s7-terms">
+                <div class="s7-terms-h">Terms</div>
+                <ul class="s7-terms-list">
+                  <li>Eat-in only · Mon-Fri</li>
+                  <li>One redemption per customer</li>
+                  <li>Cannot combine with other offers</li>
+                </ul>
+              </div>
+              <div class="s7-cta">
+                <svg class="ic ic-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                Scan in-store QR
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label">
+        <div class="num">07</div>
+        <div class="name">Offer detail</div>
+        <div class="desc">Hero discount in display weight, business card, clean terms, yellow scan CTA.</div>
+      </div>
+    </div>
+
+    <!-- ============= 8: SCANNER ============= -->
+    <div class="screen-wrap">
+      <div class="phone">
+        <div class="phone-screen s8">
+          <div class="sb"><span>9:41</span><span class="sb-right"><span class="sb-bars"><i></i><i></i><i></i><i></i></span><span class="sb-wifi"></span><span class="sb-bat"></span></span></div>
+          <div class="s8-content">
+            <div class="s8-top">
+              <div class="s8-cancel">Cancel</div>
+              <div class="s8-flash">
+                <svg class="ic ic-sm" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              </div>
+            </div>
+            <div class="s8-center">
+              <div class="s8-frame">
+                <div class="corner tl"></div>
+                <div class="corner tr"></div>
+                <div class="corner bl"></div>
+                <div class="corner br"></div>
+                <div class="s8-qr">
+                  <i></i><i></i><i></i><i></i><i></i><i class="off"></i><i></i><i></i><i></i><i></i><i></i>
+                  <i></i><i class="off"></i><i class="off"></i><i class="off"></i><i></i><i></i><i></i><i class="off"></i><i class="off"></i><i class="off"></i><i></i>
+                  <i></i><i class="off"></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i>
+                  <i></i><i class="off"></i><i></i><i class="off"></i><i></i><i></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i>
+                  <i></i><i class="off"></i><i class="off"></i><i class="off"></i><i></i><i></i><i></i><i class="off"></i><i class="off"></i><i class="off"></i><i></i>
+                  <i></i><i></i><i></i><i></i><i></i><i class="off"></i><i></i><i></i><i></i><i></i><i></i>
+                  <i class="off"></i><i></i><i class="off"></i><i></i><i></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i><i class="off"></i>
+                  <i></i><i></i><i></i><i></i><i></i><i class="off"></i><i></i><i></i><i></i><i></i><i></i>
+                  <i></i><i class="off"></i><i class="off"></i><i class="off"></i><i></i><i></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i>
+                  <i></i><i class="off"></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i><i></i><i class="off"></i><i class="off"></i><i></i>
+                  <i></i><i></i><i></i><i></i><i></i><i class="off"></i><i></i><i></i><i></i><i></i><i></i>
+                </div>
+                <div class="s8-scanline"></div>
+              </div>
+              <div class="s8-prompt">
+                <div class="h">Point at the QR code</div>
+                <div class="p">Find the locolie sticker in the window or by the till.</div>
+              </div>
+            </div>
+            <div class="s8-tip">Auto-focusing</div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label">
+        <div class="num">08</div>
+        <div class="name">QR scanner</div>
+        <div class="desc">Dark, focused. Yellow viewfinder corners, ghost QR, scanline.</div>
+      </div>
+    </div>
+
+    <!-- ============= 9: CODE REVEALED ============= -->
+    <div class="screen-wrap">
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="sb"><span>9:41</span><span class="sb-right"><span class="sb-bars"><i></i><i></i><i></i><i></i></span><span class="sb-wifi"></span><span class="sb-bat"></span></span></div>
+          <div class="scr s9-content">
+            <div class="s9-success">
+              <svg class="ic ic-xl" viewBox="0 0 24 24" style="stroke-width:2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="s9-h">You're in.</div>
+            <div class="s9-sub">Show this to staff at the till to redeem your discount.</div>
+            <div class="s9-card">
+              <div class="s9-card-eb">Your code</div>
+              <div class="s9-code">7H · 4K · 2P</div>
+              <div class="s9-card-divider"></div>
+              <div class="s9-biz">The Workshop Café</div>
+              <div class="s9-offer">20% OFF EVERYTHING</div>
+            </div>
+            <div class="s9-timer">
+              <span class="s9-timer-dot"></span>
+              Valid for 09:42
+            </div>
+            <div class="s9-instructions">
+              <svg class="ic ic-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              Staff will type this into the till. You'll see the discount applied before paying.
+            </div>
+            <div class="s9-done">Done</div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label">
+        <div class="num">09</div>
+        <div class="name">Code revealed</div>
+        <div class="desc">Perforated ticket card. Mono code. 10-min countdown.</div>
+      </div>
+    </div>
+
+    <!-- ============= 10: YOU ============= -->
+    <div class="screen-wrap">
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="sb"><span>9:41</span><span class="sb-right"><span class="sb-bars"><i></i><i></i><i></i><i></i></span><span class="sb-wifi"></span><span class="sb-bat"></span></span></div>
+          <div class="scr">
+            <div class="s10-head">
+              <div class="s10-avatar">T</div>
+              <div>
+                <div class="s10-name">Tom Brookes</div>
+                <div class="s10-loc"><svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M20 10c0 7-8 13-8 13s-8-6-8-13a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Wokingham · RG40</div>
+              </div>
+            </div>
+            <div class="s10-stats">
+              <div class="stat-box"><div class="v">14</div><div class="l">Redeemed</div></div>
+              <div class="stat-box"><div class="v sage">£86</div><div class="l">Saved</div></div>
+              <div class="stat-box"><div class="v accent">9</div><div class="l">Faves</div></div>
+            </div>
+            <div class="s10-tabs">
+              <div class="t on">History</div>
+              <div class="t">Saved</div>
+              <div class="t">Settings</div>
+            </div>
+            <div class="s10-history">
+              <div class="hist-row">
+                <div class="hist-img img-tile1"></div>
+                <div class="hist-info">
+                  <div class="hist-biz">The Workshop Café</div>
+                  <div class="hist-offer">20% off everything</div>
+                </div>
+                <div class="hist-amt"><div class="hist-saved">−£4.20</div><div class="hist-date">Today</div></div>
+              </div>
+              <div class="hist-row">
+                <div class="hist-img img-tile4"></div>
+                <div class="hist-info">
+                  <div class="hist-biz">Hartford &amp; Sons</div>
+                  <div class="hist-offer">£15 off MOT</div>
+                </div>
+                <div class="hist-amt"><div class="hist-saved">−£15.00</div><div class="hist-date">Tue</div></div>
+              </div>
+              <div class="hist-row">
+                <div class="hist-img img-tile3"></div>
+                <div class="hist-info">
+                  <div class="hist-biz">Salon Loft</div>
+                  <div class="hist-offer">15% off first cut</div>
+                </div>
+                <div class="hist-amt"><div class="hist-saved">−£8.25</div><div class="hist-date">3 Jun</div></div>
+              </div>
+              <div class="hist-row">
+                <div class="hist-img img-tile2"></div>
+                <div class="hist-info">
+                  <div class="hist-biz">The Bramble Bistro</div>
+                  <div class="hist-offer">2-for-1 mains</div>
+                </div>
+                <div class="hist-amt"><div class="hist-saved">−£18.50</div><div class="hist-date">31 May</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label">
+        <div class="num">10</div>
+        <div class="name">Your account</div>
+        <div class="desc">Avatar, savings total, history. Loyalty without stamp cards.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================
+     § 04 - GOOGLE BUSINESS INTEGRATION
+     ============================================================ -->
+<div class="section">
+  <div class="sec-head">
+    <span class="sec-num">§ 04 · Google Business Profile</span>
+    <span class="sec-meta">Integration spec</span>
+  </div>
+  <h2 class="sec-title">Every profile, pre-filled.</h2>
+  <p class="sec-lede">Merchants don't type their address, phone, hours or photos. Google Business Profile data flows in via Places API, pre-fills everything, and refreshes automatically. The business adds the one thing Google doesn't have: an offer.</p>
+
+  <div class="gspec-grid">
+    <div class="gspec-card">
+      <span class="eb">What we pull</span>
+      <h4>The full record.</h4>
+      <ul class="gspec-list">
+        <li><strong>Name</strong> <code>displayName</code></li>
+        <li><strong>Address</strong> <code>formattedAddress</code></li>
+        <li><strong>Phone</strong> <code>internationalPhoneNumber</code></li>
+        <li><strong>Website</strong> <code>websiteUri</code></li>
+        <li><strong>Hours</strong> <code>regularOpeningHours</code></li>
+        <li><strong>Star rating</strong> <code>rating</code></li>
+        <li><strong>Review count</strong> <code>userRatingCount</code></li>
+        <li><strong>Photos</strong> <code>photos[] · up to 10</code></li>
+        <li><strong>Reviews</strong> <code>reviews[] · up to 5</code></li>
+      </ul>
+    </div>
+    <div class="gspec-card">
+      <span class="eb">Endpoints</span>
+      <h4>Two APIs, simple.</h4>
+      <ul class="gspec-list">
+        <li><strong>Text Search</strong> <code>POST /places:searchText</code></li>
+        <li><strong>Place Details</strong> <code>GET /places/{id}</code></li>
+        <li><strong>Photo</strong> <code>GET /places/{id}/photos/{ref}</code></li>
+        <li><strong>Geocoding</strong> <code>GET /geocode/json</code></li>
+        <li><strong>Maps SDK iOS</strong> <code>Free unlimited</code></li>
+      </ul>
+      <p style="margin-top: 14px; font-size: 12px; color: var(--muted);">Field-mask aggressively. Cache 30 days. Refresh ratings weekly, photos monthly, base fields quarterly. Est. cost <strong style="color: var(--text);">£40-80/mo</strong> at 500 businesses.</p>
+    </div>
+  </div>
+
+  <div class="data-flow">
+    <span class="eb">Data flow</span>
+    <h4>Sign up to live profile - under a minute.</h4>
+    <p>The merchant onboarding is a single search field. They type the business name, we find it on Google, pull the full record, they confirm. That's it.</p>
+    <div class="flow-row">
+      <div class="flow-step">
+        <div class="flow-step-num">01</div>
+        <h5>Search</h5>
+        <p>Type business name. Places Text Search returns matches.</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">02</div>
+        <h5>Confirm</h5>
+        <p>Show top 3 with address + photo. Tap the right one.</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">03</div>
+        <h5>Hydrate</h5>
+        <p>Place Details with full field mask. Store in Supabase.</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">04</div>
+        <h5>Refresh</h5>
+        <p>Nightly cron updates ratings. Weekly pulls new photos.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     § 05 - BUSINESS PLAN (CONCISE)
+     ============================================================ -->
+<div class="section">
+  <div class="sec-head">
+    <span class="sec-num">§ 05 · Business Plan</span>
+    <span class="sec-meta">One-page summary</span>
+  </div>
+  <h2 class="sec-title">The thesis, tight.</h2>
+  <p class="sec-lede">A condensed version of the full plan. Free-to-use iOS app helping consumers discover offers from independent local businesses and helping those businesses reach new customers with verified, consented contact data.</p>
+
+  <div class="plan-thesis">
+    <div class="plan-thesis-text">
+      <span class="eb">Thesis</span>
+      <h4>A free, frictionless marketplace for local indie offers.</h4>
+      <p>Two-sided, both free to start. Consumers find live discounts from indies on a map. Businesses get a self-serve profile pre-filled from Google, a window-sticker QR, and customer email capture on every redemption. Monetises via freemium business tiers, sponsored emails, and AdMob - activated from Month 6 once density proves.</p>
+    </div>
+    <div class="plan-stats">
+      <div class="plan-stat"><div class="plan-stat-v">500K</div><div class="plan-stat-l">UK indie<br>businesses</div></div>
+      <div class="plan-stat"><div class="plan-stat-v">3 mo.</div><div class="plan-stat-l">Target time<br>to MVP</div></div>
+      <div class="plan-stat"><div class="plan-stat-v">&lt;£5K</div><div class="plan-stat-l">Year-one<br>budget</div></div>
+      <div class="plan-stat"><div class="plan-stat-v">UK</div><div class="plan-stat-l">National<br>from day one</div></div>
+    </div>
+  </div>
+
+  <div class="plan-grid">
+    <div class="plan-card">
+      <span class="eb">Problem</span>
+      <h5>Indies have no working marketing channel.</h5>
+      <p>Google Maps shows businesses but not their current deals. Facebook Ads need expertise indies don't have. Most local businesses rely on word-of-mouth and have no functional digital acquisition channel.</p>
+    </div>
+    <div class="plan-card">
+      <span class="eb">Solution</span>
+      <h5>Free profile + QR-scan customer capture.</h5>
+      <p>Self-serve onboarding pre-filled from Google. Publish offers in minutes. Every QR scan = a new customer with verified email and consented profile data, flowing to the business portal.</p>
+    </div>
+    <div class="plan-card">
+      <span class="eb">Market</span>
+      <h5>~500K addressable UK indies.</h5>
+      <p>1.5-2M micro indie businesses across retail, hospitality, services, trades. Year 1 reachable in 3 seed towns: ~2,000-3,000 indies, ~400K consumers in Wokingham, Reading + 1.</p>
+    </div>
+    <div class="plan-card">
+      <span class="eb">Model</span>
+      <h5>Free → Freemium → Diversified.</h5>
+      <ul>
+        <li><strong>Mo. 1-6:</strong> Free both sides. Prove density.</li>
+        <li><strong>Mo. 6-12:</strong> Business freemium £15-25/mo + sponsored emails.</li>
+        <li><strong>Year 2+:</strong> Tiers, white-label councils, affiliate revenue.</li>
+      </ul>
+    </div>
+    <div class="plan-card">
+      <span class="eb">Go-to-market</span>
+      <h5>Density first, geography second.</h5>
+      <p>Launch UK-wide in App Store. Actively recruit 50-100 businesses in 2 seed towns. Free channels: BIDs, Chambers, indie associations, local Facebook groups, subreddits, local press. Paid only after density proves the unit economics.</p>
+    </div>
+    <div class="plan-card">
+      <span class="eb">Tech</span>
+      <h5>AI-assisted, self-built, bootstrapped.</h5>
+      <p>SwiftUI or FlutterFlow for iOS. Next.js + Supabase for the portal. Google Maps + Places API for everything geographic. Built with Claude Code. No agency, no employees Year 1.</p>
+    </div>
+    <div class="plan-card">
+      <span class="eb">Costs</span>
+      <h5>Year 1 ≈ £2K-4.8K.</h5>
+      <ul>
+        <li><strong>Apple Dev</strong> £80/yr</li>
+        <li><strong>Hosting + DB</strong> £0-300/yr</li>
+        <li><strong>Google Maps API</strong> £100-1,000/yr</li>
+        <li><strong>Marketing + brand</strong> £500-1,500/yr</li>
+        <li><strong>Legal + admin</strong> £200/yr</li>
+      </ul>
+    </div>
+    <div class="plan-card">
+      <span class="eb">Top risks</span>
+      <h5>Three things that could kill this.</h5>
+      <ul>
+        <li><strong>Cold start.</strong> Sparse density on both sides. Fix: seed towns first.</li>
+        <li><strong>iOS only.</strong> Misses ~50% UK Android share. Fix: Android Mo. 4-6.</li>
+        <li><strong>Founder bandwidth.</strong> Side-project pace. Fix: be honest about timeline.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     § 06 - OPEN QUESTIONS
+     ============================================================ -->
+<div class="section">
+  <div class="sec-head">
+    <span class="sec-num">§ 06 · Open Questions</span>
+    <span class="sec-meta">To resolve before MVP</span>
+  </div>
+  <h2 class="sec-title">What we haven't decided yet.</h2>
+  <p class="sec-lede">Six categories of open questions worth thinking through. None block starting - but each will need an answer before public launch. Grouped by the function that needs to weigh in.</p>
+
+  <div class="q-groups">
+
+    <div class="q-group">
+      <div class="q-group-head">
+        <h5>Brand &amp; Name</h5>
+        <span class="q-count">04</span>
+      </div>
+      <ol class="q-list">
+        <li>Which of the ten logo concepts is the right direction? Is "locolie" the final name, or should we test "Highstreet", "Vicinity", "Postcode Perks" etc.?</li>
+        <li><strong>Trademark check</strong> across the UK IPO and EUIPO for the chosen name and mark.</li>
+        <li>What's the brand voice - friendly local-business cheerleader, slick marketplace, or something else?</li>
+        <li>Do we need an explicit "for indies, not chains" position, or does that read as small-minded?</li>
+      </ol>
+    </div>
+
+    <div class="q-group">
+      <div class="q-group-head">
+        <h5>Product</h5>
+        <span class="q-count">06</span>
+      </div>
+      <ol class="q-list">
+        <li><strong>Redemption code length and security.</strong> 6-digit, 8-digit, signed JWT? What's the spoof risk?</li>
+        <li>What happens when a business refuses to honour a valid offer? Customer reporting flow + auto-flagging.</li>
+        <li>How does a customer find <strong>which businesses do which categories</strong> if Google's data is wrong? Manual override?</li>
+        <li>Should the app have an AI assistant from day one, or is that a Phase 2 nice-to-have?</li>
+        <li>Should consumers be able to follow specific businesses for offer notifications?</li>
+        <li>How do we handle businesses that lose their Google Business Profile listing?</li>
+      </ol>
+    </div>
+
+    <div class="q-group">
+      <div class="q-group-head">
+        <h5>Business Model</h5>
+        <span class="q-count">05</span>
+      </div>
+      <ol class="q-list">
+        <li><strong>When does business freemium activate?</strong> At launch, Month 3, or Month 6?</li>
+        <li>What's the right price point for the paid tier - £15, £25, £40/mo?</li>
+        <li>Do we charge per redemption / capture instead of flat monthly?</li>
+        <li>What's the price for a sponsored email push to the consumer base, and what's the floor list size?</li>
+        <li>Should we offer free local-council partnerships in exchange for marketing reach (à la Local Pocket)?</li>
+      </ol>
+    </div>
+
+    <div class="q-group">
+      <div class="q-group-head">
+        <h5>Tech &amp; Build</h5>
+        <span class="q-count">05</span>
+      </div>
+      <ol class="q-list">
+        <li><strong>SwiftUI native vs FlutterFlow vs PWA</strong> - decide after week-one prototype.</li>
+        <li>Where does customer data sit, and how does it flow to the business portal? Direct DB or CRM-style export?</li>
+        <li>What email tooling? Resend? Or integrate with Klaviyo / Mailchimp for sponsored sends?</li>
+        <li>Push notification rules - when do we send, what frequency cap?</li>
+        <li>How does the business verify the redemption code at the till - typed in, scanned by the merchant's phone, or auto-redeemed?</li>
+      </ol>
+    </div>
+
+    <div class="q-group">
+      <div class="q-group-head">
+        <h5>Go-to-Market</h5>
+        <span class="q-count">05</span>
+      </div>
+      <ol class="q-list">
+        <li>Which two seed towns? Wokingham + Reading is the obvious pair - but is a more affluent third town (Henley) or a denser one (Brighton, Bristol) the right next bet?</li>
+        <li>How do we get the first 50 businesses signed up? Door-to-door, BID partnership, paid ads to merchants?</li>
+        <li>What's the launch story for press - "free marketing for indies", "support your high street", or something else?</li>
+        <li>Do we run paid Meta ads to consumers from day one or wait for density?</li>
+        <li><strong>Physical QR window stickers</strong> - print run size, design, distribution. Who fulfils?</li>
+      </ol>
+    </div>
+
+    <div class="q-group">
+      <div class="q-group-head">
+        <h5>Legal &amp; Ops</h5>
+        <span class="q-count">06</span>
+      </div>
+      <ol class="q-list">
+        <li>UK Companies House registration - when, and as Ltd or sole trader to start?</li>
+        <li>T&amp;Cs and Privacy Policy templates - Rocket Lawyer, Genie AI, or bespoke?</li>
+        <li><strong>GDPR &amp; consent flows</strong> for customer data capture on QR scan. Explicit opt-in language.</li>
+        <li>VAT registration - only at £90K threshold, or proactively?</li>
+        <li>Insurance - public liability, professional indemnity, both?</li>
+        <li>Who owns the data - locolie, the business, or shared? Legal basis for sharing customer emails with merchants?</li>
+      </ol>
+    </div>
+
+  </div>
+</div>
+
+<div class="endnote">
+  Brand &amp; App exploration · V0.3 · Iterate from here · locolie
+</div>
+
+</div>
+</body>
+</html>
