@@ -3,114 +3,204 @@
 
 @section('content')
 @include('portal._designnav')
+
+@php
+    // Reusable map-pin glyph (donut hole via even-odd) that scales with font-size.
+    $pin = fn ($c, $h = '0.78em') => '<svg style="height:'.$h.';width:auto;display:inline-block;vertical-align:-0.05em;margin:0 -0.01em" viewBox="0 0 24 24" fill="'.$c.'" fill-rule="evenodd" clip-rule="evenodd" aria-hidden="true"><path d="M12 2C7.58 2 4 5.58 4 10c0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 12 12.5 2.5 2.5 0 0 0 12 7.5Z"/></svg>';
+
+    // "locolie" wordmark with both o's rendered as pins of $pinColor; letters take $textClass.
+    $wm = fn ($pinColor, $textClass = 'text-slate-900') => '<span class="font-extrabold lowercase tracking-tight '.$textClass.'">l'.$pin($pinColor).'c'.$pin($pinColor).'lie</span>';
+
+    // A row of palette chips.
+    $swatch = function ($cols) {
+        $h = '';
+        foreach ($cols as $c) {
+            $h .= '<span class="inline-block h-6 w-6 rounded-md ring-1 ring-black/5" style="background:'.$c.'" title="'.$c.'"></span>';
+        }
+        return $h;
+    };
+@endphp
+
 <div class="mb-8">
     <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">Brand &amp; Logos</h1>
-    <p class="text-slate-500 mt-2 max-w-2xl">Five logo concepts, five app style directions, and the name exploration. All logos are live SVG - resolution-independent and ready to drop into the app or portal.</p>
+    <p class="text-slate-500 mt-2 max-w-2xl">The name is <strong class="text-slate-700">locolie</strong> - lowercase, friendly, with the two o&rsquo;s doubling as map pins. Below: ten logo &amp; colour concepts, five app style directions, and the name rationale. Every mark is live SVG - resolution-independent and ready to drop into the app or portal.</p>
 </div>
 
-{{-- ============================ LOGOS ============================ --}}
-<h2 class="text-xs font-semibold uppercase tracking-wider text-emerald-700 mb-4">01 · Logo concepts</h2>
+{{-- ============================ LOGO & COLOUR CONCEPTS ============================ --}}
+<h2 class="text-xs font-semibold uppercase tracking-wider text-emerald-700 mb-4">01 · Ten logo &amp; colour concepts</h2>
 <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
 
-    {{-- Concept 1: The Pin (primary) --}}
-    <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+    {{-- 01 Twin Pins (PRIMARY) --}}
+    <div class="rounded-2xl border border-emerald-300 bg-white p-6 shadow-sm ring-1 ring-emerald-100">
         <div class="flex items-center gap-4">
-            <svg width="56" height="56" viewBox="0 0 56 56" fill="none" aria-hidden="true">
-                <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#10b981"/><stop offset="1" stop-color="#0d9488"/></linearGradient></defs>
-                <path d="M28 4C18.6 4 11 11.6 11 21c0 12 17 31 17 31s17-19 17-31C45 11.6 37.4 4 28 4Z" fill="url(#g1)"/>
-                <circle cx="28" cy="21" r="7.5" fill="#fff"/>
-            </svg>
+            <div class="h-14 w-14 rounded-2xl shadow-md flex items-center justify-center" style="background:linear-gradient(135deg,#059669,#0d9488)">
+                <svg width="34" height="34" viewBox="0 0 48 24" fill="#fff" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 0C7.58 0 4 3.58 4 8c0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 12 10.5 2.5 2.5 0 0 0 12 5.5Z"/><path d="M36 0c-4.42 0-8 3.58-8 8 0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 36 10.5 2.5 2.5 0 0 0 36 5.5Z"/></svg>
+            </div>
             <div>
-                <div class="text-2xl font-extrabold tracking-tight text-slate-900">Go<span class="text-emerald-600">Local</span></div>
-                <div class="text-xs text-slate-400">The Pin</div>
+                <div class="text-2xl">{!! $wm('#059669') !!}</div>
+                <div class="text-xs text-slate-400">Twin Pins · Emerald</div>
             </div>
         </div>
-        <p class="text-sm text-slate-500 mt-4">The classic map pin = "what's near me." Clean, instantly readable, works tiny on a map. <span class="text-slate-700 font-medium">Recommended primary.</span></p>
+        <p class="text-sm text-slate-500 mt-4">The two o&rsquo;s become map pins - two places, two people meeting locally. Reads tiny on a map and clean as a favicon. <span class="text-emerald-700 font-medium">Recommended primary.</span></p>
+        <div class="flex items-center gap-1.5 mt-4">{!! $swatch(['#059669','#0d9488','#ecfdf5','#064e3b']) !!}</div>
     </div>
 
-    {{-- Concept 2: High Street tile --}}
+    {{-- 02 Loco Loop --}}
     <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
         <div class="flex items-center gap-4">
-            <svg width="56" height="56" viewBox="0 0 56 56" aria-hidden="true">
-                <defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0f766e"/><stop offset="1" stop-color="#065f46"/></linearGradient></defs>
-                <rect width="56" height="56" rx="14" fill="url(#g2)"/>
-                <path d="M14 30v12h7V34h6v8h7v-8h6v8h2V30" stroke="#fff" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
-                <path d="M12 30l4-10h24l4 10" stroke="#fff" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
-                <circle cx="28" cy="16" r="3.5" fill="#a7f3d0"/>
-            </svg>
+            <div class="h-14 w-14 rounded-2xl shadow-md flex items-center justify-center" style="background:linear-gradient(135deg,#06b6d4,#0891b2)">
+                <svg width="30" height="30" viewBox="0 0 56 56" fill="none"><circle cx="28" cy="28" r="17" stroke="#fff" stroke-width="5" stroke-dasharray="74 26" stroke-linecap="round"/><circle cx="28" cy="28" r="6" fill="#fff"/></svg>
+            </div>
             <div>
-                <div class="text-2xl font-extrabold tracking-tight text-slate-900">High<span class="text-teal-600">street</span></div>
-                <div class="text-xs text-slate-400">Rooftops</div>
+                <div class="text-2xl">{!! $wm('#0891b2') !!}</div>
+                <div class="text-xs text-slate-400">Loco Loop · Cyan</div>
             </div>
         </div>
-        <p class="text-sm text-slate-500 mt-4">A row of shop rooftops in an app tile - explicitly indie / high-street, strong PR angle ("save the high street").</p>
+        <p class="text-sm text-slate-500 mt-4">A geo-ring orbiting a centre point - &ldquo;stay in the loop with your town.&rdquo; Retention baked into the mark.</p>
+        <div class="flex items-center gap-1.5 mt-4">{!! $swatch(['#06b6d4','#0891b2','#cffafe','#164e63']) !!}</div>
     </div>
 
-    {{-- Concept 3: The Loop --}}
+    {{-- 03 Pin Drop --}}
     <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
         <div class="flex items-center gap-4">
-            <svg width="56" height="56" viewBox="0 0 56 56" fill="none" aria-hidden="true">
-                <defs><linearGradient id="g3" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#34d399"/><stop offset="1" stop-color="#0891b2"/></linearGradient></defs>
-                <circle cx="28" cy="28" r="18" stroke="url(#g3)" stroke-width="6" fill="none" stroke-dasharray="78 24" stroke-linecap="round"/>
-                <circle cx="28" cy="28" r="6.5" fill="url(#g3)"/>
-            </svg>
+            <div class="h-14 w-14 rounded-2xl shadow-md flex items-center justify-center" style="background:linear-gradient(135deg,#6366f1,#4f46e5)">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 2C7.58 2 4 5.58 4 10c0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 12 12.5 2.5 2.5 0 0 0 12 7.5Z"/></svg>
+            </div>
             <div>
-                <div class="text-2xl font-extrabold tracking-tight text-slate-900">Town<span class="text-cyan-600">Loop</span></div>
-                <div class="text-xs text-slate-400">The Loop</div>
+                <div class="text-2xl">{!! $wm('#4f46e5') !!}</div>
+                <div class="text-xs text-slate-400">Pin Drop · Indigo</div>
             </div>
         </div>
-        <p class="text-sm text-slate-500 mt-4">A geo-ring orbiting a centre point - "stay in the loop with your town." Retention baked into the mark.</p>
+        <p class="text-sm text-slate-500 mt-4">One confident pin, modern and techy. Reads as a serious software product - App-Store ready.</p>
+        <div class="flex items-center gap-1.5 mt-4">{!! $swatch(['#6366f1','#4f46e5','#eef2ff','#312e81']) !!}</div>
     </div>
 
-    {{-- Concept 4: Price-tag pin --}}
+    {{-- 04 High Street --}}
     <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
         <div class="flex items-center gap-4">
-            <svg width="56" height="56" viewBox="0 0 56 56" fill="none" aria-hidden="true">
-                <defs><linearGradient id="g4" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#059669"/><stop offset="1" stop-color="#047857"/></linearGradient></defs>
-                <path d="M27 6 46 6 46 25 27 44 8 25 27 6Z" transform="rotate(45 28 25)" fill="url(#g4)"/>
-                <circle cx="34" cy="18" r="3.6" fill="#fff"/>
-            </svg>
+            <div class="h-14 w-14 rounded-2xl shadow-md flex items-center justify-center" style="background:linear-gradient(135deg,#f59e0b,#b45309)">
+                <svg width="32" height="32" viewBox="0 0 56 56"><path d="M14 30v12h7V34h6v8h7v-8h6v8h2V30" stroke="#fff" stroke-width="2.5" fill="none" stroke-linejoin="round"/><path d="M12 30l4-10h24l4 10" stroke="#fff" stroke-width="2.5" fill="none" stroke-linejoin="round"/></svg>
+            </div>
             <div>
-                <div class="text-2xl font-extrabold tracking-tight text-slate-900">Go<span class="text-emerald-600">Local</span></div>
-                <div class="text-xs text-slate-400">Tag + Pin</div>
+                <div class="text-2xl">{!! $wm('#b45309') !!}</div>
+                <div class="text-xs text-slate-400">High Street · Amber</div>
             </div>
         </div>
-        <p class="text-sm text-slate-500 mt-4">A price tag shaped like a location marker - fuses "offer" and "nearby" into one symbol. Great as a standalone favicon.</p>
+        <p class="text-sm text-slate-500 mt-4">A row of shop rooftops - explicitly indie. Warm and inviting, with a strong &ldquo;save the high street&rdquo; PR angle.</p>
+        <div class="flex items-center gap-1.5 mt-4">{!! $swatch(['#f59e0b','#b45309','#fffbeb','#78350f']) !!}</div>
     </div>
 
-    {{-- Concept 5: Friendly wordmark (Mooch) --}}
+    {{-- 05 Coral Pop --}}
     <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
         <div class="flex items-center gap-4">
-            <svg width="56" height="56" viewBox="0 0 56 56" fill="none" aria-hidden="true">
-                <rect width="56" height="56" rx="18" fill="#ecfdf5"/>
-                <circle cx="28" cy="20" r="5.5" fill="#10b981"/>
-                <path d="M28 25c-7 0-12 5-12 12v3h24v-3c0-7-5-12-12-12Z" fill="#10b981" opacity=".25"/>
-            </svg>
+            <div class="h-14 w-14 rounded-2xl flex items-center justify-center" style="background:#f43f5e;box-shadow:3px 3px 0 #881337">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 2C7.58 2 4 5.58 4 10c0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 12 12.5 2.5 2.5 0 0 0 12 7.5Z"/></svg>
+            </div>
             <div>
-                <div class="text-2xl font-extrabold tracking-tight lowercase text-slate-900">mooch<span class="text-emerald-500">.</span></div>
-                <div class="text-xs text-slate-400">Friendly wordmark</div>
+                <div class="text-2xl">{!! $wm('#e11d48') !!}</div>
+                <div class="text-xs text-slate-400">Coral Pop · Rose</div>
             </div>
         </div>
-        <p class="text-sm text-slate-500 mt-4">Lowercase, warm, the dot doubling as a pin. Pairs with the playful "have a mooch" name - younger, more consumer-loved.</p>
+        <p class="text-sm text-slate-500 mt-4">Chunky, neo-brutalist, full of energy. The most &ldquo;consumer brand&rdquo; option - youthful and very memorable.</p>
+        <div class="flex items-center gap-1.5 mt-4">{!! $swatch(['#f43f5e','#e11d48','#fff1f2','#881337']) !!}</div>
     </div>
 
-    {{-- App icon row --}}
-    <div class="rounded-2xl border border-dashed border-slate-300 bg-white/60 p-6 shadow-sm flex flex-col">
-        <div class="text-xs text-slate-400 mb-3">App icon - at a glance</div>
-        <div class="flex items-center gap-3 flex-wrap">
-            <div class="h-14 w-14 rounded-2xl shadow-md flex items-center justify-center" style="background:linear-gradient(135deg,#10b981,#0d9488)">
-                <svg width="26" height="26" viewBox="0 0 56 56"><path d="M28 4C18.6 4 11 11.6 11 21c0 12 17 31 17 31s17-19 17-31C45 11.6 37.4 4 28 4Z" fill="#fff"/><circle cx="28" cy="21" r="7.5" fill="#10b981"/></svg>
+    {{-- 06 Sunset --}}
+    <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+        <div class="flex items-center gap-4">
+            <div class="h-14 w-14 rounded-2xl shadow-md flex items-center justify-center" style="background:linear-gradient(135deg,#f97316,#ec4899)">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 2C7.58 2 4 5.58 4 10c0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 12 12.5 2.5 2.5 0 0 0 12 7.5Z"/></svg>
             </div>
-            <div class="h-14 w-14 rounded-2xl shadow-md flex items-center justify-center text-white font-extrabold text-2xl" style="background:linear-gradient(135deg,#0f766e,#065f46)">G</div>
-            <div class="h-14 w-14 rounded-2xl shadow-md bg-white flex items-center justify-center text-emerald-600 font-extrabold text-2xl border border-slate-200">G</div>
+            <div>
+                <div class="text-2xl">{!! $wm('#ea580c') !!}</div>
+                <div class="text-xs text-slate-400">Sunset · Orange &rarr; Pink</div>
+            </div>
         </div>
-        <p class="text-sm text-slate-500 mt-4">The same pin reads cleanly as a home-screen icon in colour, knockout and light variants.</p>
+        <p class="text-sm text-slate-500 mt-4">A warm gradient pin - friendly, lifestyle, Instagram-native. Feels like evenings out and weekend treats.</p>
+        <div class="flex items-center gap-1.5 mt-4">{!! $swatch(['#f97316','#ec4899','#fff7ed','#831843']) !!}</div>
+    </div>
+
+    {{-- 07 Midnight --}}
+    <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+        <div class="flex items-center gap-4">
+            <div class="h-14 w-14 rounded-2xl shadow-md flex items-center justify-center ring-1 ring-white/10" style="background:#0b1220">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a3e635" stroke-width="2" stroke-linejoin="round"><path d="M12 21s7-6.75 7-11a7 7 0 1 0-14 0c0 4.25 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>
+            </div>
+            <div>
+                <div class="text-2xl">{!! $wm('#65a30d') !!}</div>
+                <div class="text-xs text-slate-400">Midnight · Lime on charcoal</div>
+            </div>
+        </div>
+        <p class="text-sm text-slate-500 mt-4">Dark canvas, electric-lime accent. Sleek and premium - perfect for a night mode or a future paid &ldquo;pro&rdquo; tier.</p>
+        <div class="flex items-center gap-1.5 mt-4">{!! $swatch(['#84cc16','#a3e635','#0b1220','#1a2740']) !!}</div>
+    </div>
+
+    {{-- 08 Berry --}}
+    <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+        <div class="flex items-center gap-4">
+            <div class="h-14 w-14 rounded-2xl shadow-md flex items-center justify-center" style="background:linear-gradient(135deg,#7c3aed,#a855f7)">
+                <svg width="36" height="36" viewBox="0 0 48 24" fill="#fff" fill-rule="evenodd" clip-rule="evenodd"><path opacity=".55" d="M16 0c-4.42 0-8 3.58-8 8 0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 16 10.5 2.5 2.5 0 0 0 16 5.5Z"/><path d="M30 0c-4.42 0-8 3.58-8 8 0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 30 10.5 2.5 2.5 0 0 0 30 5.5Z"/></svg>
+            </div>
+            <div>
+                <div class="text-2xl">{!! $wm('#7c3aed') !!}</div>
+                <div class="text-xs text-slate-400">Berry · Violet</div>
+            </div>
+        </div>
+        <p class="text-sm text-slate-500 mt-4">Two overlapping pins - community and connection. Distinctive in a sea of green-and-blue local apps.</p>
+        <div class="flex items-center gap-1.5 mt-4">{!! $swatch(['#7c3aed','#a855f7','#f5f3ff','#4c1d95']) !!}</div>
+    </div>
+
+    {{-- 09 Ocean --}}
+    <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+        <div class="flex items-center gap-4">
+            <div class="h-14 w-14 rounded-2xl shadow-md flex items-center justify-center" style="background:linear-gradient(135deg,#2563eb,#0ea5e9)">
+                <svg width="34" height="34" viewBox="0 0 56 56"><path fill="#fff" fill-rule="evenodd" clip-rule="evenodd" d="M28 6c-7 0-12.5 5.5-12.5 12.5C15.5 27 28 40 28 40s12.5-13 12.5-21.5C40.5 11.5 35 6 28 6Zm0 8.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/><path d="M14 44c4 3 24 3 28 0" stroke="#fff" stroke-width="2" fill="none" opacity=".6" stroke-linecap="round"/><path d="M18 49c3 2 17 2 20 0" stroke="#fff" stroke-width="2" fill="none" opacity=".33" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+                <div class="text-2xl">{!! $wm('#2563eb') !!}</div>
+                <div class="text-xs text-slate-400">Ocean · Blue</div>
+            </div>
+        </div>
+        <p class="text-sm text-slate-500 mt-4">A pin rippling over water - calm, trustworthy, dependable. Plays well for coastal and riverside towns.</p>
+        <div class="flex items-center gap-1.5 mt-4">{!! $swatch(['#2563eb','#0ea5e9','#eff6ff','#1e3a8a']) !!}</div>
+    </div>
+
+    {{-- 10 Terracotta --}}
+    <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+        <div class="flex items-center gap-4">
+            <div class="h-14 w-14 rounded-2xl shadow-md flex items-center justify-center" style="background:linear-gradient(135deg,#ea580c,#c2410c)">
+                <svg width="32" height="32" viewBox="0 0 56 56"><circle cx="39" cy="16" r="6" fill="#fff" opacity=".85"/><path fill="#fff" fill-rule="evenodd" clip-rule="evenodd" d="M24 14c-7 0-12.5 5.5-12.5 12.5C11.5 35 24 48 24 48s12.5-13 12.5-21.5C36.5 19.5 31 14 24 14Zm0 8.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg>
+            </div>
+            <div>
+                <div class="text-2xl">{!! $wm('#c2410c') !!}</div>
+                <div class="text-xs text-slate-400">Terracotta · Warm sand</div>
+            </div>
+        </div>
+        <p class="text-sm text-slate-500 mt-4">A pin meeting the sun - earthy, human, market-day warmth. Heritage feel without going fully retro.</p>
+        <div class="flex items-center gap-1.5 mt-4">{!! $swatch(['#ea580c','#c2410c','#fef3c7','#7c2d12']) !!}</div>
+    </div>
+
+</div>
+
+{{-- App icon row --}}
+<div class="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white/60 p-6 shadow-sm">
+    <div class="text-xs text-slate-400 mb-3">App icon - the primary mark across colour, knockout and light variants</div>
+    <div class="flex items-center gap-3 flex-wrap">
+        <div class="h-14 w-14 rounded-2xl shadow-md flex items-center justify-center" style="background:linear-gradient(135deg,#059669,#0d9488)">
+            <svg width="34" height="34" viewBox="0 0 48 24" fill="#fff" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 0C7.58 0 4 3.58 4 8c0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 12 10.5 2.5 2.5 0 0 0 12 5.5Z"/><path d="M36 0c-4.42 0-8 3.58-8 8 0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 36 10.5 2.5 2.5 0 0 0 36 5.5Z"/></svg>
+        </div>
+        <div class="h-14 w-14 rounded-2xl shadow-md flex items-center justify-center" style="background:#064e3b">
+            <svg width="34" height="34" viewBox="0 0 48 24" fill="#34d399" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 0C7.58 0 4 3.58 4 8c0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 12 10.5 2.5 2.5 0 0 0 12 5.5Z"/><path d="M36 0c-4.42 0-8 3.58-8 8 0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 36 10.5 2.5 2.5 0 0 0 36 5.5Z"/></svg>
+        </div>
+        <div class="h-14 w-14 rounded-2xl shadow-md bg-white border border-slate-200 flex items-center justify-center">
+            <svg width="34" height="34" viewBox="0 0 48 24" fill="#059669" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 0C7.58 0 4 3.58 4 8c0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 12 10.5 2.5 2.5 0 0 0 12 5.5Z"/><path d="M36 0c-4.42 0-8 3.58-8 8 0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8Zm0 5.5A2.5 2.5 0 1 0 36 10.5 2.5 2.5 0 0 0 36 5.5Z"/></svg>
+        </div>
     </div>
 </div>
 
 {{-- ============================ STYLE DIRECTIONS ============================ --}}
 <h2 id="styles" class="scroll-mt-24 text-xs font-semibold uppercase tracking-wider text-emerald-700 mt-12 mb-4">02 · App style directions</h2>
-<p class="text-slate-500 -mt-2 mb-5 max-w-2xl text-sm">Each direction is shown as a live "offer card" - what a deal would actually look like in the app.</p>
+<p class="text-slate-500 -mt-2 mb-5 max-w-2xl text-sm">Each direction is shown as a live &ldquo;offer card&rdquo; - what a deal would actually look like in the app.</p>
 <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
 
     {{-- Fresh Mint --}}
@@ -143,7 +233,7 @@
                 <button class="mt-3 w-full rounded-lg bg-white/90 text-slate-900 text-sm font-semibold py-2">Redeem</button>
             </div>
         </div>
-        <div class="p-5"><div class="font-semibold text-slate-900">Liquid Glass</div><p class="text-sm text-slate-500 mt-1">Frosted, translucent, very "iOS 2025". Premium and fresh - heaviest on polish.</p></div>
+        <div class="p-5"><div class="font-semibold text-slate-900">Liquid Glass</div><p class="text-sm text-slate-500 mt-1">Frosted, translucent, very &ldquo;iOS 2025&rdquo;. Premium and fresh - heaviest on polish.</p></div>
     </div>
 
     {{-- Premium Dark --}}
@@ -159,7 +249,7 @@
                 <button class="mt-3 w-full rounded-lg text-slate-900 text-sm font-semibold py-2" style="background:#fbbf24">Redeem</button>
             </div>
         </div>
-        <div class="p-5"><div class="font-semibold text-slate-900">Premium Dark</div><p class="text-sm text-slate-500 mt-1">Charcoal + gold accent. Feels exclusive and high-end; great for a "pro" tier.</p></div>
+        <div class="p-5"><div class="font-semibold text-slate-900">Premium Dark</div><p class="text-sm text-slate-500 mt-1">Charcoal + gold accent. Feels exclusive and high-end; great for a &ldquo;pro&rdquo; tier.</p></div>
     </div>
 
     {{-- Editorial / High Street --}}
@@ -175,7 +265,7 @@
                 <button class="mt-3 w-full rounded-lg text-white text-sm font-medium py-2" style="background:#7c2d12">Redeem</button>
             </div>
         </div>
-        <div class="p-5"><div class="font-semibold text-slate-900">Editorial / High Street</div><p class="text-sm text-slate-500 mt-1">Warm cream, serif headers, heritage feel. Leans into "support local" storytelling.</p></div>
+        <div class="p-5"><div class="font-semibold text-slate-900">Editorial / High Street</div><p class="text-sm text-slate-500 mt-1">Warm cream, serif headers, heritage feel. Leans into &ldquo;support local&rdquo; storytelling.</p></div>
     </div>
 
     {{-- Bold Pop --}}
@@ -191,7 +281,7 @@
                 <button class="mt-3 w-full rounded-xl text-white text-sm font-bold py-2" style="background:#111">Redeem</button>
             </div>
         </div>
-        <div class="p-5"><div class="font-semibold text-slate-900">Bold Pop</div><p class="text-sm text-slate-500 mt-1">Energetic, chunky, fun. Most "consumer brand" - memorable but harder to keep premium.</p></div>
+        <div class="p-5"><div class="font-semibold text-slate-900">Bold Pop</div><p class="text-sm text-slate-500 mt-1">Energetic, chunky, fun. Most &ldquo;consumer brand&rdquo; - memorable but harder to keep premium.</p></div>
     </div>
 
     <div class="rounded-2xl border border-dashed border-slate-300 bg-white/60 p-6 shadow-sm flex flex-col justify-center">
@@ -200,30 +290,25 @@
     </div>
 </div>
 
-{{-- ============================ NAMES ============================ --}}
-<h2 id="names" class="scroll-mt-24 text-xs font-semibold uppercase tracking-wider text-emerald-700 mt-12 mb-4">03 · Name exploration</h2>
+{{-- ============================ THE NAME ============================ --}}
+<h2 id="names" class="scroll-mt-24 text-xs font-semibold uppercase tracking-wider text-emerald-700 mt-12 mb-4">03 · The name - locolie</h2>
 <div class="grid gap-5 lg:grid-cols-3">
-    @php
-        $nameGroups = [
-            ['Local / proximity', ['locolie - current, clear', 'Vicinity - premium', 'Neara - brandable "nearby"', 'Hereabouts - characterful', 'Patch - "what\'s in your patch"']],
-            ['High street / community', ['Highstreet - strong PR angle', 'TownLoop - retention in the name', 'LocalLoop - clearer locality', 'Doorstep - hyperlocal & homely', 'Cornershop - nostalgic, British']],
-            ['Discovery / brandable', ['Mooch - "have a mooch", fun', 'Yonder - calm, premium', 'Pop - "pop in", punchy', 'Tucked - curated gems']],
-        ];
-    @endphp
-    @foreach ($nameGroups as [$group, $names])
-        <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
-            <div class="text-sm font-semibold text-slate-900">{{ $group }}</div>
-            <ul class="mt-3 space-y-2">
-                @foreach ($names as $n)
-                    @php([$head, $tail] = array_pad(explode(' - ', $n, 2), 2, ''))
-                    <li class="text-sm"><span class="font-medium text-slate-800">{{ $head }}</span><span class="text-slate-400"> - {{ $tail }}</span></li>
-                @endforeach
-            </ul>
-        </div>
-    @endforeach
+    <div class="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-6 lg:col-span-2">
+        <div class="text-2xl mb-2">{!! $wm('#059669') !!}</div>
+        <p class="text-sm text-emerald-900/80">Reads <em>lo-co-lie</em>. It hides &ldquo;local&rdquo; without saying it outright, the two o&rsquo;s give us a built-in pin motif, and it&rsquo;s short, lowercase and friendly. <strong>locolie.com</strong> is live. The wordmark works as plain text or with the pins dropped in - so it always degrades gracefully.</p>
+    </div>
+    <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+        <div class="text-sm font-semibold text-slate-900">Still to lock down</div>
+        <ul class="mt-3 space-y-2 text-sm text-slate-500 list-disc pl-4">
+            <li>UK IPO trademark check on the wordmark</li>
+            <li>Secure <code>.co.uk</code> + key social handles</li>
+            <li>Pick the primary mark (recommend <strong class="text-emerald-700">Twin Pins</strong>)</li>
+            <li>Gut-check with a few Wokingham merchants</li>
+        </ul>
+    </div>
 </div>
-<div class="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-6">
-    <div class="font-semibold text-emerald-900">Shortlist to test</div>
-    <p class="text-sm text-emerald-800/80 mt-1">Carry three forward: a clear one (<strong>locolie</strong> / <strong>Vicinity</strong>), a community one (<strong>Patch</strong> / <strong>TownLoop</strong>), and a brandable wildcard (<strong>Mooch</strong>). Check <code>.com</code>/<code>.co.uk</code> + UK IPO trademark, then gut-check with a few Wokingham merchants. Full write-up in Appendix C of the <a href="{{ route('portal.plan') }}" class="underline">business plan</a>.</p>
+<div class="mt-5 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+    <div class="font-semibold text-slate-900">Alternates kept on file</div>
+    <p class="text-sm text-slate-500 mt-1">If locolie ever hits a trademark wall: <strong>Patch</strong> (&ldquo;what&rsquo;s in your patch&rdquo;), <strong>TownLoop</strong> (retention in the name), and the brandable wildcard <strong>Mooch</strong> (&ldquo;have a mooch&rdquo;). Full write-up in Appendix C of the <a href="{{ route('portal.plan') }}" class="underline">business plan</a>.</p>
 </div>
 @endsection

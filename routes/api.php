@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\BrowseController;
 use App\Http\Controllers\Api\BusinessController;
 use App\Http\Controllers\Api\PushController;
 use App\Http\Controllers\Api\RedemptionController;
+use App\Http\Controllers\Api\SyncController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,3 +34,10 @@ Route::post('/push/subscribe', [PushController::class, 'subscribe']);
 Route::post('/offers/{offer}/redeem', [RedemptionController::class, 'redeem']);
 Route::post('/redemptions/verify', [RedemptionController::class, 'verify']);
 Route::get('/redemptions/{code}', [RedemptionController::class, 'show']);
+
+// Local -> production data sync (token-guarded). See SyncController + `php artisan sync:push`.
+Route::middleware('sync.token')->prefix('sync')->group(function () {
+    Route::get('/status', [SyncController::class, 'status']);
+    Route::post('/data', [SyncController::class, 'data']);
+    Route::post('/image', [SyncController::class, 'image']);
+});

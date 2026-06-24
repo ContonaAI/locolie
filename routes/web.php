@@ -65,6 +65,7 @@ Route::middleware('portal')->group(function () {
 
     // Admin CRM
     Route::get('/admin', [PortalController::class, 'admin'])->name('portal.admin');
+    Route::get('/admin/settings', [PortalController::class, 'settings'])->name('portal.settings');
     Route::post('/admin/business/{business}/onboard', [PortalController::class, 'adminToggleOnboard'])->name('admin.onboard');
     Route::post('/admin/business/{business}/plan', [PortalController::class, 'adminSetPlan'])->name('admin.plan');
     Route::post('/admin/prospect/search', [PortalController::class, 'adminProspectSearch'])->name('admin.prospect.search');

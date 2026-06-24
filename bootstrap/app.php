@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'portal' => \App\Http\Middleware\PortalAuth::class,
+            'sync.token' => \App\Http\Middleware\VerifySyncToken::class,
         ]);
 
         // Unauthenticated business-guard requests go to the business login.

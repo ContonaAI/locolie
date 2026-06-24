@@ -97,6 +97,33 @@ class PortalController extends Controller
         ]);
     }
 
+    /**
+     * Admin settings: data-sync configuration + this environment's data footprint.
+     */
+    public function settings()
+    {
+        $token = (string) config('sync.token');
+        $bizDir = \Illuminate\Support\Facades\Storage::disk('public')->exists('biz')
+            ? \Illuminate\Support\Facades\Storage::disk('public')->files('biz') : [];
+
+        return view('portal.settings', [
+            'sync' => [
+                'configured' => filled($token),
+                'token_masked' => filled($token)
+                    ? substr($token, 0, 6).str_repeat('•', 10).substr($token, -4)
+                    : null,
+                'endpoint' => url('/api/sync'),
+                'last_sync' => \Illuminate\Support\Facades\Cache::get('sync.last_at'),
+                'counts' => [
+                    'businesses' => \App\Models\Business::count(),
+                    'offers' => \App\Models\Offer::count(),
+                    'categories' => \App\Models\Category::count(),
+                    'images' => count($bizDir),
+                ],
+            ],
+        ]);
+    }
+
     /** CRM: flip a business between live (onboarded) and lead. */
     public function adminToggleOnboard(\App\Models\Business $business)
     {
