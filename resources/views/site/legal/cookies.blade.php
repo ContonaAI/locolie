@@ -29,7 +29,7 @@
 <p>Some features rely on third parties that may set their own cookies, including Google Maps (to show the map), Google Translate (the language switcher), and OpenStreetMap/Nominatim (approximate location). These providers have their own privacy and cookie notices.</p>
 
 <h2 id="managing">4. Managing your choices</h2>
-<p>When you first visit, we ask for your consent to non-essential cookies through our cookie banner. You can change your choice at any time using the <button type="button" onclick="try{localStorage.removeItem('ll_cookie_consent');location.reload();}catch(e){}" class="legal-cookie-reset">cookie settings</button> link below, or by clearing cookies in your browser. Most browsers also let you block or delete cookies in their settings — though some parts of the site may not work as well if you do.</p>
+<p>When you first visit, we ask for your consent to non-essential cookies through our cookie banner. You can change your choice at any time using the <button type="button" onclick="try{localStorage.removeItem('ll_cookie_consent');location.reload();}catch(e){}" class="legal-cookie-reset">cookie settings</button> link below, or by clearing cookies in your browser. Most browsers also let you block or delete cookies in their settings - though some parts of the site may not work as well if you do.</p>
 
 <h2 id="changes">5. Changes</h2>
 <p>We may update this policy as our use of cookies changes. Please check back for the latest version.</p>

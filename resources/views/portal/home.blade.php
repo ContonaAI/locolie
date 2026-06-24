@@ -892,7 +892,7 @@ function goLocalApp() {
     catIcon(slug){
       const I={
         all:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/>',
-        // Parent (top-level) groups — shown as the home category tiles.
+        // Parent (top-level) groups - shown as the home category tiles.
         'eat-drink':'<path d="M18 8h1a3 3 0 0 1 0 6h-1"/><path d="M4 8h14v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><line x1="6" y1="2" x2="6" y2="4.5"/><line x1="10" y1="2" x2="10" y2="4.5"/><line x1="14" y1="2" x2="14" y2="4.5"/>',
         'health-beauty':'<path d="M12 2.5l1.7 4.9 4.9 1.6-4.9 1.6L12 15.5l-1.7-4.9L5.4 9l4.9-1.6z"/><path d="M18 14l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/>',
         'fitness-leisure':'<path d="M6.5 6.5l11 11"/><path d="M4 7 7 4l2.5 2.5L7 9z"/><path d="M20 17l-3 3-2.5-2.5L17 15z"/><path d="M4.5 11 2 13l2 2"/><path d="M19.5 13 22 11l-2-2"/>',

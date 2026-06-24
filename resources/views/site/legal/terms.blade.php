@@ -35,7 +35,7 @@
     <li>You are responsible for the offers you publish, for honouring them, and for complying with all laws that apply to them (including consumer protection, advertising and pricing rules).</li>
     <li>You grant us a non-exclusive, royalty-free licence to display your business name, logo, photos, descriptions and offers on the Platform and in our marketing of the Platform.</li>
     <li>You must not list content that is false, misleading, offensive, infringing, or that you do not have the right to use.</li>
-    <li>Where you collect customer details through the Platform (for example shoppers who opt in to hear from you), you become a data controller of those details and must handle them lawfully — see our <a href="{{ route('legal.privacy') }}">Privacy Policy</a>.</li>
+    <li>Where you collect customer details through the Platform (for example shoppers who opt in to hear from you), you become a data controller of those details and must handle them lawfully - see our <a href="{{ route('legal.privacy') }}">Privacy Policy</a>.</li>
 </ul>
 
 <h2 id="plans">5. Plans, fees &amp; payment</h2>

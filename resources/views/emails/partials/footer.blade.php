@@ -1,8 +1,8 @@
 {{--
     Compliant marketing-email footer (UK GDPR / PECR / CAN-SPAM).
     Required for any marketing message. Pass:
-      $recipientEmail  — the contact's email (for the signed links)
-      $topic           — the subscription topic this email was sent under (optional)
+      $recipientEmail  - the contact's email (for the signed links)
+      $topic           - the subscription topic this email was sent under (optional)
 
     Also set these mail headers when you send, so Gmail/Apple show a native
     one-click unsubscribe:

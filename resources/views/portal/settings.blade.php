@@ -44,7 +44,7 @@
     </div>
     <div class="flex items-center justify-between gap-4 py-2.5">
       <dt class="text-slate-500">Sync token</dt>
-      <dd class="font-mono text-xs text-slate-700">{{ $sync['token_masked'] ?? '— not set —' }}</dd>
+      <dd class="font-mono text-xs text-slate-700">{{ $sync['token_masked'] ?? '- not set -' }}</dd>
     </div>
   </dl>
 </section>
@@ -65,7 +65,7 @@
   </div>
 
   <ul class="text-sm text-slate-500 mt-4 space-y-1.5 list-disc list-inside">
-    <li>Adds and updates records — it never deletes anything already live.</li>
+    <li>Adds and updates records - it never deletes anything already live.</li>
     <li>Safe to run as often as you like; matching is by natural key.</li>
     <li>Add <code class="font-mono text-xs bg-slate-100 px-1 py-0.5 rounded">--skip-images</code> to push data only (faster).</li>
   </ul>

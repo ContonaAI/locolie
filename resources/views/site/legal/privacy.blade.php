@@ -42,10 +42,10 @@
         <tr><td>Meet legal, tax and accounting obligations</td><td>Legal obligation</td></tr>
     </tbody>
 </table>
-<p>Where we rely on consent, you can withdraw it at any time without affecting processing already carried out. Where we rely on legitimate interests, you can object — see your rights below.</p>
+<p>Where we rely on consent, you can withdraw it at any time without affecting processing already carried out. Where we rely on legitimate interests, you can object - see your rights below.</p>
 
 <h2 id="marketing">4. Marketing &amp; your choices</h2>
-<p>We only send marketing where the law allows it and you can opt out at any time. You control exactly what you receive — offers near you, product updates, SMS alerts, and (for businesses) owner emails — through our <a href="{{ route('subscriptions.preferences') }}">preference centre</a>, or by using the unsubscribe link in any email. Unsubscribing is honoured promptly and free of charge.</p>
+<p>We only send marketing where the law allows it and you can opt out at any time. You control exactly what you receive - offers near you, product updates, SMS alerts, and (for businesses) owner emails - through our <a href="{{ route('subscriptions.preferences') }}">preference centre</a>, or by using the unsubscribe link in any email. Unsubscribing is honoured promptly and free of charge.</p>
 
 <h2 id="sharing">5. Who we share data with</h2>
 <ul>
