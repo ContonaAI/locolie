@@ -31,7 +31,8 @@
         ],
     };
 @endphp
-<svg viewBox="0 0 240 240" {{ $attributes->merge(['class' => 'h-full w-full']) }} role="img" aria-label="locolie verified local seal">
+<span {{ $attributes->merge(['class' => 'inline-flex shrink-0 leading-none']) }}>
+<svg viewBox="0 0 240 240" class="h-full w-full" role="img" aria-label="locolie verified local seal">
     <defs>
         <path id="{{ $id }}-t" d="M30 120 a90 90 0 0 1 180 0" fill="none"/>
         <path id="{{ $id }}-b" d="M34 120 a86 86 0 0 0 172 0" fill="none"/>
@@ -54,3 +55,4 @@
     </g>
     <text x="120" y="150" text-anchor="middle" font-family="Inter,sans-serif" font-size="26" font-weight="800" letter-spacing="-0.6" fill="{{ $p['word'] }}">locolie</text>
 </svg>
+</span>

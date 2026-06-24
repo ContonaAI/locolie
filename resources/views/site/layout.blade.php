@@ -364,7 +364,9 @@
                     <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1.6C7.3 1.6 3.5 5.4 3.5 10.1c0 5.6 8.5 12.3 8.5 12.3s8.5-6.7 8.5-12.3C20.5 5.4 16.7 1.6 12 1.6Zm0 5.9a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4Z"/></svg>
                     Newcastle NE1 · indies only, always
                 </p>
-                <x-seal variant="light" class="mt-6 h-20 w-20" />
+                <div class="mt-6">
+                    <x-seal variant="light" class="h-24 w-24" />
+                </div>
             </div>
             <div>
                 <h4 class="text-xs font-semibold uppercase tracking-wider text-muted">Product</h4>
