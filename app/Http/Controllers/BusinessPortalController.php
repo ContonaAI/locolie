@@ -3,6 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Business;
+use App\Models\Campaign;
+use App\Models\DeviceToken;
+use App\Models\PushSubscription;
+use App\Models\Redemption;
+use App\Services\BillingService;
+use App\Services\Messaging\MessagingService;
+use App\Services\ReportingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -70,7 +77,7 @@ class BusinessPortalController extends Controller
 
     protected function redemptionsFor(Business $business)
     {
-        return \App\Models\Redemption::whereHas('offer', fn ($q) => $q->where('business_id', $business->id))->get();
+        return Redemption::whereHas('offer', fn ($q) => $q->where('business_id', $business->id))->get();
     }
 
     /** Distinct first-party customers captured at redemption — the retailer value prop. */
@@ -106,7 +113,13 @@ class BusinessPortalController extends Controller
         ]);
     }
 
-    /** Email the captured (opted-in) customers — the marketing channel. */
+    /**
+     * Quick email draft — saves the subject + body as a draft Campaign against
+     * the captured (opted-in) customers. This does NOT send: real branded
+     * delivery happens in the Messaging Studio (messagingSend), which routes
+     * through MessagingService::dispatch. Kept as a fast way to jot down a
+     * campaign from the dashboard before sending it for real.
+     */
     public function emailCustomers(Request $request)
     {
         $business = Auth::guard('business')->user();
@@ -116,15 +129,16 @@ class BusinessPortalController extends Controller
         ]);
 
         $recipients = $this->customersFor($business)->where('opt_in', true)->count();
-        \App\Models\Campaign::create([
+        Campaign::create([
             'business_id' => $business->id,
             'channel' => 'email',
+            'status' => 'draft',
             'subject' => $data['subject'],
             'body' => $data['body'],
-            'sent_count' => $recipients,
+            'sent_count' => 0,
         ]);
 
-        return back()->with('status', "Email queued to {$recipients} opted-in customers.");
+        return back()->with('status', "Draft saved. Head to Messaging to send it as branded email to your {$recipients} opted-in customers.");
     }
 
     /**
@@ -132,7 +146,7 @@ class BusinessPortalController extends Controller
      * their own captured customers. Same channels + previews as the team studio,
      * scoped to this one brand.
      */
-    public function messaging(\App\Services\Messaging\MessagingService $messaging)
+    public function messaging(MessagingService $messaging)
     {
         $business = Auth::guard('business')->user();
         $customers = $this->customersFor($business);
@@ -141,7 +155,7 @@ class BusinessPortalController extends Controller
             'business' => $business,
             'overview' => $messaging->overview(),
             'channels' => config('messaging.channels'),
-            'campaigns' => \App\Models\Campaign::where('business_id', $business->id)->latest('id')->limit(10)->get(),
+            'campaigns' => Campaign::where('business_id', $business->id)->latest('id')->limit(10)->get(),
             'samples' => [
                 'email' => $this->sampleMessage('email'),
                 'sms' => $this->sampleMessage('sms'),
@@ -155,7 +169,7 @@ class BusinessPortalController extends Controller
             'audience' => [
                 'email' => $customers->where('opt_in', true)->count(),
                 'sms' => $this->smsCustomersFor($business)->count(),
-                'push' => \App\Models\PushSubscription::count() + \App\Models\DeviceToken::count(),
+                'push' => PushSubscription::count() + DeviceToken::count(),
             ],
         ]);
     }
@@ -186,7 +200,7 @@ class BusinessPortalController extends Controller
     }
 
     /** Live preview of one channel for this brand (AJAX). */
-    public function messagingPreview(Request $request, \App\Services\Messaging\MessagingService $messaging)
+    public function messagingPreview(Request $request, MessagingService $messaging)
     {
         $business = Auth::guard('business')->user();
         $channel = $request->validate(['channel' => ['required', Rule::in(['email', 'sms', 'push'])]])['channel'];
@@ -200,7 +214,7 @@ class BusinessPortalController extends Controller
     }
 
     /** Send a branded message to this brand's own opted-in customers. */
-    public function messagingSend(Request $request, \App\Services\Messaging\MessagingService $messaging)
+    public function messagingSend(Request $request, MessagingService $messaging)
     {
         $business = Auth::guard('business')->user();
         $data = $request->validate([
@@ -228,7 +242,7 @@ class BusinessPortalController extends Controller
     }
 
     /** Retailer reporting suite - this brand's own performance, dynamically. */
-    public function reports(Request $request, \App\Services\ReportingService $reporting)
+    public function reports(Request $request, ReportingService $reporting)
     {
         $business = Auth::guard('business')->user();
         $days = (int) $request->integer('days', 30);
@@ -242,7 +256,7 @@ class BusinessPortalController extends Controller
     }
 
     /** Download the report's customer + offer tables as CSV. */
-    public function reportsExport(\App\Services\ReportingService $reporting)
+    public function reportsExport(ReportingService $reporting)
     {
         $business = Auth::guard('business')->user();
         $report = $reporting->forBusiness($business, 90);
@@ -270,15 +284,30 @@ class BusinessPortalController extends Controller
             ])->values();
     }
 
-    /** A sample message per channel so the initial preview is never empty. */
+    /**
+     * A starter message per channel, pre-filled with the brand's own live offer
+     * where one exists - so the retailer can promote what is actually on in one
+     * click, rather than starting from a blank box.
+     */
     protected function sampleMessage(string $channel): array
     {
         $business = Auth::guard('business')->user();
+        $offer = $business->activeOffers()->latest('id')->first();
+        $deal = $offer
+            ? trim(($offer->badge ? $offer->badge.' - ' : '').$offer->title)
+            : '20% off your next visit';
+        $shopUrl = url('/shop/'.$business->slug);
 
         return match ($channel) {
-            'email' => ['subject' => "A treat from {$business->name}", 'preheader' => 'Just for our regulars', 'body' => "Thanks for being a regular. Here is 20% off your next visit - show this email at the till.", 'cta_label' => 'View the offer', 'cta_url' => url('/')],
-            'sms' => ['body' => "{$business->name}: 20% off your next visit this week. Show this text at the till."],
-            'push' => ['title' => $business->name, 'body' => '20% off your next visit - tap to see the offer'],
+            'email' => [
+                'subject' => "A treat from {$business->name}",
+                'preheader' => 'Just for our regulars',
+                'body' => "Thanks for being a regular at {$business->name}. Here is what is on: {$deal}. Show this email in store to claim it.",
+                'cta_label' => 'See the offer',
+                'cta_url' => $shopUrl,
+            ],
+            'sms' => ['body' => "{$business->name}: {$deal}. Show this text in store. Reply STOP to opt out."],
+            'push' => ['title' => $business->name, 'body' => "{$deal} - tap to see the offer"],
         };
     }
 
@@ -299,7 +328,7 @@ class BusinessPortalController extends Controller
     }
 
     /** Self-serve plan change. Routes through Stripe Checkout when keys are set. */
-    public function upgrade(Request $request, \App\Services\BillingService $billing)
+    public function upgrade(Request $request, BillingService $billing)
     {
         $business = Auth::guard('business')->user();
         $data = $request->validate(['plan' => ['required', Rule::in(array_keys(Business::PLANS))]]);

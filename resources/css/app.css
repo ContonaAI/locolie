@@ -2,8 +2,116 @@
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
+@source '../views';
 
+/*
+ | locolie unified design system (audit 03-design-system.md).
+ | Tokens below are the single source of truth across the marketing site, the /app
+ | consumer + Capacitor build, the business CRM, the team portal, and the customer
+ | report. House style: hyphens only, no em/en-dashes.
+ |
+ | NOTE: the back-compat aliases at the bottom of @theme preserve the class names the
+ | views already use (text-emerald, bg-emerald-soft, border-hair, rounded-card, the
+ | Inter font) so switching the layouts from the Tailwind CDN to this compiled build
+ | is visually faithful. The new brand, sand and semantic ramps are layered in for the
+ | incremental re-skin.
+ */
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+  /* Fonts (Inter is what renders today on every surface; drop Instrument Sans/Serif) */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* Brand green ramp (anchor #059669) */
+  --color-brand-50:  #ecfdf5;
+  --color-brand-100: #d1fae5;
+  --color-brand-200: #a7f3d0;
+  --color-brand-300: #6ee7b7;
+  --color-brand-400: #34d399;
+  --color-brand-500: #10b981;
+  --color-brand-600: #059669;
+  --color-brand-700: #047857;
+  --color-brand-800: #065f46;
+  --color-brand-900: #064e3b;
+
+  /* Ink + warm sand neutrals (one system) */
+  --color-ink:          #0a0a0a;
+  --color-ink-soft:     #1c1b19;
+  --color-sand-50:      #faf9f6;
+  --color-sand-100:     #f4f2ec;
+  --color-sand-200:     #e9e6dd;
+  --color-sand-300:     #dcd8cc;
+  --color-muted:        #6b675e;
+  --color-muted-strong: #44413a;
+  --color-line:         #e6e3da;
+  --color-surface:      #ffffff;
+  --color-surface-2:    #faf9f6;
+
+  /* Accent (paid/sponsored only) */
+  --color-accent-amber:      #d97706;
+  --color-accent-amber-soft: #fef3c7;
+
+  /* Semantic */
+  --color-success:      #15803d;
+  --color-success-soft: #dcfce7;
+  --color-warn:         #b45309;
+  --color-warn-soft:    #fef3c7;
+  --color-error:        #dc2626;
+  --color-error-soft:   #fee2e2;
+  --color-info:         #0369a1;
+  --color-info-soft:    #e0f2fe;
+
+  /* Type scale (font-size / line-height) */
+  --text-2xs:     0.656rem;  --text-2xs--line-height: 1.4;
+  --text-xs:      0.75rem;   --text-xs--line-height: 1.45;
+  --text-sm:      0.875rem;  --text-sm--line-height: 1.5;
+  --text-base:    1rem;      --text-base--line-height: 1.55;
+  --text-h4:      1.125rem;  --text-h4--line-height: 1.3;
+  --text-h3:      1.375rem;  --text-h3--line-height: 1.25;
+  --text-h2:      1.875rem;  --text-h2--line-height: 1.15;
+  --text-h1:      2.5rem;    --text-h1--line-height: 1.1;
+  --text-display: 3.5rem;    --text-display--line-height: 1.04;
+
+  /* Radius scale */
+  --radius-xs:   8px;
+  --radius-sm:   12px;
+  --radius-md:   16px;
+  --radius-lg:   22px;
+  --radius-pill: 9999px;
+
+  /* Elevation scale */
+  --shadow-xs:   0 1px 2px rgba(15,26,34,.05);
+  --shadow-sm:   0 1px 2px rgba(15,26,34,.04), 0 8px 22px rgba(15,26,34,.06);
+  --shadow-md:   0 8px 18px rgba(15,26,34,.10), 0 20px 44px rgba(15,26,34,.12);
+  --shadow-lg:   0 18px 50px -18px rgba(0,0,0,.22);
+  --shadow-xl:   0 30px 70px -25px rgba(0,0,0,.45);
+
+  /* Container widths */
+  --w-prose:   48rem;
+  --w-content: 72rem;
+  --w-wide:    80rem;
+
+  /* --- Back-compat aliases: keep the class names the views already use ---------- */
+  --color-emerald:      #059669;  /* text-emerald / bg-emerald (the brand) */
+  --color-emerald-soft: #d1fae5;  /* bg-emerald-soft */
+  --color-hair:         #e6e3da;  /* border-hair (was #e5e5e5) */
+  --radius-card:        16px;     /* rounded-card (was 18px) */
+}
+
+/* Brand-tinted primary-button glow (color-mix, not a static token) */
+@utility shadow-brand {
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--color-brand-600) 34%, transparent);
+}
+
+@layer base {
+  body { background: var(--color-sand-50); color: var(--color-ink); }
+
+  /* One visible focus ring on every surface (generalises the old site-only rule) */
+  a:focus-visible,
+  button:focus-visible,
+  [role="button"]:focus-visible {
+    outline: 2px solid var(--color-brand-600);
+    outline-offset: 2px;
+  }
+
+  ::selection { background: color-mix(in srgb, var(--color-brand-600) 20%, transparent); }
 }

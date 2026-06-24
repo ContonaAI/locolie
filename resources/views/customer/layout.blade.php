@@ -12,17 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
-          colors: { emerald: { DEFAULT: '#059669', soft: '#d1fae5' } },
-        },
-      },
-    };
-  </script>
+  @vite(['resources/css/app.css', 'resources/js/app.js'])
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
   <style>
@@ -46,7 +36,7 @@
   {{-- Minimal top bar with the locolie wordmark --}}
   <header class="sticky top-0 z-30 bg-white/85 backdrop-blur border-b border-slate-200">
     <div class="max-w-lg mx-auto px-5 h-14 flex items-center justify-center">
-      <a href="{{ route('app') }}" class="text-xl font-extrabold lowercase tracking-tight text-slate-900">l<span class="brand-pin"></span>c<span class="brand-pin"></span>lie</a>
+      <a href="{{ route('app') }}" class="text-xl font-extrabold tracking-tight text-slate-900">L<svg style="height:0.9em;width:auto;display:inline-block;vertical-align:-0.13em;margin:0 -0.012em;filter:drop-shadow(0 1px 3px rgba(5,150,105,.4))" viewBox="0 0 24 24" fill="#059669" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1.6C7.3 1.6 3.5 5.4 3.5 10.1c0 5.6 8.5 12.3 8.5 12.3s8.5-6.7 8.5-12.3C20.5 5.4 16.7 1.6 12 1.6Zm0 5.9a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4Z"/></svg>colie</a>
     </div>
   </header>
 

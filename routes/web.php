@@ -43,7 +43,7 @@ Route::get('/m', fn (\Illuminate\Http\Request $r) => redirect('/app'.($r->getQue
 
 // ── Business self-serve CRM (email + password) ───────────────────────────────
 Route::get('/business/login', [BusinessPortalController::class, 'showLogin'])->name('business.login');
-Route::post('/business/login', [BusinessPortalController::class, 'login'])->name('business.login.submit');
+Route::post('/business/login', [BusinessPortalController::class, 'login'])->middleware('throttle:5,1')->name('business.login.submit');
 Route::post('/business/logout', [BusinessPortalController::class, 'logout'])->name('business.logout');
 Route::middleware('auth:business')->group(function () {
     Route::get('/business', [BusinessPortalController::class, 'dashboard'])->name('business.dashboard');
@@ -75,7 +75,7 @@ Route::get('/s/{secret}', [PortalController::class, 'sticker'])->name('qr.sticke
 
 // ── Internal team portal (design / brand / admin CRM / ideas) ────────────────
 Route::get('/login', [PortalController::class, 'loginForm'])->name('portal.login');
-Route::post('/login', [PortalController::class, 'login'])->name('portal.login.submit');
+Route::post('/login', [PortalController::class, 'login'])->middleware('throttle:5,1')->name('portal.login.submit');
 Route::post('/logout', [PortalController::class, 'logout'])->name('portal.logout');
 
 Route::middleware('portal')->group(function () {

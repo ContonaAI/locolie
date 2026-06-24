@@ -16,7 +16,7 @@
     $body = $p['body'] ?? '';
     $brandName = $p['brand_name'] ?? 'locolie';
     $brandColor = $p['brand_color'] ?? '#059669';
-    $initials = $p['brand_initials'] ?? 'GL';
+    $initials = $p['brand_initials'] ?? 'LO';
     $logo = $p['logo_url'] ?? null;
     $appName = $p['app_name'] ?? 'locolie';
     $cta = $p['cta_label'] ?? '';

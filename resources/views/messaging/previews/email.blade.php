@@ -16,7 +16,7 @@
     $ctaLabel = $preview['cta_label'] ?? '';
     $ctaUrl = $preview['cta_url'] ?? '';
     $logoUrl = $preview['logo_url'] ?? null;
-    $initials = $preview['brand_initials'] ?? 'GL';
+    $initials = $preview['brand_initials'] ?? 'LO';
     $footer = $preview['footer'] ?? '';
     $snippet = $preheader ?: \Illuminate\Support\Str::limit(trim(strip_tags($bodyHtml)), 80);
 @endphp

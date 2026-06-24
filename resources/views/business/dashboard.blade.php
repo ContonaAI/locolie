@@ -78,7 +78,7 @@
         <h2 class="font-bold text-lg text-slate-900">Your customers</h2>
         <div class="flex items-center gap-2">
           <a href="{{ route('business.customers.export') }}" class="text-sm font-semibold text-slate-600 hover:text-slate-900">Export CSV</a>
-          <button @click="compose=!compose" class="text-sm font-semibold text-slate-600 hover:text-slate-900">Quick email</button>
+          <button @click="compose=!compose" class="text-sm font-semibold text-slate-600 hover:text-slate-900">Draft email</button>
           <a href="{{ route('business.messaging') }}" class="rounded-lg bg-emerald-600 text-white text-sm font-semibold px-4 py-2 hover:bg-emerald-700 inline-flex items-center gap-1.5">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
             Messaging Studio
@@ -88,11 +88,12 @@
       <p class="text-sm text-slate-500 mb-4">Every shopper who redeems an offer is captured here - <span class="font-semibold text-slate-700">your own customer list to market to</span>, something the big chains have always had and independents never did. {{ $customers->count() }} captured · {{ $customers->where('opt_in',true)->count() }} opted in to marketing.</p>
 
       <div x-show="compose" x-cloak class="mb-5 rounded-xl border border-emerald-200 bg-emerald-50/40 p-4">
+        <p class="text-xs text-slate-500 mb-3">Jot down a campaign now and save it as a draft. When you are ready to send it as branded email to your {{ $customers->where('opt_in',true)->count() }} opted-in customers, open the <a href="{{ route('business.messaging') }}" class="font-semibold text-emerald-700 hover:underline">Messaging Studio</a>.</p>
         <form method="POST" action="{{ route('business.customers.email') }}" class="space-y-3">
           @csrf
           <input name="subject" required placeholder="Subject (e.g. A treat for our regulars 🎉)" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
           <textarea name="body" rows="3" required placeholder="Your message to opted-in customers…" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"></textarea>
-          <button class="rounded-lg bg-emerald-600 text-white text-sm font-bold px-5 py-2.5 hover:bg-emerald-700">Send to {{ $customers->where('opt_in',true)->count() }} customers</button>
+          <button class="rounded-lg bg-emerald-600 text-white text-sm font-bold px-5 py-2.5 hover:bg-emerald-700">Save draft</button>
         </form>
       </div>
 

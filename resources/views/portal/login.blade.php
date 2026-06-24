@@ -5,7 +5,7 @@
 <div class="min-h-[60vh] flex items-center justify-center">
     <div class="w-full max-w-sm">
         <div class="text-center mb-6">
-            <h1 class="text-2xl font-bold text-slate-900">Go<span class="text-emerald-600">Local</span> Portal</h1>
+            <h1 class="text-2xl font-bold text-slate-900">l<span class="text-emerald-600">o</span>colie Portal</h1>
             <p class="text-sm text-slate-500 mt-1">Private working space - enter the password to continue.</p>
         </div>
         <form method="POST" action="{{ route('portal.login.submit') }}" class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">

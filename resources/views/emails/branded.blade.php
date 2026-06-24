@@ -8,7 +8,7 @@
     $ctaLabel = $preview['cta_label'] ?? '';
     $ctaUrl = $preview['cta_url'] ?? '';
     $logoUrl = $preview['logo_url'] ?? null;
-    $initials = $preview['brand_initials'] ?? 'GL';
+    $initials = $preview['brand_initials'] ?? 'LO';
     $footer = $preview['footer'] ?? '';
 @endphp
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -102,16 +102,24 @@
                     {{-- Footer --}}
                     <tr>
                         <td style="padding:22px 32px 30px; font-family:'Inter',Arial,sans-serif;">
-                            <p style="margin:0 0 10px; font-size:13px; line-height:1.5; color:#64748b;">
-                                {{ $footer }}
-                            </p>
+                            @if ($footer)
+                                <p style="margin:0 0 10px; font-size:13px; line-height:1.5; color:#64748b;">
+                                    {{ $footer }}
+                                </p>
+                            @endif
                             <p style="margin:0; font-size:12px; line-height:1.5; color:#94a3b8;">
                                 Sent with care by {{ $brandName }} on
                                 <span style="color:#059669; font-weight:600;">locolie</span> -
                                 your local-deals marketplace.
-                                <br />
-                                <a href="#" style="color:#94a3b8; text-decoration:underline;">Unsubscribe</a> at any time.
                             </p>
+
+                            {{-- Compliant GDPR/PECR unsubscribe + preferences footer.
+                                 $recipient is ['email' => ..., 'name' => ...] from BrandedCampaign;
+                                 the partial expects $recipientEmail (string) and optional $topic. --}}
+                            @include('emails.partials.footer', [
+                                'recipientEmail' => $recipient['email'] ?? null,
+                                'topic' => $preview['topic'] ?? null,
+                            ])
                         </td>
                     </tr>
 

@@ -32,23 +32,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
-                    colors: {
-                        ink: '#0a0a0a',
-                        emerald: { DEFAULT: '#059669', soft: '#d1fae5' },
-                        muted: '#737373',
-                        hair: '#e5e5e5',
-                    },
-                    borderRadius: { card: '18px' },
-                },
-            },
-        };
-    </script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <style>
@@ -145,8 +129,8 @@
 <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 @php
-    $pin = '<svg style="height:0.92em;width:auto;display:inline-block;vertical-align:-0.16em;margin:0 -0.015em" viewBox="0 0 24 24" fill="#059669" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1.6C7.3 1.6 3.5 5.4 3.5 10.1c0 5.6 8.5 12.3 8.5 12.3s8.5-6.7 8.5-12.3C20.5 5.4 16.7 1.6 12 1.6Zm0 5.9a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4Z"/></svg>';
-    $wordmark = '<span class="wordmark lowercase text-ink">l'.$pin.'c'.$pin.'lie</span>';
+    $pin = '<svg style="height:0.92em;width:auto;display:inline-block;vertical-align:-0.12em;margin:0 -0.012em;filter:drop-shadow(0 1px 3px rgba(5,150,105,.4))" viewBox="0 0 24 24" fill="#059669" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1.6C7.3 1.6 3.5 5.4 3.5 10.1c0 5.6 8.5 12.3 8.5 12.3s8.5-6.7 8.5-12.3C20.5 5.4 16.7 1.6 12 1.6Zm0 5.9a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4Z"/></svg>';
+    $wordmark = '<span class="wordmark text-ink">L'.$pin.'colie</span>';
     // Languages we plan to support (English live; rest scaffolded for translation).
     $languages = ['en' => '🇬🇧 English', 'pl' => '🇵🇱 Polski', 'es' => '🇪🇸 Español', 'fr' => '🇫🇷 Français', 'ur' => '🇵🇰 اردو', 'zh' => '🇨🇳 中文'];
     // Roll-out roadmap - a region/county is "live" or "soon".
@@ -173,7 +157,7 @@
     class="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-5 sm:pt-4">
     <nav aria-label="Primary"
         :class="scrolled ? 'bg-white/85 shadow-xl shadow-black/[0.07]' : 'bg-white/55 shadow-lg shadow-black/[0.04]'"
-        class="glass mx-auto flex max-w-7xl 2xl:max-w-[1500px] items-center justify-between gap-2 rounded-full border border-white/60 px-2.5 py-2 transition-all duration-300 sm:px-3">
+        class="glass mx-auto flex max-w-7xl items-center justify-between gap-2 rounded-full border border-white/60 px-2.5 py-2 transition-all duration-300 sm:px-3">
         <a href="/" class="pl-2 text-lg sm:text-xl">{!! $wordmark !!}</a>
 
         {{-- Center links --}}
@@ -371,7 +355,7 @@
 
 {{-- ===================== FOOTER ===================== --}}
 <footer class="border-t border-hair bg-[#f5f5f5]">
-    <div class="mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 py-14 sm:px-6">
+    <div class="mx-auto max-w-7xl px-5 py-14 sm:px-6">
         <div class="grid gap-10 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
             <div>
                 <a href="/" class="text-xl">{!! $wordmark !!}</a>
@@ -388,6 +372,7 @@
                     <li><a href="/#how" class="text-ink/80 transition hover:text-emerald">How it works</a></li>
                     <li><a href="/#demo" class="text-ink/80 transition hover:text-emerald">Live demo</a></li>
                     <li><a href="/app" class="text-ink/80 transition hover:text-emerald">Launch web app</a></li>
+                    <li><a href="{{ route('customer.report.entry') }}" class="text-ink/80 transition hover:text-emerald">Your savings</a></li>
                 </ul>
             </div>
             <div>

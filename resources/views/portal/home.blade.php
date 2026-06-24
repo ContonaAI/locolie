@@ -783,7 +783,8 @@
     @endif
   </section>
 
-  {{-- QUICK LINKS --}}
+  {{-- QUICK LINKS (internal team navigation only; never rendered in the consumer/business solo app) --}}
+  @unless($solo)
   <div class="gl-chrome mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
     @php
         $svgAttr = 'width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"';
@@ -805,6 +806,7 @@
         </a>
     @endforeach
   </div>
+  @endunless
 </div>
 
 <script>

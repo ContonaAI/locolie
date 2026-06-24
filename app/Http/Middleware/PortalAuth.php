@@ -13,15 +13,12 @@ class PortalAuth
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Password gate disabled short-term — portal is open. Auto-authorise so the
-        // layout nav still renders. To re-enable, restore the redirect below.
-        $request->session()->put('portal_authed', true);
+        // Shared-password gate. The internal team portal exposes admin CRM, campaign
+        // sends and the messaging studio, so it must not be publicly reachable.
+        if (! $request->session()->get('portal_authed')) {
+            return redirect()->route('portal.login')->with('intended', $request->fullUrl());
+        }
 
         return $next($request);
-
-        // if (! $request->session()->get('portal_authed')) {
-        //     return redirect()->route('portal.login')->with('intended', $request->fullUrl());
-        // }
-        // return $next($request);
     }
 }
