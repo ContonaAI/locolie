@@ -455,13 +455,18 @@
                   <div class="scr"><div class="feed">
                     {{-- parent category tiles (icons) --}}
                     <div class="cat-tiles">
-                      <button class="cat-tile" :class="cCat===null && 'on'" @click="cCat=null; cSub=null"><span class="cat-ic" x-html="catIcon('all')"></span><span>All</span></button>
+                      <button class="cat-tile" :class="cCat===null && 'on'" @click="cCat=null; cSub=null; cSub2=null"><span class="cat-ic" x-html="catIcon('all')"></span><span>All</span></button>
                       <template x-for="c in parents" :key="c.slug"><button class="cat-tile" :class="cCat===c.slug && 'on'" @click="selectParent(c.slug)"><span class="cat-ic" x-html="catIcon(c.slug)"></span><span x-text="c.name"></span></button></template>
                     </div>
                     {{-- sub-category chips for the selected parent --}}
                     <div class="pill-row" x-show="cCat && cCat!=='foryou' && subCats.length" x-cloak style="margin-top:-4px;">
-                      <div class="pill" :class="!cSub && 'on'" @click="cSub=null">All <span x-text="cCatName"></span></div>
-                      <template x-for="s in subCats" :key="s.slug"><div class="pill" :class="cSub===s.slug && 'on'" @click="cSub = cSub===s.slug ? null : s.slug" x-text="s.name"></div></template>
+                      <div class="pill" :class="!cSub && 'on'" @click="selectSub(null)">All <span x-text="cCatName"></span></div>
+                      <template x-for="s in subCats" :key="s.slug"><div class="pill" :class="cSub===s.slug && 'on'" @click="selectSub(s.slug)" x-text="s.name"></div></template>
+                    </div>
+                    {{-- third-level chips (e.g. builder trades) for the selected sub-category --}}
+                    <div class="pill-row" x-show="cSub && subCats2.length" x-cloak style="margin-top:-6px;">
+                      <div class="pill" :class="!cSub2 && 'on'" @click="cSub2=null">All <span x-text="cSubName"></span></div>
+                      <template x-for="s in subCats2" :key="s.slug"><div class="pill" :class="cSub2===s.slug && 'on'" @click="cSub2 = cSub2===s.slug ? null : s.slug" x-text="s.name"></div></template>
                     </div>
                     <p x-show="loading" style="text-align:center;color:var(--muted);font-size:13px;padding:28px 0;">Loading…</p>
 
@@ -490,7 +495,7 @@
                         </div>
                         <template x-for="c in categoriesWithBiz" :key="c.slug">
                           <div class="explore">
-                            <div class="sec-head"><div class="sec-title">Explore <span x-text="c.name"></span></div><div class="sec-link" @click="cCat=c.slug; cSub=null">See all</div></div>
+                            <div class="sec-head"><div class="sec-title">Explore <span x-text="c.name"></span></div><div class="sec-link" @click="cCat=c.slug; cSub=null; cSub2=null">See all</div></div>
                             <div class="hscroll">
                               <template x-for="b in byCat(c.slug)" :key="c.slug+b.id">
                                 <div class="hcard" @click="openBusiness(b)">
@@ -507,7 +512,7 @@
                     {{-- category selected: vertical list --}}
                     <template x-if="!loading && cCat">
                       <div>
-                        <div class="sec-head"><div class="sec-title" x-text="cCat==='foryou' ? 'For you' : (cSub ? cSubName : cCatName)"></div><div class="sec-link" @click="cCat=null; cSub=null">Clear</div></div>
+                        <div class="sec-head"><div class="sec-title" x-text="cCat==='foryou' ? 'For you' : (cSub2 ? cSub2Name : (cSub ? cSubName : cCatName))"></div><div class="sec-link" @click="cCat=null; cSub=null; cSub2=null">Clear</div></div>
                         <template x-for="b in visible" :key="b.id">
                           <div class="row" @click="openBusiness(b)">
                             <div class="row-img" :style="b.image ? ('background-image:url('+b.image+');background-size:cover;background-position:center') : ''"></div>
@@ -528,7 +533,7 @@
                     <span style="color:#fff;font-size:13px;cursor:pointer;" @click="view='none'; searchQ=''">Cancel</span>
                   </div>
                   <div class="scr"><div class="feed">
-                    <template x-if="!searchQ"><div><div class="label" style="margin-bottom:10px;">Browse categories</div><div style="display:flex;flex-wrap:wrap;gap:7px;"><template x-for="c in parents" :key="c.slug"><div class="pill" @click="cCat=c.slug; cSub=null; view='none'; tab='home'" x-text="c.name"></div></template></div></div></template>
+                    <template x-if="!searchQ"><div><div class="label" style="margin-bottom:10px;">Browse categories</div><div style="display:flex;flex-wrap:wrap;gap:7px;"><template x-for="c in parents" :key="c.slug"><div class="pill" @click="cCat=c.slug; cSub=null; cSub2=null; view='none'; tab='home'" x-text="c.name"></div></template></div></div></template>
                     <template x-for="b in searchResults" :key="b.id"><div class="row" @click="openBusiness(b)"><div class="row-img" :style="b.image ? ('background-image:url('+b.image+');background-size:cover;background-position:center') : ''"></div><div class="row-info"><div class="row-name" x-text="b.name"></div><div class="row-meta"><span x-text="b.category"></span></div></div><div class="offer-pill" x-show="b.offers[0]" x-text="b.offers[0]?.badge"></div></div></template>
                     <p x-show="searchQ && !searchResults.length" style="text-align:center;color:var(--muted);font-size:13px;padding:28px 0;">No results.</p>
                   </div></div>
@@ -537,8 +542,8 @@
                 {{-- MAP --}}
                 <div x-show="tab==='map' && view==='none'" style="flex:1;display:flex;flex-direction:column;min-height:0;">
                   <div class="pill-row" style="padding:9px 12px 7px;flex-shrink:0;background:var(--bg);border-bottom:1px solid var(--line);">
-                    <div class="pill" :class="cCat===null && 'on'" @click="cCat=null; cSub=null; mapRefresh()">All</div>
-                    <template x-for="c in parents" :key="c.slug"><div class="pill" :class="cCat===c.slug && 'on'" @click="cCat=c.slug; cSub=null; mapRefresh()" x-text="c.name"></div></template>
+                    <div class="pill" :class="cCat===null && 'on'" @click="cCat=null; cSub=null; cSub2=null; mapRefresh()">All</div>
+                    <template x-for="c in parents" :key="c.slug"><div class="pill" :class="cCat===c.slug && 'on'" @click="cCat=c.slug; cSub=null; cSub2=null; mapRefresh()" x-text="c.name"></div></template>
                   </div>
                   <div class="mapel" id="cmap"></div>
                 </div>
@@ -784,7 +789,7 @@
 <script>
 function goLocalApp() {
   return {
-    tab:'home', view:'none', btab:'home', cCat:null, cSub:null, active:null, activeOffer:null, focus:null,
+    tab:'home', view:'none', btab:'home', cCat:null, cSub:null, cSub2:null, active:null, activeOffer:null, focus:null,
     lastCode:null, countdown:'', codeExpired:false, loading:false,
     verifyMsg:'', verifyOk:false, bizError:'',
     mapsKey: @json($mapsKey ?? ''), mapsReady:false,
@@ -833,14 +838,16 @@ function goLocalApp() {
       return list;
     },
     // Does a business fall under the active category selection (parent slug, or a drilled-in sub)?
+    // Match a business against the deepest active selection, using its ancestor path.
     inCat(b){
       if(this.cCat==='foryou') return this.matchesPrefs(b);
-      if(!this.cCat) return true;
-      if(this.cSub) return b.category_slug===this.cSub;
-      return b.category_parent_slug===this.cCat || b.category_slug===this.cCat;
+      const sel = this.cSub2 || this.cSub || this.cCat;
+      if(!sel) return true;
+      return (b.cat_slugs||[]).includes(sel);
     },
-    matchesPrefs(b){ return !this.prefs.length || this.prefs.includes(b.category_parent_slug) || this.prefs.includes(b.category_slug); },
-    selectParent(slug){ this.cCat = this.cCat===slug ? null : slug; this.cSub = null; },
+    matchesPrefs(b){ const s=b.cat_slugs||[]; return !this.prefs.length || this.prefs.some(p=>s.includes(p)); },
+    selectParent(slug){ this.cCat = this.cCat===slug ? null : slug; this.cSub = null; this.cSub2 = null; },
+    selectSub(slug){ this.cSub = this.cSub===slug ? null : slug; this.cSub2 = null; },
     get visible(){
       let list = this.applyFilters(this.withOffers.filter(b=>this.inCat(b)));
       return [...list].sort((a,b)=> this.sort==='rating' ? (b.rating-a.rating) : (parseFloat(this.dist(a))-parseFloat(this.dist(b))));
@@ -848,14 +855,18 @@ function goLocalApp() {
     get filterCount(){ return [this.fDist, this.fRating, this.fOffer, this.fSale].filter(v=>v!==null).length + (this.openNow?1:0); },
     get featured(){ return [...this.applyFilters(this.withOffers)].sort((a,b)=>((b.featured?1:0)-(a.featured?1:0))||(b.rating-a.rating)||(b.reviews_count-a.reviews_count)).slice(0,8); },
     // Explore-by-category rows are grouped by PARENT (only parents that have live offers).
-    get categoriesWithBiz(){ const list=this.applyFilters(this.withOffers); return this.parents.filter(p=>list.some(b=>b.category_parent_slug===p.slug)); },
+    get categoriesWithBiz(){ const list=this.applyFilters(this.withOffers); return this.parents.filter(p=>list.some(b=>(b.cat_slugs||[]).includes(p.slug))); },
     get currentParent(){ return this.parents.find(p=>p.slug===this.cCat); },
     get subCats(){ return this.currentParent ? (this.currentParent.children||[]) : []; },
+    get currentSub(){ return this.subCats.find(c=>c.slug===this.cSub); },
+    get subCats2(){ return this.currentSub ? (this.currentSub.children||[]) : []; },
     get cCatName(){ if(this.cCat==='foryou') return 'For you'; return this.currentParent ? this.currentParent.name : ''; },
-    get cSubName(){ const s=this.subCats.find(c=>c.slug===this.cSub); return s?s.name:''; },
-    // Build the grouped <select> options for business signup (parent header rows + indented leaves).
-    get catOptions(){ const out=[]; this.parents.forEach(p=>{ out.push({key:'h-'+p.slug, header:true, label:p.name}); (p.children||[]).forEach(c=>out.push({key:String(c.id), id:c.id, label:'  '+c.name})); }); return out; },
-    byCat(slug){ return this.applyFilters(this.withOffers.filter(b=>b.category_parent_slug===slug || b.category_slug===slug)).sort((a,b)=>parseFloat(this.dist(a))-parseFloat(this.dist(b))); },
+    get cSubName(){ return this.currentSub ? this.currentSub.name : ''; },
+    get cSub2Name(){ const s=this.subCats2.find(c=>c.slug===this.cSub2); return s?s.name:''; },
+    // Grouped <select> options for business signup: top parents as headers, every
+    // descendant selectable and indented by depth (so builder trades are pickable).
+    get catOptions(){ const out=[]; const walk=(nodes,depth)=>{ nodes.forEach(n=>{ if(depth===0){ out.push({key:'h-'+n.slug, header:true, label:n.name}); } else { out.push({key:String(n.id), id:n.id, label:' '.repeat(depth*2)+n.name}); } if(n.children&&n.children.length) walk(n.children, depth+1); }); }; walk(this.parents,0); return out; },
+    byCat(slug){ return this.applyFilters(this.withOffers.filter(b=>(b.cat_slugs||[]).includes(slug))).sort((a,b)=>parseFloat(this.dist(a))-parseFloat(this.dist(b))); },
     offerPct(b){ const o=b.offers&&b.offers[0]; if(!o) return 0; const m=String(o.badge||'').match(/(\d+)\s*%/); if(m) return +m[1]; return /free|bogo|2[- ]?for|no fee/i.test((o.badge||'')+' '+(o.title||'')) ? 100 : 0; },
     catIcon(slug){
       const I={
@@ -919,9 +930,10 @@ function goLocalApp() {
       this.$watch('tab', ()=>this.resetScroll());
 
       this.parents = await this.api('/categories').catch(()=>[]);
-      // Tag each leaf with its parent slug, and keep a flat leaf list for matching/search.
-      this.parents.forEach(p => (p.children||[]).forEach(c => c.parent_slug = p.slug));
-      this.categories = this.parents.flatMap(p => p.children||[]);
+      // Flatten the whole tree (parents → subs → sub-trades) for search/lookup.
+      const flat=[]; const walk=n=>{ flat.push(n); (n.children||[]).forEach(walk); };
+      this.parents.forEach(walk);
+      this.categories = flat;
       await this.fetchBusinesses(true);
 
       const slug = new URLSearchParams(location.search).get('b');

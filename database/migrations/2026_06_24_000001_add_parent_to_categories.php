@@ -8,17 +8,24 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('categories', function (Blueprint $table) {
-            // Self-referencing parent. Top-level (parent) categories have parent_id = null;
-            // businesses always belong to a leaf (sub) category.
-            $table->foreignId('parent_id')->nullable()->after('id')->constrained('categories')->nullOnDelete();
-        });
+        // Self-referencing parent. Top-level (parent) categories have parent_id = null;
+        // businesses link to the deepest available sub-category.
+        // Plain indexed column (no FK) — avoids self-referencing-FK failures on MySQL
+        // that would abort the whole migrate run, and the app doesn't rely on the
+        // constraint. Guarded so it's safe to re-run.
+        if (! Schema::hasColumn('categories', 'parent_id')) {
+            Schema::table('categories', function (Blueprint $table) {
+                $table->unsignedBigInteger('parent_id')->nullable()->after('id')->index();
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('categories', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('parent_id');
-        });
+        if (Schema::hasColumn('categories', 'parent_id')) {
+            Schema::table('categories', function (Blueprint $table) {
+                $table->dropColumn('parent_id');
+            });
+        }
     }
 };

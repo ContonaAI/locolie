@@ -8,11 +8,11 @@ use Illuminate\Database\Seeder;
 class CategorySeeder extends Seeder
 {
     /**
-     * Two-level taxonomy: parent groups with leaf sub-categories.
-     * Businesses always link to a LEAF slug. All 12 original leaf slugs are
-     * preserved (food-drink, pubs-bars, retail, hairdressers, beauty, fitness,
-     * builders, mechanics, trades, pet-care, health, services) so existing
-     * business seeders and data keep working.
+     * Nested taxonomy. A node value is either a string (leaf name) or
+     * [name, [children…]]. Depth is arbitrary — e.g. Builders expands into
+     * Google-style building trades. Businesses link to the deepest node that
+     * fits; the original 12 leaf slugs are preserved so existing data/seeders
+     * keep working.
      */
     protected array $tree = [
         'eat-drink' => ['Food & Drink', [
@@ -34,7 +34,18 @@ class CategorySeeder extends Seeder
             'activities' => 'Activities & Days Out',
         ]],
         'home-maintenance' => ['Home & Maintenance', [
-            'builders'   => 'Builders',
+            'builders' => ['Builders', [
+                'general-builders' => 'General Builders',
+                'extensions'       => 'Extensions & New Builds',
+                'loft-conversions' => 'Loft Conversions',
+                'roofing'          => 'Roofing',
+                'bricklaying'      => 'Bricklaying & Masonry',
+                'plastering'       => 'Plastering & Rendering',
+                'carpentry'        => 'Carpentry & Joinery',
+                'groundworks'      => 'Groundworks & Foundations',
+                'scaffolding'      => 'Scaffolding',
+                'damp-proofing'    => 'Damp Proofing',
+            ]],
             'trades'     => 'Plumbers & Electricians',
             'decorators' => 'Painters & Decorators',
             'cleaning'   => 'Cleaning Services',
@@ -46,8 +57,8 @@ class CategorySeeder extends Seeder
             'valeting'  => 'Car Wash & Valeting',
         ]],
         'shopping' => ['Shopping', [
-            'retail'  => 'Retail & Gifts',
-            'fashion' => 'Fashion & Clothing',
+            'retail'   => 'Retail & Gifts',
+            'fashion'  => 'Fashion & Clothing',
             'florists' => 'Florists',
         ]],
         'pets' => ['Pets', [
@@ -61,22 +72,26 @@ class CategorySeeder extends Seeder
         ]],
     ];
 
+    protected int $sort = 0;
+
     public function run(): void
     {
-        $parentSort = 0;
-        $leafSort = 0;
+        $this->sort = 0;
+        $this->seedLevel($this->tree, null);
+    }
 
-        foreach ($this->tree as $parentSlug => [$parentName, $children]) {
-            $parent = Category::updateOrCreate(
-                ['slug' => $parentSlug],
-                ['name' => $parentName, 'parent_id' => null, 'sort' => ++$parentSort],
+    protected function seedLevel(array $nodes, ?int $parentId): void
+    {
+        foreach ($nodes as $slug => $value) {
+            [$name, $children] = is_array($value) ? $value : [$value, null];
+
+            $cat = Category::updateOrCreate(
+                ['slug' => $slug],
+                ['name' => $name, 'parent_id' => $parentId, 'sort' => ++$this->sort],
             );
 
-            foreach ($children as $slug => $name) {
-                Category::updateOrCreate(
-                    ['slug' => $slug],
-                    ['name' => $name, 'parent_id' => $parent->id, 'sort' => ++$leafSort],
-                );
+            if (is_array($children)) {
+                $this->seedLevel($children, $cat->id);
             }
         }
     }

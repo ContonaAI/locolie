@@ -74,6 +74,22 @@ class Category extends Model
         return $this->hasMany(Category::class, 'parent_id')->orderBy('sort');
     }
 
+    /**
+     * This category's slug plus every ancestor slug, deepest first
+     * (e.g. ['roofing', 'builders', 'home-maintenance']). Lets the app match a
+     * business against a selection at any level of the tree. Walks the loaded
+     * parent chain, so eager-load `category.parent.parent…` to avoid N+1s.
+     */
+    public function ancestorSlugs(): array
+    {
+        $slugs = [];
+        for ($c = $this; $c; $c = $c->parent) {
+            $slugs[] = $c->slug;
+        }
+
+        return $slugs;
+    }
+
     /** Top-level (parent) categories. */
     public function scopeParents(Builder $query): Builder
     {

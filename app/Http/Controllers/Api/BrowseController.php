@@ -11,27 +11,28 @@ class BrowseController extends Controller
 {
     public function categories()
     {
-        // Parent groups, each with their leaf sub-categories nested under `children`.
+        // Full category tree (parents → sub-categories → sub-trades), each node
+        // shaped recursively with its `children`.
+        $shape = function (Category $c) use (&$shape) {
+            return [
+                'id' => $c->id,
+                'name' => $c->name,
+                'slug' => $c->slug,
+                'children' => $c->children->map($shape)->values(),
+            ];
+        };
+
         return Category::parents()
-            ->with(['children' => fn ($q) => $q->orderBy('sort')])
+            ->with('children.children.children')
             ->orderBy('sort')
             ->get()
-            ->map(fn ($p) => [
-                'id' => $p->id,
-                'name' => $p->name,
-                'slug' => $p->slug,
-                'children' => $p->children->map(fn ($c) => [
-                    'id' => $c->id,
-                    'name' => $c->name,
-                    'slug' => $c->slug,
-                ])->values(),
-            ]);
+            ->map($shape);
     }
 
     public function businesses(Request $request)
     {
         $query = Business::query()
-            ->with(['category.parent', 'activeOffers'])
+            ->with(['category.parent.parent', 'activeOffers'])
             ->live();
 
         if ($postcode = $request->query('postcode')) {
@@ -40,10 +41,12 @@ class BrowseController extends Controller
         }
 
         if ($slug = $request->query('category')) {
-            // Match a leaf slug directly, or a parent slug (= all its sub-categories).
+            // Match the slug at any level: the category itself, its parent, or grandparent.
             $query->whereHas('category', fn ($q) => $q
                 ->where('slug', $slug)
-                ->orWhereHas('parent', fn ($p) => $p->where('slug', $slug)));
+                ->orWhereHas('parent', fn ($p) => $p
+                    ->where('slug', $slug)
+                    ->orWhereHas('parent', fn ($g) => $g->where('slug', $slug))));
         }
 
         if ($q = $request->query('q')) {
@@ -62,7 +65,7 @@ class BrowseController extends Controller
 
     public function business(Business $business)
     {
-        $business->load(['category.parent', 'activeOffers']);
+        $business->load(['category.parent.parent', 'activeOffers']);
 
         return $this->present($business, full: true);
     }
@@ -70,7 +73,7 @@ class BrowseController extends Controller
     /** Resolve a window-sticker QR token to its business (used by the in-app scanner). */
     public function byToken(string $token)
     {
-        $business = Business::with(['category.parent', 'activeOffers'])
+        $business = Business::with(['category.parent.parent', 'activeOffers'])
             ->where('qr_token', $token)
             ->firstOr(fn () => abort(404));
 
@@ -87,6 +90,8 @@ class BrowseController extends Controller
             'category_slug' => $b->category?->slug,
             'category_parent' => $b->category?->parent?->name,
             'category_parent_slug' => $b->category?->parent?->slug,
+            // Own slug + every ancestor — lets the app filter at any tree depth.
+            'cat_slugs' => $b->category?->ancestorSlugs() ?? [],
             'postcode' => $b->postcode,
             'lat' => $b->lat,
             'lng' => $b->lng,
