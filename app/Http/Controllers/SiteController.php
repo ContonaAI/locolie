@@ -13,7 +13,7 @@ class SiteController extends Controller
         return view('site.home', [
             'stats' => [
                 'businesses' => Business::live()->count(),
-                'categories' => Category::leaves()->count(),
+                'categories' => Category::supportsHierarchy() ? Category::leaves()->count() : Category::count(),
                 'offers' => \App\Models\Offer::where('status', 'active')->count(),
             ],
             'categories' => $this->categoriesWithCounts(),

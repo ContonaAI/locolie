@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Schema;
 
 #[Fillable(['parent_id', 'name', 'slug', 'icon', 'sort'])]
 class Category extends Model
@@ -57,6 +58,19 @@ class Category extends Model
     public static function iconPath(?string $slug): string
     {
         return self::ICONS[$slug] ?? self::ICONS['services'];
+    }
+
+    /**
+     * Whether the parent/child hierarchy is available in the database yet.
+     * Lets the app degrade to a flat category list if the `parent_id` migration
+     * hasn't run on this environment (so a lagging deploy can't 500 the site).
+     * Cached per request.
+     */
+    public static function supportsHierarchy(): bool
+    {
+        static $has = null;
+
+        return $has ??= Schema::hasColumn('categories', 'parent_id');
     }
 
     public function businesses(): HasMany

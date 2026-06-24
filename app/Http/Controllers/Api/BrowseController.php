@@ -11,6 +11,17 @@ class BrowseController extends Controller
 {
     public function categories()
     {
+        // Fallback for environments where the parent_id migration hasn't run yet:
+        // return a flat list (no children) so the app still works.
+        if (! Category::supportsHierarchy()) {
+            return Category::orderBy('sort')->get()->map(fn ($c) => [
+                'id' => $c->id,
+                'name' => $c->name,
+                'slug' => $c->slug,
+                'children' => [],
+            ]);
+        }
+
         // Full category tree (parents → sub-categories → sub-trades), each node
         // shaped recursively with its `children`.
         $shape = function (Category $c) use (&$shape) {
