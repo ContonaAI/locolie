@@ -11,13 +11,27 @@ class BrowseController extends Controller
 {
     public function categories()
     {
-        return Category::orderBy('sort')->get(['id', 'name', 'slug']);
+        // Parent groups, each with their leaf sub-categories nested under `children`.
+        return Category::parents()
+            ->with(['children' => fn ($q) => $q->orderBy('sort')])
+            ->orderBy('sort')
+            ->get()
+            ->map(fn ($p) => [
+                'id' => $p->id,
+                'name' => $p->name,
+                'slug' => $p->slug,
+                'children' => $p->children->map(fn ($c) => [
+                    'id' => $c->id,
+                    'name' => $c->name,
+                    'slug' => $c->slug,
+                ])->values(),
+            ]);
     }
 
     public function businesses(Request $request)
     {
         $query = Business::query()
-            ->with(['category', 'activeOffers'])
+            ->with(['category.parent', 'activeOffers'])
             ->live();
 
         if ($postcode = $request->query('postcode')) {
@@ -26,7 +40,10 @@ class BrowseController extends Controller
         }
 
         if ($slug = $request->query('category')) {
-            $query->whereHas('category', fn ($q) => $q->where('slug', $slug));
+            // Match a leaf slug directly, or a parent slug (= all its sub-categories).
+            $query->whereHas('category', fn ($q) => $q
+                ->where('slug', $slug)
+                ->orWhereHas('parent', fn ($p) => $p->where('slug', $slug)));
         }
 
         if ($q = $request->query('q')) {
@@ -45,7 +62,7 @@ class BrowseController extends Controller
 
     public function business(Business $business)
     {
-        $business->load(['category', 'activeOffers']);
+        $business->load(['category.parent', 'activeOffers']);
 
         return $this->present($business, full: true);
     }
@@ -53,7 +70,7 @@ class BrowseController extends Controller
     /** Resolve a window-sticker QR token to its business (used by the in-app scanner). */
     public function byToken(string $token)
     {
-        $business = Business::with(['category', 'activeOffers'])
+        $business = Business::with(['category.parent', 'activeOffers'])
             ->where('qr_token', $token)
             ->firstOr(fn () => abort(404));
 
@@ -68,6 +85,8 @@ class BrowseController extends Controller
             'slug' => $b->slug,
             'category' => $b->category?->name,
             'category_slug' => $b->category?->slug,
+            'category_parent' => $b->category?->parent?->name,
+            'category_parent_slug' => $b->category?->parent?->slug,
             'postcode' => $b->postcode,
             'lat' => $b->lat,
             'lng' => $b->lng,

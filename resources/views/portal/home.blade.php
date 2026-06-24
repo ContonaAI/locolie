@@ -62,9 +62,9 @@
   .screens > [x-show]{ position:absolute; inset:0; }
 
   .app-header{ background:color-mix(in srgb, var(--ink) 80%, transparent); -webkit-backdrop-filter:blur(22px) saturate(180%); backdrop-filter:blur(22px) saturate(180%); padding:12px 15px 14px; flex-shrink:0; }
-  .app-header-row{ display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px; min-height:34px; }
-  .app-header-brand{ color:#fff; font-size:21px; font-weight:800; justify-self:center; text-align:center; letter-spacing:-.02em; }
-  .app-header-brand .pin-letter{ height:.78em; }
+  .app-header-row{ display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px; min-height:40px; }
+  .app-header-brand{ color:#fff; font-size:27px; font-weight:800; justify-self:center; letter-spacing:-.03em; display:inline-flex; align-items:center; line-height:1; }
+  .app-header-brand .pin-letter{ height:.82em; vertical-align:baseline; margin:0 .006em; }
   .app-header-loc{ display:flex; align-items:center; gap:4px; color:rgba(255,255,255,.75); font-size:12px; cursor:pointer; justify-self:start; min-width:0; }
   .app-header-loc strong{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .bell{ justify-self:end; }
@@ -353,7 +353,7 @@
                   <div x-show="onb===2">
                     <div style="font-family:var(--display),serif;font-weight:var(--display-weight);font-size:24px;">What are you into?</div>
                     <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;">
-                      <template x-for="c in categories" :key="c.slug"><div class="chip" :class="form.prefs.includes(c.slug) && 'on'" @click="togglePref(c.slug)" x-text="c.name"></div></template>
+                      <template x-for="c in parents" :key="c.slug"><div class="chip" :class="form.prefs.includes(c.slug) && 'on'" @click="togglePref(c.slug)" x-text="c.name"></div></template>
                     </div>
                   </div>
                   <div x-show="onb===3" style="text-align:center;">
@@ -453,10 +453,15 @@
                 {{-- HOME --}}
                 <div x-show="tab==='home' && view==='none'" style="flex:1;display:flex;flex-direction:column;min-height:0;">
                   <div class="scr"><div class="feed">
-                    {{-- category tiles (icons) --}}
+                    {{-- parent category tiles (icons) --}}
                     <div class="cat-tiles">
-                      <button class="cat-tile" :class="cCat===null && 'on'" @click="cCat=null"><span class="cat-ic" x-html="catIcon('all')"></span><span>All</span></button>
-                      <template x-for="c in categories" :key="c.slug"><button class="cat-tile" :class="cCat===c.slug && 'on'" @click="cCat = cCat===c.slug ? null : c.slug"><span class="cat-ic" x-html="catIcon(c.slug)"></span><span x-text="c.name"></span></button></template>
+                      <button class="cat-tile" :class="cCat===null && 'on'" @click="cCat=null; cSub=null"><span class="cat-ic" x-html="catIcon('all')"></span><span>All</span></button>
+                      <template x-for="c in parents" :key="c.slug"><button class="cat-tile" :class="cCat===c.slug && 'on'" @click="selectParent(c.slug)"><span class="cat-ic" x-html="catIcon(c.slug)"></span><span x-text="c.name"></span></button></template>
+                    </div>
+                    {{-- sub-category chips for the selected parent --}}
+                    <div class="pill-row" x-show="cCat && cCat!=='foryou' && subCats.length" x-cloak style="margin-top:-4px;">
+                      <div class="pill" :class="!cSub && 'on'" @click="cSub=null">All <span x-text="cCatName"></span></div>
+                      <template x-for="s in subCats" :key="s.slug"><div class="pill" :class="cSub===s.slug && 'on'" @click="cSub = cSub===s.slug ? null : s.slug" x-text="s.name"></div></template>
                     </div>
                     <p x-show="loading" style="text-align:center;color:var(--muted);font-size:13px;padding:28px 0;">Loading…</p>
 
@@ -485,7 +490,7 @@
                         </div>
                         <template x-for="c in categoriesWithBiz" :key="c.slug">
                           <div class="explore">
-                            <div class="sec-head"><div class="sec-title">Explore <span x-text="c.name"></span></div><div class="sec-link" @click="cCat=c.slug">See all</div></div>
+                            <div class="sec-head"><div class="sec-title">Explore <span x-text="c.name"></span></div><div class="sec-link" @click="cCat=c.slug; cSub=null">See all</div></div>
                             <div class="hscroll">
                               <template x-for="b in byCat(c.slug)" :key="c.slug+b.id">
                                 <div class="hcard" @click="openBusiness(b)">
@@ -502,7 +507,7 @@
                     {{-- category selected: vertical list --}}
                     <template x-if="!loading && cCat">
                       <div>
-                        <div class="sec-head"><div class="sec-title" x-text="cCat==='foryou' ? 'For you' : cCatName"></div><div class="sec-link" @click="cCat=null">Clear</div></div>
+                        <div class="sec-head"><div class="sec-title" x-text="cCat==='foryou' ? 'For you' : (cSub ? cSubName : cCatName)"></div><div class="sec-link" @click="cCat=null; cSub=null">Clear</div></div>
                         <template x-for="b in visible" :key="b.id">
                           <div class="row" @click="openBusiness(b)">
                             <div class="row-img" :style="b.image ? ('background-image:url('+b.image+');background-size:cover;background-position:center') : ''"></div>
@@ -523,7 +528,7 @@
                     <span style="color:#fff;font-size:13px;cursor:pointer;" @click="view='none'; searchQ=''">Cancel</span>
                   </div>
                   <div class="scr"><div class="feed">
-                    <template x-if="!searchQ"><div><div class="label" style="margin-bottom:10px;">Browse categories</div><div style="display:flex;flex-wrap:wrap;gap:7px;"><template x-for="c in categories" :key="c.slug"><div class="pill" @click="cCat=c.slug; view='none'; tab='home'" x-text="c.name"></div></template></div></div></template>
+                    <template x-if="!searchQ"><div><div class="label" style="margin-bottom:10px;">Browse categories</div><div style="display:flex;flex-wrap:wrap;gap:7px;"><template x-for="c in parents" :key="c.slug"><div class="pill" @click="cCat=c.slug; cSub=null; view='none'; tab='home'" x-text="c.name"></div></template></div></div></template>
                     <template x-for="b in searchResults" :key="b.id"><div class="row" @click="openBusiness(b)"><div class="row-img" :style="b.image ? ('background-image:url('+b.image+');background-size:cover;background-position:center') : ''"></div><div class="row-info"><div class="row-name" x-text="b.name"></div><div class="row-meta"><span x-text="b.category"></span></div></div><div class="offer-pill" x-show="b.offers[0]" x-text="b.offers[0]?.badge"></div></div></template>
                     <p x-show="searchQ && !searchResults.length" style="text-align:center;color:var(--muted);font-size:13px;padding:28px 0;">No results.</p>
                   </div></div>
@@ -532,8 +537,8 @@
                 {{-- MAP --}}
                 <div x-show="tab==='map' && view==='none'" style="flex:1;display:flex;flex-direction:column;min-height:0;">
                   <div class="pill-row" style="padding:9px 12px 7px;flex-shrink:0;background:var(--bg);border-bottom:1px solid var(--line);">
-                    <div class="pill" :class="cCat===null && 'on'" @click="cCat=null; mapRefresh()">All</div>
-                    <template x-for="c in categories" :key="c.slug"><div class="pill" :class="cCat===c.slug && 'on'" @click="cCat=c.slug; mapRefresh()" x-text="c.name"></div></template>
+                    <div class="pill" :class="cCat===null && 'on'" @click="cCat=null; cSub=null; mapRefresh()">All</div>
+                    <template x-for="c in parents" :key="c.slug"><div class="pill" :class="cCat===c.slug && 'on'" @click="cCat=c.slug; cSub=null; mapRefresh()" x-text="c.name"></div></template>
                   </div>
                   <div class="mapel" id="cmap"></div>
                 </div>
@@ -650,7 +655,7 @@
                       <div class="gmock" x-show="gResults.length" @click.outside="gResults=[]" style="display:none"><template x-for="g in gResults" :key="g.name"><div @click="pickGoogle(g)"><svg class="ic ic-sm" viewBox="0 0 24 24" style="color:var(--accent)"><path d="M20 10c0 7-8 13-8 13s-8-6-8-13a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><span><b x-text="g.name"></b> · <span style="color:var(--muted)" x-text="g.postcode"></span></span></div></template></div>
                     </div>
                     <input class="field" style="background:rgba(255,255,255,.95);border:0;" x-model="form.bName" placeholder="Business name">
-                    <select class="field" style="background:rgba(255,255,255,.95);border:0;color:var(--text-2);" x-model="form.bCat"><option value="">Choose a category…</option><template x-for="c in categories" :key="c.id"><option x-text="c.name" :value="c.id"></option></template></select>
+                    <select class="field" style="background:rgba(255,255,255,.95);border:0;color:var(--text-2);" x-model="form.bCat"><option value="">Choose a category…</option><template x-for="o in catOptions" :key="o.key"><option :value="o.id || ''" :disabled="o.header" x-text="o.label"></option></template></select>
                     <input class="field" style="background:rgba(255,255,255,.95);border:0;" x-model="form.bPostcode" placeholder="Postcode (e.g. NE1 6QF)">
                     <button class="pri-btn" @click="signupBusiness()">Create business account</button>
                     <p x-show="bizError" style="color:#fca5a5;font-size:12px;text-align:center;" x-text="bizError"></p>
@@ -758,7 +763,7 @@
         $svgAttr = 'width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"';
         $cards = [
             ['route' => 'portal.plan',    'svg' => '<svg '.$svgAttr.'><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>', 'title' => 'Business Plan',  'desc' => 'Market, product, GTM, financials - 3 co-founders, equal equity.'],
-            ['route' => 'portal.brand',   'svg' => '<svg '.$svgAttr.'><path d="M12 3l1.9 4.6 4.9.4-3.7 3.2 1.1 4.8L12 13.9 7.8 16l1.1-4.8L5.2 8l4.9-.4z"/></svg>', 'title' => 'Brand & Logos',  'desc' => '5 logo concepts, 5 style directions, the name exploration.'],
+            ['route' => 'portal.brand',   'svg' => '<svg '.$svgAttr.'><path d="M12 3l1.9 4.6 4.9.4-3.7 3.2 1.1 4.8L12 13.9 7.8 16l1.1-4.8L5.2 8l4.9-.4z"/></svg>', 'title' => 'Brand & Logos',  'desc' => '10 logo & colour concepts, 5 style directions, the name.'],
             ['route' => 'portal.design',  'svg' => '<svg '.$svgAttr.'><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>', 'title' => 'App Screens',    'desc' => 'Full brand system and 10 polished app screens.'],
             ['route' => 'portal.admin',   'svg' => '<svg '.$svgAttr.'><path d="M3 3v18h18"/><rect x="7" y="9" width="3" height="9"/><rect x="14" y="5" width="3" height="13"/></svg>', 'title' => 'Data & Admin',   'desc' => 'Every business, offer and redemption in the live database.'],
             ['route' => 'portal.mockups', 'svg' => '<svg '.$svgAttr.'><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>', 'title' => 'Mockups',        'desc' => $mockupCount > 0 ? $mockupCount.' image'.($mockupCount === 1 ? '' : 's').' uploaded' : 'Upload your designs.'],
@@ -779,7 +784,7 @@
 <script>
 function goLocalApp() {
   return {
-    tab:'home', view:'none', btab:'home', cCat:null, active:null, activeOffer:null, focus:null,
+    tab:'home', view:'none', btab:'home', cCat:null, cSub:null, active:null, activeOffer:null, focus:null,
     lastCode:null, countdown:'', codeExpired:false, loading:false,
     verifyMsg:'', verifyOk:false, bizError:'',
     mapsKey: @json($mapsKey ?? ''), mapsReady:false,
@@ -788,7 +793,7 @@ function goLocalApp() {
     brandNames:['locolie','Vicinity','Patch','TownLoop','Mooch','Highstreet'],
     onb:1, sort:'distance', openNow:false, searchQ:'', device:'mobile',
     filterOpen:false, fDist:null, fRating:null, fOffer:null, fSale:null,
-    categories:[], businesses:[], customer:null, business:null, secret:null,
+    parents:[], categories:[], businesses:[], customer:null, business:null, secret:null,
     bizOffers:[], stats:{redeemed:0,pending:0,recent:[]}, favs:[], prefs:[],
     notifications:[], unread:0, notifOpen:false, seen:[], notifyOn:false,
     gResults:[], tickN:0, map:null, markers:[], bizMap:null,
@@ -827,20 +832,43 @@ function goLocalApp() {
       if(this.fSale) list = list.filter(b=>(b.offers||[]).some(o=>o.sale_type===this.fSale));
       return list;
     },
+    // Does a business fall under the active category selection (parent slug, or a drilled-in sub)?
+    inCat(b){
+      if(this.cCat==='foryou') return this.matchesPrefs(b);
+      if(!this.cCat) return true;
+      if(this.cSub) return b.category_slug===this.cSub;
+      return b.category_parent_slug===this.cCat || b.category_slug===this.cCat;
+    },
+    matchesPrefs(b){ return !this.prefs.length || this.prefs.includes(b.category_parent_slug) || this.prefs.includes(b.category_slug); },
+    selectParent(slug){ this.cCat = this.cCat===slug ? null : slug; this.cSub = null; },
     get visible(){
-      let list = this.withOffers.filter(b=>{ if(this.cCat==='foryou') return this.prefs.includes(b.category_slug); if(this.cCat) return b.category_slug===this.cCat; return true; });
-      list = this.applyFilters(list);
+      let list = this.applyFilters(this.withOffers.filter(b=>this.inCat(b)));
       return [...list].sort((a,b)=> this.sort==='rating' ? (b.rating-a.rating) : (parseFloat(this.dist(a))-parseFloat(this.dist(b))));
     },
     get filterCount(){ return [this.fDist, this.fRating, this.fOffer, this.fSale].filter(v=>v!==null).length + (this.openNow?1:0); },
     get featured(){ return [...this.applyFilters(this.withOffers)].sort((a,b)=>((b.featured?1:0)-(a.featured?1:0))||(b.rating-a.rating)||(b.reviews_count-a.reviews_count)).slice(0,8); },
-    get categoriesWithBiz(){ return this.categories.filter(c=>this.applyFilters(this.withOffers).some(b=>b.category_slug===c.slug)); },
-    get cCatName(){ const c=this.categories.find(c=>c.slug===this.cCat); return c?c.name:''; },
-    byCat(slug){ return this.applyFilters(this.withOffers.filter(b=>b.category_slug===slug)).sort((a,b)=>parseFloat(this.dist(a))-parseFloat(this.dist(b))); },
+    // Explore-by-category rows are grouped by PARENT (only parents that have live offers).
+    get categoriesWithBiz(){ const list=this.applyFilters(this.withOffers); return this.parents.filter(p=>list.some(b=>b.category_parent_slug===p.slug)); },
+    get currentParent(){ return this.parents.find(p=>p.slug===this.cCat); },
+    get subCats(){ return this.currentParent ? (this.currentParent.children||[]) : []; },
+    get cCatName(){ if(this.cCat==='foryou') return 'For you'; return this.currentParent ? this.currentParent.name : ''; },
+    get cSubName(){ const s=this.subCats.find(c=>c.slug===this.cSub); return s?s.name:''; },
+    // Build the grouped <select> options for business signup (parent header rows + indented leaves).
+    get catOptions(){ const out=[]; this.parents.forEach(p=>{ out.push({key:'h-'+p.slug, header:true, label:p.name}); (p.children||[]).forEach(c=>out.push({key:String(c.id), id:c.id, label:'  '+c.name})); }); return out; },
+    byCat(slug){ return this.applyFilters(this.withOffers.filter(b=>b.category_parent_slug===slug || b.category_slug===slug)).sort((a,b)=>parseFloat(this.dist(a))-parseFloat(this.dist(b))); },
     offerPct(b){ const o=b.offers&&b.offers[0]; if(!o) return 0; const m=String(o.badge||'').match(/(\d+)\s*%/); if(m) return +m[1]; return /free|bogo|2[- ]?for|no fee/i.test((o.badge||'')+' '+(o.title||'')) ? 100 : 0; },
     catIcon(slug){
       const I={
         all:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/>',
+        // Parent (top-level) groups — shown as the home category tiles.
+        'eat-drink':'<path d="M18 8h1a3 3 0 0 1 0 6h-1"/><path d="M4 8h14v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><line x1="6" y1="2" x2="6" y2="4.5"/><line x1="10" y1="2" x2="10" y2="4.5"/><line x1="14" y1="2" x2="14" y2="4.5"/>',
+        'health-beauty':'<path d="M12 2.5l1.7 4.9 4.9 1.6-4.9 1.6L12 15.5l-1.7-4.9L5.4 9l4.9-1.6z"/><path d="M18 14l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/>',
+        'fitness-leisure':'<path d="M6.5 6.5l11 11"/><path d="M4 7 7 4l2.5 2.5L7 9z"/><path d="M20 17l-3 3-2.5-2.5L17 15z"/><path d="M4.5 11 2 13l2 2"/><path d="M19.5 13 22 11l-2-2"/>',
+        'home-maintenance':'<path d="M3 11 12 4l9 7"/><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9"/><path d="M10 20v-5h4v5"/>',
+        'motoring':'<circle cx="7" cy="17" r="1.8"/><circle cx="17" cy="17" r="1.8"/><path d="M5.2 17H3v-4.5l1.8-4h8.5l3.5 4H21V17h-2.2"/><line x1="8.8" y1="17" x2="15.2" y2="17"/>',
+        'shopping':'<path d="M6 2 3 6v13a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>',
+        'pets':'<circle cx="6.5" cy="9.5" r="1.8"/><circle cx="11" cy="6" r="1.8"/><circle cx="16.5" cy="7.5" r="1.8"/><circle cx="19" cy="13" r="1.6"/><path d="M11.5 12c-2.2 0-4.5 1.7-4.5 4 0 1.9 1.6 3 3.3 3 1.3 0 1.7-.6 3.2-.6s1.9.6 3.2.6c1.7 0 3.3-1.1 3.3-3 0-2.3-2.3-4-4.5-4z"/>',
+        'professional':'<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>',
         'food-drink':'<path d="M18 8h1a3 3 0 0 1 0 6h-1"/><path d="M4 8h14v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><line x1="6" y1="2" x2="6" y2="4.5"/><line x1="10" y1="2" x2="10" y2="4.5"/><line x1="14" y1="2" x2="14" y2="4.5"/>',
         'pubs-bars':'<path d="M6 3h12l-1.4 9.2A4 4 0 0 1 12.65 16h-1.3a4 4 0 0 1-3.95-3.8z"/><line x1="12" y1="16" x2="12" y2="21"/><line x1="8" y1="21" x2="16" y2="21"/>',
         retail:'<path d="M6 2 3 6v13a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>',
@@ -890,7 +918,10 @@ function goLocalApp() {
       this.$watch('view', ()=>this.resetScroll());
       this.$watch('tab', ()=>this.resetScroll());
 
-      this.categories = await this.api('/categories').catch(()=>[]);
+      this.parents = await this.api('/categories').catch(()=>[]);
+      // Tag each leaf with its parent slug, and keep a flat leaf list for matching/search.
+      this.parents.forEach(p => (p.children||[]).forEach(c => c.parent_slug = p.slug));
+      this.categories = this.parents.flatMap(p => p.children||[]);
       await this.fetchBusinesses(true);
 
       const slug = new URLSearchParams(location.search).get('b');
@@ -1016,7 +1047,7 @@ function goLocalApp() {
       const qs = this.location==='all' ? '' : ('?postcode='+encodeURIComponent(this.location));
       const data = await this.api('/businesses'+qs).catch(()=>null); if(!data) return;
       const fresh=[];
-      data.forEach(b=>b.offers.forEach(o=>{ if(!this.seen.includes(o.id)){ if(!this.prefs.length || this.prefs.includes(b.category_slug)){ fresh.push({biz:b.name, text:o.badge+' - '+o.title}); } this.seen.push(o.id); } }));
+      data.forEach(b=>b.offers.forEach(o=>{ if(!this.seen.includes(o.id)){ if(this.matchesPrefs(b)){ fresh.push({biz:b.name, text:o.badge+' - '+o.title}); } this.seen.push(o.id); } }));
       this.businesses = data; if(this.tab==='map' && this.map) this.renderMarkers();
       if(fresh.length){ this.save('gl_seen', this.seen); fresh.forEach(f=>{ this.notifications.unshift({id:Date.now()+Math.random(), biz:f.biz, text:f.text}); this.unread++; if(this.notifyOn && 'Notification' in window && Notification.permission==='granted'){ try{ new Notification('New offer at '+f.biz, {body:f.text, icon:'/icon.svg'}); }catch(e){} } }); this.notifications = this.notifications.slice(0,20); this.save('gl_notifs', this.notifications); }
       if(this.secret) this.loadBiz();
