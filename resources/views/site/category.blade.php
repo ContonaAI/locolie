@@ -1,13 +1,13 @@
 @extends('site.layout')
-@section('title', $category->name.' in Newcastle NE1 - independent '.$category->name.' on locolie')
-@section('meta_description', 'Discover independent '.strtolower($category->name).' in Newcastle NE1 on locolie - see live offers, ratings and redeem deals at the till.')
+@section('title', $category->name.' in '.$llPlace.' - independent '.$category->name.' on locolie')
+@section('meta_description', 'Discover independent '.strtolower($category->name).' in '.$llPlace.' on locolie - see live offers, ratings and redeem deals at the till.')
 
 @push('head')
 @php
     $catLower = strtolower($category->name);
     $catFaqs = [
-        ['q' => "Are these {$category->name} in Newcastle independent?", 'a' => "Yes - every business listed here is a genuine independent {$catLower} in or around Newcastle NE1, never a national chain."],
-        ['q' => "Do independent {$catLower} in Newcastle offer discounts?", 'a' => "Many do. Businesses on locolie publish exclusive offers - look for the offer badge on a listing, then show the code or QR at the till to redeem it."],
+        ['q' => "Are these {$category->name} in {$llCity} independent?", 'a' => "Yes - every business listed here is a genuine independent {$catLower} in or around {$llPlace}, never a national chain."],
+        ['q' => "Do independent {$catLower} in {$llCity} offer discounts?", 'a' => "Many do. Businesses on locolie publish exclusive offers - look for the offer badge on a listing, then show the code or QR at the till to redeem it."],
         ['q' => "Is locolie free to use to find {$catLower}?", 'a' => "Completely free for shoppers. Discover independent {$catLower} near you and save with offers that keep money on your local high street."],
     ];
 @endphp
@@ -44,7 +44,7 @@
             </span>
             <div>
                 <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl">{{ $category->name }}</h1>
-                <p class="mt-1 text-muted">{{ $businesses->count() }} independent {{ \Illuminate\Support\Str::plural('business', $businesses->count()) }} in Newcastle NE1</p>
+                <p class="mt-1 text-muted">{{ $businesses->count() }} independent {{ \Illuminate\Support\Str::plural('business', $businesses->count()) }} in {{ $llPlace }}</p>
             </div>
         </div>
         <p class="mt-6 max-w-2xl text-base leading-relaxed text-muted">Skip the chains and back your high street. These are real, independent {{ strtolower($category->name) }} near you - with live offers you redeem at the till on locolie.</p>
@@ -99,7 +99,7 @@
                     <a href="/app?b={{ $b->slug }}" target="_blank" rel="noopener" class="card-hover group overflow-hidden rounded-card border border-hair bg-white">
                         <div class="relative h-44 overflow-hidden bg-[#e2e8f0]">
                             @if ($b->photos)
-                                <img src="{{ $b->photos[0] }}" alt="{{ $b->name }} - {{ $category->name }} in Newcastle NE1" loading="lazy" decoding="async" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                                <img src="{{ $b->photos[0] }}" alt="{{ $b->name }} - {{ $category->name }} in {{ $b->city ?? $llCity }}" loading="lazy" decoding="async" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
                             @else
                                 <div class="h-full w-full bg-gradient-to-br from-emerald-soft to-[#e2e8f0]"></div>
                             @endif

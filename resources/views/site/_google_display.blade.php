@@ -12,7 +12,7 @@
     $bizName  = $sample->name ?? 'Your Business';
     $bizCat   = $sample?->category?->name ?? 'independent shop';
     $bizCatLc = \Illuminate\Support\Str::lower($bizCat);
-    $bizCity  = $sample->city ?? 'Newcastle';
+    $bizCity  = $sample->city ?? $llCity;
     $bizRating  = $sample && $sample->rating ? number_format($sample->rating, 1) : '4.8';
     $bizReviews = $sample && $sample->reviews_count ? $sample->reviews_count : 120;
     $bizColor   = $sample ? $sample->brandColor() : '#059669';

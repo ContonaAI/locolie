@@ -1,6 +1,6 @@
 @extends('site.layout')
 @section('title', 'locolie - back your high street and bag real local discounts')
-@section('meta_description', 'locolie helps you back the indies. Shoppers discover real discounts from independent shops near you in Newcastle NE1. Retailers list free, post offers that drive footfall, and message customers in real time by email, SMS and push.')
+@section('meta_description', 'locolie helps you back the indies. Shoppers discover real discounts from independent shops near you in '.$llPlace.'. Retailers list free, post offers that drive footfall, and message customers in real time by email, SMS and push.')
 
 @push('head')
 <script>window.FL_CITIES = @json($cityData); window.FL_POINTS = @json($mapPoints);</script>
@@ -60,13 +60,13 @@
             <span :class="live ? 'text-emerald' : 'text-amber-600'"
                   class="inline-flex items-center gap-2 rounded-full border border-hair bg-white/70 glass px-3.5 py-1.5 text-xs font-semibold shadow-sm">
                 <span class="relative flex h-2 w-2"><span class="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" :class="live ? 'bg-emerald' : 'bg-amber-500'"></span><span class="relative inline-flex h-2 w-2 rounded-full" :class="live ? 'bg-emerald' : 'bg-amber-500'"></span></span>
-                <span x-text="label">Now live in Newcastle NE1</span>
+                <span x-text="label">Now live in {{ $llPlace }}</span>
             </span>
             <h1 class="mt-6 text-4xl font-extrabold leading-[1.02] tracking-tight text-balance sm:text-5xl lg:text-[4.1rem]">
                 Back the indies. <span class="gradient-text">Bag the deals</span>.
             </h1>
             <p class="mt-5 max-w-lg text-lg leading-relaxed text-muted">
-                locolie brings back your high street. Find real discounts from independents near you, tap to reveal the offer and redeem it at the till - and keep the corner cafe, the family butcher and the indie salon thriving. <span class="font-semibold text-ink">Live in Newcastle now</span>, rolling out across the UK next.
+                locolie brings back your high street. Find real discounts from independents near you, tap to reveal the offer and redeem it at the till - and keep the corner cafe, the family butcher and the indie salon thriving. <span class="font-semibold text-ink">Live in {{ $llCity }} now</span>, rolling out across the UK next.
             </p>
             <div class="mt-8 flex flex-col gap-3 sm:flex-row">
                 <a href="/app" class="group inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-ink/10 transition hover:bg-emerald hover:shadow-emerald/25">
@@ -87,7 +87,7 @@
                 @endforeach
             </div>
             <div class="mt-8 flex items-center gap-6 text-sm text-muted">
-                <div><span class="text-xl font-extrabold text-ink" x-text="count">{{ $stats['businesses'] }}</span> <span class="block text-xs">indies <span x-text="'in '+place" class="text-emerald">in Newcastle</span></span></div>
+                <div><span class="text-xl font-extrabold text-ink" x-text="count">{{ $stats['businesses'] }}</span> <span class="block text-xs">indies <span x-text="'in '+place" class="text-emerald">in {{ $llCity }}</span></span></div>
                 <span class="h-8 w-px bg-hair"></span>
                 <div><span class="text-xl font-extrabold text-ink" data-count="{{ $stats['offers'] }}">{{ $stats['offers'] }}</span> <span class="block text-xs">live deals</span></div>
                 <span class="h-8 w-px bg-hair"></span>
@@ -182,7 +182,7 @@
             <div class="flex flex-wrap items-center justify-between gap-3 px-6 pt-5">
                 <div>
                     <div class="text-xs font-semibold uppercase tracking-wider text-emerald">Where we're at</div>
-                    <h3 class="text-lg font-bold">Live in Newcastle, coming to your town next</h3>
+                    <h3 class="text-lg font-bold">Live in {{ $llCity }}, coming to your town next</h3>
                 </div>
                 <div class="flex items-center gap-4 text-xs font-medium text-muted">
                     <span class="inline-flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-emerald"></span> Live now</span>
@@ -319,7 +319,7 @@
         <div class="mx-auto max-w-2xl text-center reveal">
             <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald">Explore</h2>
             <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Every kind of indie.</p>
-            <p class="mt-4 text-muted">From your morning coffee to your MOT - browse the categories we cover in Newcastle NE1.</p>
+            <p class="mt-4 text-muted">From your morning coffee to your MOT - browse the categories we cover in {{ $llPlace }}.</p>
         </div>
         <div class="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             @foreach ($categories as $i => $c)
@@ -344,14 +344,14 @@
         <div class="mx-auto max-w-2xl text-center reveal">
             <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald">On locolie now</h2>
             <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Real indies, real discounts.</p>
-            <p class="mt-4 text-muted">A few of the {{ number_format($stats['businesses']) }} Newcastle indies already live in the app.</p>
+            <p class="mt-4 text-muted">A few of the {{ number_format($stats['businesses']) }} {{ $llCity }} indies already live in the app.</p>
         </div>
         <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             @foreach ($featured as $i => $b)
                 @php $offer = $b->activeOffers->first(); @endphp
                 <a href="/app?b={{ $b->slug }}" target="_blank" rel="noopener" class="reveal card-hover group overflow-hidden rounded-card border border-hair bg-white" data-d="{{ ($i % 3) + 1 }}">
                     <div class="relative h-44 overflow-hidden bg-[#e2e8f0]">
-                        <img src="{{ $b->photos[0] }}" alt="{{ $b->name }} - independent {{ $b->category?->name }} in Newcastle" loading="lazy" decoding="async" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                        <img src="{{ $b->photos[0] }}" alt="{{ $b->name }} - independent {{ $b->category?->name }} in {{ $b->city ?? $llCity }}" loading="lazy" decoding="async" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
                         @if ($b->plan !== 'free')
                             <span class="absolute right-3 top-3 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white">Sponsored</span>
                         @endif
@@ -386,7 +386,7 @@
         <div class="mx-auto max-w-2xl text-center reveal">
             <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald-soft">See it live</h2>
             <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">A real, fast, properly handy app.</p>
-            <p class="mt-4 text-white/60">{{ number_format($stats['businesses']) }} real Newcastle indies, live right now. Open it full-screen and it works a treat on any device.</p>
+            <p class="mt-4 text-white/60">{{ number_format($stats['businesses']) }} real {{ $llCity }} indies, live right now. Open it full-screen and it works a treat on any device.</p>
         </div>
 
         <div class="mt-12 grid items-center gap-10 reveal lg:grid-cols-2">
@@ -475,7 +475,7 @@
         <div class="mx-auto max-w-2xl text-center reveal">
             <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald">Case studies</h2>
             <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Indies, winning.</p>
-            <p class="mt-4 text-muted">How real NE1 indies use locolie to <span class="font-semibold text-ink">pull in footfall</span> and <span class="font-semibold text-ink">keep customers coming back</span>.</p>
+            <p class="mt-4 text-muted">How real {{ $ll['area'] }} indies use locolie to <span class="font-semibold text-ink">pull in footfall</span> and <span class="font-semibold text-ink">keep customers coming back</span>.</p>
         </div>
         <div class="mt-14 grid gap-6 lg:grid-cols-3">
             @php
@@ -510,7 +510,7 @@
                 </figure>
             @endforeach
         </div>
-        <p class="mt-6 text-center text-xs text-muted">Illustrative results from early locolie pilots with indies in Newcastle NE1.</p>
+        <p class="mt-6 text-center text-xs text-muted">Illustrative results from early locolie pilots with indies in {{ $llPlace }}.</p>
     </div>
 </section>
 
@@ -584,7 +584,7 @@
         <div class="grid gap-8 text-center sm:grid-cols-3">
             <div class="reveal"><div class="text-5xl font-extrabold tracking-tight"><span data-count="{{ $stats['businesses'] }}">{{ $stats['businesses'] }}</span></div><div class="mt-2 text-sm font-medium text-white/60">Independent shops</div></div>
             <div class="reveal" data-d="1"><div class="text-5xl font-extrabold tracking-tight"><span data-count="{{ $stats['categories'] }}">{{ $stats['categories'] }}</span></div><div class="mt-2 text-sm font-medium text-white/60">Categories</div></div>
-            <div class="reveal" data-d="2"><div class="text-5xl font-extrabold tracking-tight gradient-text">NE1</div><div class="mt-2 text-sm font-medium text-white/60">Newcastle city centre</div></div>
+            <div class="reveal" data-d="2"><div class="text-5xl font-extrabold tracking-tight gradient-text">{{ $ll['area'] }}</div><div class="mt-2 text-sm font-medium text-white/60">{{ $llCity }} city centre</div></div>
         </div>
     </div>
 </section>
@@ -617,7 +617,7 @@
         <div class="mx-auto mt-14 grid max-w-4xl gap-6 sm:grid-cols-3">
             @php $founders = [
                 ['name'=>'Tom','initials'=>'T','role'=>'Co-founder','line'=>'Product & engineering - building the app shoppers actually want to open.'],
-                ['name'=>'Joe','initials'=>'J','role'=>'Co-founder','line'=>'Growth & business - getting locolie into every NE1 shop window.'],
+                ['name'=>'Joe','initials'=>'J','role'=>'Co-founder','line'=>'Growth & business - getting locolie into every '.$ll['area'].' shop window.'],
                 ['name'=>'Roddy','initials'=>'R','role'=>'Co-founder','line'=>'Operations & partnerships - keeping local indies on side and onboarded.'],
             ]; @endphp
             @foreach ($founders as $i => $f)
@@ -665,7 +665,7 @@
 <section class="border-t border-hair py-20 text-center sm:py-28">
     <div class="mx-auto max-w-2xl px-5 sm:px-6 reveal">
         <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl text-balance">Ready to back the indies?</h2>
-        <p class="mt-4 text-muted">Join the shoppers and retailers bringing Newcastle's independent high street back to life.</p>
+        <p class="mt-4 text-muted">Join the shoppers and retailers bringing {{ $llCity }}'s independent high street back to life.</p>
         <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             <a href="/app" class="inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-emerald">Find local deals</a>
             <a href="/for-business" class="inline-flex items-center justify-center rounded-full border border-hair bg-white px-6 py-3.5 text-sm font-semibold text-ink transition hover:border-ink">List your business - free</a>

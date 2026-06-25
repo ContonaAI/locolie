@@ -1,6 +1,6 @@
 @extends('site.layout')
 @section('title', 'For Business - locolie')
-@section('meta_description', 'List your indie business on locolie for free. Get found by local shoppers in Newcastle NE1, drive footfall with offers, and message customers by email, SMS and push. Upgrade from £19/mo.')
+@section('meta_description', 'List your indie business on locolie for free. Get found by local shoppers in '.$llPlace.', drive footfall with offers, and message customers by email, SMS and push. Upgrade from £'.$llFeaturedPrice.'/mo.')
 
 @section('content')
 
@@ -249,7 +249,7 @@
                     </ul>
                     <div class="mt-5 flex items-center justify-between border-t border-white/10 pt-4">
                         <span class="text-sm font-bold">All in</span>
-                        <span class="text-lg font-extrabold">From £0 <span class="text-xs font-medium text-white/60">up to £49/mo</span></span>
+                        <span class="text-lg font-extrabold">From £0 <span class="text-xs font-medium text-white/60">up to £{{ \App\Models\Business::PLANS['premium']['price'] }}/mo</span></span>
                     </div>
                 </div>
             </div>
@@ -428,9 +428,9 @@
             @php
                 $faqs = [
                     ['q' => 'Is it really free to list?', 'a' => 'Yes, and free forever. On the Free plan you show up in search and on the map, post offers, and redeem them with a QR scan at the till. You only pay if you choose a paid plan for extra reach.'],
-                    ['q' => 'Who can join locolie?', 'a' => 'locolie is just for independent UK businesses. We don\'t list the national chains, and that\'s the whole point. We\'re backing local, starting in Newcastle NE1.'],
+                    ['q' => 'Who can join locolie?', 'a' => 'locolie is just for independent UK businesses. We don\'t list the national chains, and that\'s the whole point. We\'re backing local, starting in '.$llPlace.'.'],
                     ['q' => 'How do offer redemptions work?', 'a' => 'You post an offer, a shopper reveals the code in the app, and at the till you scan their QR (or they scan your window sticker). Every redemption is logged, so you can see exactly what footfall each offer drove.'],
-                    ['q' => 'What\'s the difference between Featured and Premium?', 'a' => 'Featured (£19/mo) gets you featured-rail placement, a "Sponsored" badge, priority in search and on the map, and a monthly email feature. Premium (£49/mo) adds top placement, push notifications to nearby shoppers, unlimited email campaigns and an analytics dashboard.'],
+                    ['q' => 'What\'s the difference between Featured and Premium?', 'a' => 'Featured (£'.\App\Models\Business::PLANS['featured']['price'].'/mo) gets you featured-rail placement, a "Sponsored" badge, priority in search and on the map, and a monthly email feature. Premium (£'.\App\Models\Business::PLANS['premium']['price'].'/mo) adds top placement, push notifications to nearby shoppers, unlimited email campaigns and an analytics dashboard.'],
                     ['q' => 'Can I cancel or change plan anytime?', 'a' => 'Of course. There are no contracts. Upgrade, downgrade or cancel whenever you like, and changes take effect from your next billing cycle.'],
                     ['q' => 'Do I really get to keep my customer data?', 'a' => 'Yes, and that\'s the whole point. Every shopper who redeems an offer joins your own customer list (name, email, visit count), which you can export anytime and market to by email and push. Customers opt in to marketing and it\'s all GDPR-compliant, but the relationship is yours, not ours and not a chain\'s.'],
                 ];
@@ -459,7 +459,7 @@
 <section class="border-t border-hair bg-ink py-20 text-center text-white sm:py-24">
     <div class="mx-auto max-w-2xl px-5 sm:px-6">
         <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl text-balance">Put your shop on the map.</h2>
-        <p class="mt-4 text-white/70">Join the independents already backing local on locolie in Newcastle NE1. Free to start.</p>
+        <p class="mt-4 text-white/70">Join the independents already backing local on locolie in {{ $llPlace }}. Free to start.</p>
         <a href="/business/join" class="mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-ink transition hover:bg-emerald hover:text-white">
             List my shop free
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>

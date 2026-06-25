@@ -1,6 +1,6 @@
 @extends('site.layout')
-@section('title', $business->name.' - '.$business->category?->name.' in Newcastle NE1 | locolie')
-@section('meta_description', \Illuminate\Support\Str::limit('Independent '.$business->category?->name.' in Newcastle - '.($business->description ?: $business->name.' on locolie. See offers, ratings and redeem deals at the till.'), 155))
+@section('title', $business->name.' - '.$business->category?->name.' in '.($business->city ?: $llCity).' | locolie')
+@section('meta_description', \Illuminate\Support\Str::limit('Independent '.$business->category?->name.' in '.($business->city ?: $llCity).' - '.($business->description ?: $business->name.' on locolie. See offers, ratings and redeem deals at the till.'), 155))
 
 @push('head')
 @php
@@ -15,7 +15,7 @@
         'address' => array_filter([
             '@type' => 'PostalAddress',
             'streetAddress' => $business->address ?: null,
-            'addressLocality' => 'Newcastle upon Tyne',
+            'addressLocality' => $business->city ?: $ll['city_full'],
             'postalCode' => $business->postcode,
             'addressCountry' => 'GB',
         ]),
@@ -62,7 +62,7 @@
 
 <section class="relative">
     <div class="h-64 w-full overflow-hidden bg-[#e2e8f0] sm:h-80">
-        @if($img)<img src="{{ $img }}" alt="{{ $business->name }} - {{ $business->category?->name }} in Newcastle" class="h-full w-full object-cover">@else<div class="h-full w-full bg-gradient-to-br from-emerald-soft to-[#e2e8f0]"></div>@endif
+        @if($img)<img src="{{ $img }}" alt="{{ $business->name }} - {{ $business->category?->name }} in {{ $business->city ?: $llCity }}" class="h-full w-full object-cover">@else<div class="h-full w-full bg-gradient-to-br from-emerald-soft to-[#e2e8f0]"></div>@endif
     </div>
     <div class="mx-auto max-w-5xl 2xl:max-w-6xl px-5 sm:px-6">
         <div class="-mt-16 rounded-card border border-hair bg-white p-6 shadow-xl sm:p-8">
@@ -132,7 +132,7 @@
         <div class="space-y-4">
             <div class="rounded-card border border-hair bg-white p-5">
                 <h3 class="font-bold text-ink">Visit</h3>
-                <p class="mt-2 text-sm text-muted">{{ $business->address ?: 'Newcastle '.$business->postcode }}</p>
+                <p class="mt-2 text-sm text-muted">{{ $business->address ?: trim(($business->city ?: $llCity).' '.$business->postcode) }}</p>
                 <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($business->name.' '.$business->postcode) }}" target="_blank" rel="noopener" class="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald hover:text-ink">Get directions <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
             </div>
             <div class="rounded-card border border-hair bg-emerald-soft p-5">
