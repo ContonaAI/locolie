@@ -14,7 +14,9 @@
 /.zed
 /auth.json
 /node_modules
-/public/build
+# NOTE: public/build IS committed - the production server can't build assets
+# (old Node), so the compiled bundle ships in git. Keeping it tracked means the
+# Vite manifest and its hashed assets always commit together (no stale-asset 500s).
 /public/fonts-manifest.dev.json
 /public/hot
 /public/storage
