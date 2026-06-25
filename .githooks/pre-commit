@@ -1,0 +1,20 @@
+#!/bin/sh
+# Auto-rebuild the front-end before every commit so the committed public/build
+# assets always match the source. Production serves these committed assets, so
+# they must never drift from resources/css + resources/js + the Blade views.
+#
+# Enabled via:  git config core.hooksPath .githooks
+# (the npm build script already no-ops gracefully when vite is unavailable).
+
+echo "[pre-commit] rebuilding front-end assets (npm run build)..."
+if ! npm run build >/tmp/golocal-precommit-build.log 2>&1; then
+  echo "[pre-commit] build FAILED - aborting commit. Last output:"
+  tail -20 /tmp/golocal-precommit-build.log
+  exit 1
+fi
+
+# Stage the freshly built assets so they ride along in this commit.
+git add public/build >/dev/null 2>&1
+
+echo "[pre-commit] assets rebuilt and staged."
+exit 0

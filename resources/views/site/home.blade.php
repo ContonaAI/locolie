@@ -476,27 +476,31 @@
         <div class="mt-14 grid gap-6 lg:grid-cols-3">
             @php
                 $stories = [
-                    ['cat' => 'Food & Drink', 'icon' => 'food-drink', 'name' => 'A Quayside café',
+                    ['cat' => 'Food & Drink', 'icon' => 'food-drink', 'name' => 'A Quayside café', 'img' => '/storage/marketing/cafe-owner.jpg',
                      'quote' => 'A “20% off before noon” offer filled our quietest hours. We captured 140 regulars in a month - now we just text them when the cakes come out of the oven.',
                      'stat' => '+38%', 'statlabel' => 'weekday morning covers'],
-                    ['cat' => 'Hairdressers', 'icon' => 'hairdressers', 'name' => 'A Grainger St barber',
+                    ['cat' => 'Hairdressers', 'icon' => 'hairdressers', 'name' => 'A Grainger St barber', 'img' => '/storage/marketing/barber-owner.jpg',
                      'quote' => 'New-client cuts via the app, then automated win-back texts at the 5-week mark. Our chairs are full and the rebookings run themselves.',
                      'stat' => '210', 'statlabel' => 'customers on their list'],
-                    ['cat' => 'Fitness', 'icon' => 'fitness', 'name' => 'An independent gym',
+                    ['cat' => 'Fitness', 'icon' => 'fitness', 'name' => 'An independent gym', 'img' => '/storage/marketing/gym-owner.jpg',
                      'quote' => 'Free class taster on locolie, push notification to anyone within a mile. We turned taster sign-ups into members for the price of zero ad spend.',
                      'stat' => '£0', 'statlabel' => 'spent on ads'],
                 ];
             @endphp
             @foreach ($stories as $i => $s)
-                <figure class="reveal card-hover flex flex-col overflow-hidden rounded-card border border-hair bg-white" data-d="{{ $i+1 }}">
-                    <div class="relative flex items-center gap-3 overflow-hidden bg-gradient-to-br from-emerald-soft to-white px-7 pb-5 pt-6">
-                        <svg class="absolute -right-5 -top-4 h-28 w-28 text-emerald/10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">{!! \App\Models\Category::iconPath($s['icon']) !!}</svg>
-                        <span class="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-emerald shadow-sm"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">{!! \App\Models\Category::iconPath($s['icon']) !!}</svg></span>
-                        <span class="relative text-xs font-semibold uppercase tracking-wide text-emerald">{{ $s['cat'] }}</span>
+                <figure class="reveal card-hover group flex flex-col overflow-hidden rounded-card border border-hair bg-white" data-d="{{ $i+1 }}">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="{{ $s['img'] }}" alt="{{ $s['name'] }} owner at work" loading="lazy" class="h-full w-full object-cover transition duration-700 group-hover:scale-105">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent"></div>
+                        <span class="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald shadow-sm backdrop-blur">
+                            <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">{!! \App\Models\Category::iconPath($s['icon']) !!}</svg>
+                            {{ $s['cat'] }}
+                        </span>
+                        <span class="absolute bottom-3 left-4 text-sm font-bold text-white drop-shadow-sm">{{ $s['name'] }}</span>
                     </div>
                     <blockquote class="flex-1 px-7 pt-5 text-[15px] leading-relaxed text-ink/80">“{{ $s['quote'] }}”</blockquote>
                     <figcaption class="mx-7 mb-7 mt-5 flex items-center justify-between border-t border-hair pt-4">
-                        <span class="text-sm font-semibold text-ink">{{ $s['name'] }}</span>
+                        <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Verified result</span>
                         <span class="text-right"><span class="block text-2xl font-extrabold gradient-text">{{ $s['stat'] }}</span><span class="block text-[11px] text-muted">{{ $s['statlabel'] }}</span></span>
                     </figcaption>
                 </figure>
