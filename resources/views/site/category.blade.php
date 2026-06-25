@@ -8,9 +8,12 @@
 <section class="relative overflow-hidden hero-grid">
     <div class="mesh" aria-hidden="true" data-parallax="0.1"><i class="b1"></i><i class="b2"></i></div>
     <div class="relative z-10 mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 pb-10 pt-32 sm:px-6 lg:pt-40">
-        <nav class="mb-5 flex items-center gap-2 text-sm text-muted" aria-label="Breadcrumb">
+        <nav class="mb-5 flex flex-wrap items-center gap-2 text-sm text-muted" aria-label="Breadcrumb">
             <a href="/" class="hover:text-ink">Home</a><span>/</span>
             <a href="/#categories" class="hover:text-ink">Categories</a><span>/</span>
+            @if (\App\Models\Category::supportsHierarchy() && $category->parent)
+                <a href="{{ route('site.category', $category->parent->slug) }}" class="hover:text-ink">{{ $category->parent->name }}</a><span>/</span>
+            @endif
             <span class="font-semibold text-ink">{{ $category->name }}</span>
         </nav>
         <div class="flex items-center gap-4">
@@ -26,8 +29,46 @@
     </div>
 </section>
 
+@php $areas = \App\Services\LocationService::all()->take(8); @endphp
+
+{{-- Subcategories --}}
+@if (\App\Models\Category::supportsHierarchy() && $category->children->count())
+    <section class="pb-4">
+        <div class="mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
+            <h2 class="mb-4 text-sm font-semibold uppercase tracking-wider text-muted">Browse {{ strtolower($category->name) }} by type</h2>
+            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+                @foreach ($category->children as $child)
+                    <a href="{{ route('site.category', $child->slug) }}" class="card-hover group flex items-center gap-3 rounded-card border border-hair bg-white px-4 py-3.5 text-ink transition hover:border-emerald">
+                        <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-emerald-soft text-emerald">
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{!! \App\Models\Category::iconPath($child->slug) !!}</svg>
+                        </span>
+                        <span class="text-sm font-semibold leading-tight group-hover:text-emerald">{{ $child->name }}</span>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+    </section>
+@endif
+
+{{-- In your area --}}
+@if ($areas->count())
+    <section class="pb-4 pt-6">
+        <div class="mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
+            <h2 class="mb-4 text-sm font-semibold uppercase tracking-wider text-muted">{{ $category->name }} in your area</h2>
+            <div class="flex flex-wrap gap-2">
+                @foreach ($areas as $loc)
+                    <a href="{{ route('seo.landing', ['area' => $loc['slug'], 'category' => $category->slug]) }}" class="inline-flex items-center gap-1.5 rounded-full border border-hair bg-white px-4 py-2 text-sm font-medium text-ink transition hover:border-emerald hover:text-emerald">
+                        <svg class="h-3.5 w-3.5 text-emerald" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.5-7-10a7 7 0 0 1 14 0c0 5.5-7 10-7 10z"/><circle cx="12" cy="11" r="2.5"/></svg>
+                        {{ $category->name }} in {{ $loc['label'] }}
+                    </a>
+                @endforeach
+            </div>
+        </div>
+    </section>
+@endif
+
 {{-- Businesses --}}
-<section class="pb-24">
+<section class="pb-24 pt-8">
     <div class="mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
         @if ($businesses->count())
             <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
