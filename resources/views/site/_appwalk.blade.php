@@ -5,8 +5,12 @@
      cubic-bezier(.16,.8,.3,1) easing + the map-pin sonar ping from the logo).
      Tapping the frame opens the real app at $src.
      Props: $src, $class, $dark (bool), $cards (collection|null). --}}
+@include('site._appchrome')
 @php
     $dark = $dark ?? false;
+    // The real app wordmark: "L" + map-pin (first o) + "colie" (mirrors markFor()).
+    $pinGlyph = '<svg class="dm-pin" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1.6C7.3 1.6 3.5 5.4 3.5 10.1c0 5.6 8.5 12.3 8.5 12.3s8.5-6.7 8.5-12.3C20.5 5.4 16.7 1.6 12 1.6Zm0 5.9a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4Z"/></svg>';
+    $awWordmark = 'L'.$pinGlyph.'colie';
     $list = (isset($cards) && $cards && count($cards)) ? collect($cards)->values() : collect();
     $primary = $list->first();
     $grid = $list->slice(1, 2)->values();
@@ -80,15 +84,15 @@
 
         {{-- ============ SCREEN 0 · DISCOVER ============ --}}
         <div x-show="i === 0" x-transition:enter="aw-tr" x-transition:enter-start="aw-from" x-transition:enter-end="aw-to" x-transition:leave="aw-tr" x-transition:leave-start="aw-to" x-transition:leave-end="aw-leave" class="absolute inset-0 flex flex-col">
-          <div class="bg-[#0a0a0a] px-3 pb-2.5 pt-2 text-white">
-            <div class="flex items-center justify-between">
-              <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-white/70"><svg class="h-3 w-3 text-emerald" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8Zm0 5.5A2.5 2.5 0 1 1 12 12.5 2.5 2.5 0 0 1 12 7.5Z"/></svg>Newcastle</span>
-              <span class="text-sm font-extrabold lowercase tracking-tight">l{!! $mpin !!}c{!! $mpin !!}lie</span>
-              <svg class="h-4 w-4 text-white/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          <div class="dm-head">
+            <div class="dm-head-row">
+              <span class="dm-loc"><svg class="dm-loc-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 7-8 13-8 13s-8-6-8-13a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><strong>Newcastle</strong><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:rgba(255,255,255,.5)"><polyline points="6 9 12 15 18 9"/></svg></span>
+              <span class="dm-wm" style="font-size:19px">{!! $awWordmark !!}</span>
+              <svg class="dm-head-bell" style="height:16px;width:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
             </div>
-            <div class="mt-2 flex items-center gap-2 rounded-xl bg-white/10 px-3 py-2">
-              <svg class="h-3.5 w-3.5 text-white/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-              <span class="text-[11px] text-white/50">Search shops &amp; offers</span>
+            <div class="dm-search">
+              <div class="dm-search-input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="height:14px;width:14px"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> Search shops &amp; offers</div>
+              <div class="dm-search-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="height:15px;width:15px"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg></div>
             </div>
           </div>
           <div class="flex-1 overflow-hidden px-3 pt-3">
@@ -194,12 +198,17 @@
         </div>
       </div>
 
-      {{-- PERSISTENT bottom tab bar - the single biggest "this is the app" cue --}}
-      @php $tabs = [['Home','<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'],['Map','<polygon points="1 6 8 3 16 6 23 3 23 18 16 21 8 18 1 21"/>'],['Scan','<path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/>'],['Saved','<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/>']]; @endphp
-      <div class="mx-3 mb-3 flex items-center justify-around rounded-2xl bg-white/95 py-2 shadow-lg ring-1 ring-black/5 backdrop-blur">
+      {{-- PERSISTENT bottom tab bar - the exact app nav (icons copied from the live app). --}}
+      @php $tabs = [
+        ['Home','<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'],
+        ['Map','<polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>'],
+        ['Scan','<path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="3" y1="12" x2="21" y2="12"/>'],
+        ['Saved','<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>'],
+      ]; @endphp
+      <div class="dm-tabbar">
         @foreach ($tabs as $ti => $t)
-          <div class="aw-tab flex flex-col items-center gap-0.5 text-[8px] font-semibold" :class="{{ \Illuminate\Support\Js::from($activeTab) }}[i] === {{ $ti }} ? 'text-emerald' : 'text-ink/40'">
-            <svg class="h-4 w-4 transition-transform duration-300" :class="{{ \Illuminate\Support\Js::from($activeTab) }}[i] === {{ $ti }} ? '-translate-y-px scale-110' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{!! $t[1] !!}</svg>{{ $t[0] }}
+          <div class="dm-tab" :class="{{ \Illuminate\Support\Js::from($activeTab) }}[i] === {{ $ti }} && 'on'">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">{!! $t[1] !!}</svg>{{ $t[0] }}
           </div>
         @endforeach
       </div>
