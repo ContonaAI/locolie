@@ -79,8 +79,8 @@ class SeoContentService
 
         $support = $count > 0
             ? $this->pick([
-                "Right now there are {$count} to choose from".($names ? ", including ".$this->humanList($names)."." : "."),
-                "We currently feature {$count} ".($count === 1 ? 'business' : 'businesses')." here".($names ? " - ".$this->humanList($names)." among them." : "."),
+                "Right now there are {$count} to choose from".($names ? ', including '.$this->humanList($names).'.' : '.'),
+                "We currently feature {$count} ".($count === 1 ? 'business' : 'businesses').' here'.($names ? ' - '.$this->humanList($names).' among them.' : '.'),
             ], $seed.'b')
             : "We're adding more {$catLower} in {$loc} all the time - check back soon, or browse nearby areas below.";
 

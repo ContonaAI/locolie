@@ -375,6 +375,7 @@
                     <li><a href="/#demo" class="text-ink/80 transition hover:text-emerald">Live demo</a></li>
                     <li><a href="/app" class="text-ink/80 transition hover:text-emerald">Launch web app</a></li>
                     <li><a href="{{ route('customer.report.entry') }}" class="text-ink/80 transition hover:text-emerald">Your savings</a></li>
+                    <li><a href="{{ route('seo.index') }}" class="text-ink/80 transition hover:text-emerald">Local directory</a></li>
                 </ul>
             </div>
             <div>

@@ -258,6 +258,13 @@
     </div>
 </section>
 
+{{-- ============================================================ FOUND ON GOOGLE --}}
+<section class="border-t border-hair py-20 sm:py-28">
+    <div class="mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
+        @include('site._google_display')
+    </div>
+</section>
+
 {{-- ============================================================ PRICING --}}
 <section id="pricing" class="border-y border-hair bg-[#f5f5f5] py-20 sm:py-28">
     <div class="mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">

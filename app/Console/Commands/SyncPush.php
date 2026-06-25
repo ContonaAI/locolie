@@ -7,7 +7,6 @@ use App\Models\Category;
 use App\Models\Offer;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 
 /**
  * Push curated local data (categories, businesses, offers + photos) up to the

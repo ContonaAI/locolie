@@ -64,7 +64,8 @@
                         @php $o = $b->activeOffers->first(); @endphp
                         <div class="w-1/2 overflow-hidden rounded-2xl bg-white shadow-sm">
                             <div class="relative h-20 bg-[#e2e8f0]">
-                                <img src="{{ $b->photos[0] }}" alt="{{ $b->name }}" loading="lazy" decoding="async" class="h-full w-full object-cover">
+                                <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-emerald-500 to-emerald-800 text-xl font-extrabold text-white/90">{{ mb_strtoupper(mb_substr($b->name, 0, 1)) }}</div>
+                                <img src="{{ $b->photos[0] ?? '' }}" alt="{{ $b->name }}" loading="lazy" decoding="async" onerror="this.remove()" class="relative h-full w-full object-cover">
                                 @if ($o)<span class="absolute left-2 top-2 rounded-md bg-emerald px-1.5 py-0.5 text-[8px] font-extrabold text-white">{{ $o->badge }}</span>@endif
                                 @if ($b->plan !== 'free')<span class="absolute right-2 top-2 rounded-md bg-black/70 px-1.5 py-0.5 text-[7px] font-bold uppercase text-white">Spon</span>@endif
                             </div>

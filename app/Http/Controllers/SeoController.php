@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Services\LocationService;
 use App\Services\SeoContentService;
-use Illuminate\Support\Str;
 
 /**
  * Programmatic local-SEO pages: a self-generating set of "{category} in

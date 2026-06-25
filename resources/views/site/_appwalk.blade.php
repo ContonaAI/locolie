@@ -1,10 +1,33 @@
-{{-- Animated, self-contained phone that walks through the app being USED: it
-     auto-cycles Discover -> Offer -> Scan -> Savings, with a moving tap cursor and
-     a caption that tracks each step. Tapping the frame opens the real app at $src.
+{{-- Animated, self-contained phone that walks through the app being USED:
+     Discover -> Offer -> Scan -> Savings, on a loop. Built to MIRROR the real
+     app - same dark header, same bottom tab bar (persistent), real business
+     photos - and to move with the brand's motion language (smooth
+     cubic-bezier(.16,.8,.3,1) easing + the map-pin sonar ping from the logo).
+     Tapping the frame opens the real app at $src.
      Props: $src, $class, $dark (bool), $cards (collection|null). --}}
 @php
     $dark = $dark ?? false;
-    $realCard = (isset($cards) && $cards && count($cards)) ? collect($cards)->first() : null;
+    $list = (isset($cards) && $cards && count($cards)) ? collect($cards)->values() : collect();
+    $primary = $list->first();
+    $grid = $list->slice(1, 2)->values();
+
+    // A branded gradient + initial always sits behind the photo, so a missing or
+    // broken file degrades gracefully (onerror removes the img, revealing it) -
+    // no broken-image icons, ever. Parent element must be position:relative.
+    $photo = function ($biz) {
+        $initial = e(mb_strtoupper(mb_substr($biz?->name ?? 'L', 0, 1)));
+        $fallback = '<div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-emerald-500 to-emerald-800 font-extrabold text-white/90" style="font-size:1.6rem">'.$initial.'</div>';
+        $p = $biz?->photos[0] ?? null;
+        $img = $p ? '<img src="'.e($p).'" alt="'.e($biz?->name ?? '').'" loading="lazy" decoding="async" onerror="this.remove()" class="relative h-full w-full object-cover">' : '';
+        return $fallback.$img;
+    };
+
+    $pName = $primary?->name ?? 'The Corner Café';
+    $pCat = $primary?->category?->name ?? 'Coffee';
+    $pRating = $primary ? number_format((float) $primary->rating, 1) : '4.9';
+    $pOffer = $primary?->activeOffers?->first();
+    $pBadge = $pOffer?->badge ?? '25% OFF';
+    $pTitle = $pOffer?->title ?? 'Any breakfast, all week';
 
     // Deterministic decorative QR so the "scan" screen looks the part.
     $qn = 17; $qc = 100 / $qn; $qmods = '';
@@ -24,20 +47,23 @@
     };
     $qr = '<svg viewBox="0 0 100 100" class="h-full w-full"><g fill="#0a0a0a">'.$qmods.'</g>'.$qfind(0, 0).$qfind(0, $qn - 6).$qfind($qn - 6, 0).'</svg>';
 
+    $mpin = '<span class="inline-block h-2 w-2 bg-emerald align-middle" style="border-radius:50% 50% 50% 0;transform:rotate(-45deg)"></span>';
     $steps = ['Discover offers near you', 'Reveal your code', 'Scan it at the till', 'Watch your savings add up'];
+    // Which bottom-tab lights up on each step.
+    $activeTab = [0, 0, 2, 3];
 @endphp
 
 <div class="{{ $class ?? '' }} relative"
      x-data="{ i: 0, n: 4, t: null, paused: false,
-               start() { this.t = setInterval(() => { if (!this.paused) this.i = (this.i + 1) % this.n; }, 2800); },
+               start() { this.t = setInterval(() => { if (!this.paused) this.i = (this.i + 1) % this.n; }, 3200); },
                go(k) { this.i = k; clearInterval(this.t); this.start(); } }"
      x-init="start()" @mouseenter="paused = true" @mouseleave="paused = false">
 
   {{-- caption that tracks the step --}}
-  <div class="absolute -top-9 left-1/2 hidden -translate-x-1/2 sm:block">
+  <div class="absolute -top-9 left-1/2 z-20 hidden -translate-x-1/2 sm:block">
     <template x-for="(s, k) in {{ \Illuminate\Support\Js::from($steps) }}" :key="k">
-      <span x-show="i === k" x-transition.opacity
-            class="whitespace-nowrap rounded-full {{ $dark ? 'bg-white/10 text-white' : 'bg-ink/90 text-white' }} px-3.5 py-1.5 text-xs font-semibold shadow-lg" x-text="s"></span>
+      <span x-show="i === k" x-transition:enter="aw-cap" x-transition:enter-start="aw-cap-0" x-transition:enter-end="aw-cap-1"
+            class="absolute left-1/2 top-0 -translate-x-1/2 whitespace-nowrap rounded-full {{ $dark ? 'bg-white/10 text-white ring-1 ring-white/15' : 'bg-ink/90 text-white' }} px-3.5 py-1.5 text-xs font-semibold shadow-lg backdrop-blur" x-text="s"></span>
     </template>
   </div>
 
@@ -48,114 +74,138 @@
     <span class="absolute -right-[14px] top-28 z-30 h-16 w-[3px] rounded-r bg-[#222]"></span>
     <div class="flex items-center justify-center bg-black" style="height:24px;"><span class="h-[16px] w-20 rounded-full bg-[#0a0a0a] ring-1 ring-white/10"></span></div>
 
-    <div class="relative bg-[#eef1f4]" style="height:600px;">
+    {{-- The app body: a fixed content stage with a persistent bottom tab bar, exactly like the app. --}}
+    <div class="relative flex flex-col bg-[#eef1f4]" style="height:600px;">
+      <div class="relative flex-1 overflow-hidden">
 
-      {{-- ============ SCREEN 0 · DISCOVER ============ --}}
-      <div x-show="i === 0" x-transition:enter="transition duration-500" x-transition:enter-start="opacity-0 translate-x-6" x-transition:enter-end="opacity-100 translate-x-0" class="absolute inset-0 flex flex-col">
-        <div class="bg-[#0a0a0a] px-3 pb-2.5 pt-2 text-white">
-          <div class="flex items-center justify-between">
-            <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-white/70"><svg class="h-3 w-3 text-emerald" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8Zm0 5.5A2.5 2.5 0 1 1 12 12.5 2.5 2.5 0 0 1 12 7.5Z"/></svg>Newcastle</span>
-            @php $mpin = '<span class="inline-block h-2 w-2 bg-emerald align-middle" style="border-radius:50% 50% 50% 0;transform:rotate(-45deg)"></span>'; @endphp
-            <span class="text-sm font-extrabold lowercase tracking-tight">l{!! $mpin !!}c{!! $mpin !!}lie</span>
-            <svg class="h-4 w-4 text-white/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        {{-- ============ SCREEN 0 · DISCOVER ============ --}}
+        <div x-show="i === 0" x-transition:enter="aw-tr" x-transition:enter-start="aw-from" x-transition:enter-end="aw-to" x-transition:leave="aw-tr" x-transition:leave-start="aw-to" x-transition:leave-end="aw-leave" class="absolute inset-0 flex flex-col">
+          <div class="bg-[#0a0a0a] px-3 pb-2.5 pt-2 text-white">
+            <div class="flex items-center justify-between">
+              <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-white/70"><svg class="h-3 w-3 text-emerald" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8Zm0 5.5A2.5 2.5 0 1 1 12 12.5 2.5 2.5 0 0 1 12 7.5Z"/></svg>Newcastle</span>
+              <span class="text-sm font-extrabold lowercase tracking-tight">l{!! $mpin !!}c{!! $mpin !!}lie</span>
+              <svg class="h-4 w-4 text-white/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+            </div>
+            <div class="mt-2 flex items-center gap-2 rounded-xl bg-white/10 px-3 py-2">
+              <svg class="h-3.5 w-3.5 text-white/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <span class="text-[11px] text-white/50">Search shops &amp; offers</span>
+            </div>
           </div>
-          <div class="mt-2 flex items-center gap-2 rounded-xl bg-white/10 px-3 py-2">
-            <svg class="h-3.5 w-3.5 text-white/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-            <span class="text-[11px] text-white/50">Search shops &amp; offers</span>
-          </div>
-        </div>
-        <div class="flex-1 overflow-hidden px-3 pt-3">
-          <div class="mb-2 text-[13px] font-extrabold text-ink">Featured today</div>
-          @if ($realCard)
-            @php $o = $realCard->activeOffers->first(); @endphp
-            <div class="overflow-hidden rounded-2xl bg-white shadow-sm">
+          <div class="flex-1 overflow-hidden px-3 pt-3">
+            <div class="mb-2 text-[13px] font-extrabold text-ink">Featured today</div>
+            <div class="relative overflow-hidden rounded-2xl bg-white shadow-sm">
               <div class="relative h-28 bg-[#e2e8f0]">
-                <img src="{{ $realCard->photos[0] }}" alt="{{ $realCard->name }}" loading="lazy" decoding="async" class="h-full w-full object-cover">
-                @if ($o)<span class="absolute left-2 top-2 rounded-md bg-emerald px-1.5 py-0.5 text-[9px] font-extrabold text-white">{{ $o->badge }}</span>@endif
+                {!! $photo($primary) !!}
+                <span class="absolute left-2 top-2 rounded-md bg-emerald px-1.5 py-0.5 text-[9px] font-extrabold text-white">{{ $pBadge }}</span>
+                {{-- brand sonar ping: nudges the eye to the featured card --}}
+                <span class="aw-ping absolute right-3 top-3" x-show="i===0"></span>
               </div>
               <div class="p-2.5">
-                <div class="truncate text-[12px] font-bold text-ink">{{ $realCard->name }}</div>
-                <div class="mt-0.5 flex items-center gap-1 text-[9px] text-muted"><span class="text-amber-500">★</span>{{ number_format((float) $realCard->rating, 1) }} · {{ $realCard->category?->name }}</div>
-                @if ($o)<div class="mt-1.5 truncate rounded-md bg-emerald-soft px-2 py-1 text-[10px] font-bold text-emerald">{{ $o->title }}</div>@endif
+                <div class="truncate text-[12px] font-bold text-ink">{{ $pName }}</div>
+                <div class="mt-0.5 flex items-center gap-1 text-[9px] text-muted"><span class="text-amber-500">★</span>{{ $pRating }} · {{ $pCat }}</div>
+                <div class="mt-1.5 truncate rounded-md bg-emerald-soft px-2 py-1 text-[10px] font-bold text-emerald">{{ $pTitle }}</div>
               </div>
             </div>
-          @else
-            <div class="overflow-hidden rounded-2xl bg-white shadow-sm">
-              <div class="relative h-28 bg-gradient-to-br from-[#3a2f2a] to-[#1a1410]"><span class="absolute left-2 top-2 rounded-md bg-emerald px-1.5 py-0.5 text-[9px] font-extrabold text-white">25% OFF</span></div>
-              <div class="p-2.5"><div class="text-[12px] font-bold text-ink">The Corner Café</div><div class="mt-0.5 text-[9px] text-muted"><span class="text-amber-500">★</span> 4.9 · Coffee</div><div class="mt-1.5 rounded-md bg-emerald-soft px-2 py-1 text-[10px] font-bold text-emerald">Any breakfast, all week</div></div>
+            <div class="mt-2.5 grid grid-cols-2 gap-2.5">
+              @forelse ($grid as $g)
+                <div class="overflow-hidden rounded-2xl bg-white shadow-sm">
+                  <div class="relative h-14 bg-[#e2e8f0]">{!! $photo($g) !!}</div>
+                  <div class="p-2"><div class="truncate text-[10px] font-bold text-ink">{{ $g->name }}</div><div class="mt-1 truncate rounded bg-emerald-soft px-1.5 py-0.5 text-[8px] font-bold text-emerald">{{ $g->activeOffers->first()?->badge ?? 'Offer' }}</div></div>
+                </div>
+              @empty
+                @foreach (['Newcastle Fitness','Bones Barbers'] as $idx => $nm)
+                  <div class="overflow-hidden rounded-2xl bg-white shadow-sm">
+                    <div class="h-14 bg-gradient-to-br {{ $idx ? 'from-[#1f2937] to-[#0b1220]' : 'from-[#0e7490] to-[#155e75]' }}"></div>
+                    <div class="p-2"><div class="truncate text-[10px] font-bold text-ink">{{ $nm }}</div><div class="mt-1 rounded bg-emerald-soft px-1.5 py-0.5 text-[8px] font-bold text-emerald">Free taster</div></div>
+                  </div>
+                @endforeach
+              @endforelse
             </div>
-          @endif
-          <div class="mt-2.5 grid grid-cols-2 gap-2.5">
-            @foreach (['Newcastle Fitness','Bones Barbers'] as $idx => $nm)
-              <div class="overflow-hidden rounded-2xl bg-white shadow-sm">
-                <div class="h-14 bg-gradient-to-br {{ $idx ? 'from-[#1f2937] to-[#0b1220]' : 'from-[#0e7490] to-[#155e75]' }}"></div>
-                <div class="p-2"><div class="truncate text-[10px] font-bold text-ink">{{ $nm }}</div><div class="mt-1 rounded bg-emerald-soft px-1.5 py-0.5 text-[8px] font-bold text-emerald">Free taster</div></div>
+          </div>
+        </div>
+
+        {{-- ============ SCREEN 1 · OFFER DETAIL ============ --}}
+        <div x-show="i === 1" x-transition:enter="aw-tr" x-transition:enter-start="aw-from" x-transition:enter-end="aw-to" x-transition:leave="aw-tr" x-transition:leave-start="aw-to" x-transition:leave-end="aw-leave" class="absolute inset-0 flex flex-col bg-white">
+          <div class="relative h-40 bg-[#e2e8f0]">
+            {!! $photo($primary) !!}
+            <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+            <div class="absolute left-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></div>
+            <span class="absolute left-3 bottom-3 rounded-lg bg-emerald px-2 py-1 text-[11px] font-extrabold text-white shadow">{{ $pBadge }}</span>
+          </div>
+          <div class="flex-1 px-4 pt-3.5">
+            <div class="text-[15px] font-extrabold text-ink">{{ $pName }}</div>
+            <div class="mt-0.5 flex items-center gap-1 text-[10px] text-muted"><span class="text-amber-500">★</span> {{ $pRating }} · {{ $pCat }} · 0.3 mi</div>
+            <div class="mt-3 rounded-xl border border-emerald-soft bg-emerald-soft/40 p-3">
+              <div class="text-[12px] font-bold text-ink">{{ $pTitle }}</div>
+              <div class="mt-0.5 text-[10px] text-muted">Show the code at the till. One per visit.</div>
+            </div>
+            <div class="mt-3 rounded-xl border-2 border-dashed border-emerald/40 bg-white p-3 text-center">
+              <div class="text-[9px] font-bold uppercase tracking-widest text-muted">Your code</div>
+              <div class="mt-1 font-mono text-xl font-extrabold tracking-[0.2em] text-emerald">LOCO-7K2</div>
+            </div>
+          </div>
+          <div class="px-4 pb-4">
+            <div class="relative rounded-xl bg-emerald py-3 text-center text-[13px] font-bold text-white shadow-lg shadow-emerald/30">
+              Reveal &amp; redeem
+              <span class="aw-ping aw-ping-light absolute right-4 top-1/2 -translate-y-1/2" x-show="i===1"></span>
+            </div>
+          </div>
+        </div>
+
+        {{-- ============ SCREEN 2 · SCAN AT TILL ============ --}}
+        <div x-show="i === 2" x-transition:enter="aw-tr" x-transition:enter-start="aw-from" x-transition:enter-end="aw-to" x-transition:leave="aw-tr" x-transition:leave-start="aw-to" x-transition:leave-end="aw-leave" class="absolute inset-0 flex flex-col items-center justify-center bg-[#0a0a0a] px-6 text-center text-white">
+          <div class="text-[13px] font-bold uppercase tracking-[0.18em] text-emerald-soft">Show this at the till</div>
+          <div class="relative mt-5 h-44 w-44">
+            {{-- brand sonar rings radiating from the code, echoing the logo pin ping --}}
+            <span class="aw-ping aw-ping-xl absolute inset-0 m-auto" x-show="i===2"></span>
+            <span class="aw-ping aw-ping-xl aw-ping-d2 absolute inset-0 m-auto" x-show="i===2"></span>
+            <div class="relative h-44 w-44 overflow-hidden rounded-2xl bg-white p-3">
+              {!! $qr !!}
+              <div class="pointer-events-none absolute inset-x-0 h-0.5 bg-emerald/80 shadow-[0_0_12px_4px_rgba(5,150,105,.7)]" style="animation: scanline 2.4s cubic-bezier(.45,0,.55,1) infinite;"></div>
+            </div>
+          </div>
+          <div class="mt-5 font-mono text-lg font-extrabold tracking-[0.2em]">LOCO-7K2</div>
+          <div class="mt-1 text-[11px] text-white/50">{{ \Illuminate\Support\Str::limit($pName, 22) }} · {{ $pBadge }}</div>
+        </div>
+
+        {{-- ============ SCREEN 3 · SAVINGS ============ --}}
+        <div x-show="i === 3" x-transition:enter="aw-tr" x-transition:enter-start="aw-from" x-transition:enter-end="aw-to" x-transition:leave="aw-tr" x-transition:leave-start="aw-to" x-transition:leave-end="aw-leave" class="absolute inset-0 flex flex-col bg-[#eef1f4]">
+          <div class="bg-[#0a0a0a] px-4 pb-4 pt-3 text-white">
+            <div class="text-[11px] font-semibold text-white/60">Your locolie</div>
+            <div class="mt-1 flex items-end gap-1.5"><span class="text-3xl font-extrabold">£42.50</span><span class="mb-1 text-[11px] text-emerald-soft">saved this month</span></div>
+          </div>
+          <div class="flex-1 px-3 pt-3">
+            <div class="mb-2 text-[12px] font-extrabold text-ink">Recently redeemed</div>
+            @php
+              $recent = $list->take(3)->map(fn ($b) => [$b->name, $b->activeOffers->first()?->title ?? 'Offer redeemed']);
+              if ($recent->isEmpty()) $recent = collect([['The Corner Café','25% off breakfast'],['Bones Barbers','Free fringe trim'],['Newcastle Fitness','Free class taster']]);
+              $amounts = ['£4.20','£8.00','£12.00'];
+            @endphp
+            @foreach ($recent as $idx => $row)
+              <div class="mb-2 flex items-center justify-between rounded-xl bg-white p-2.5 shadow-sm">
+                <div class="flex min-w-0 items-center gap-2.5">
+                  <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-soft text-emerald"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+                  <div class="min-w-0"><div class="truncate text-[11px] font-bold text-ink">{{ $row[0] }}</div><div class="truncate text-[9px] text-muted">{{ $row[1] }}</div></div>
+                </div>
+                <span class="shrink-0 text-[11px] font-extrabold text-emerald">{{ $amounts[$idx] ?? '£5.00' }}</span>
               </div>
             @endforeach
           </div>
         </div>
       </div>
 
-      {{-- ============ SCREEN 1 · OFFER DETAIL ============ --}}
-      <div x-show="i === 1" x-transition:enter="transition duration-500" x-transition:enter-start="opacity-0 translate-x-6" x-transition:enter-end="opacity-100 translate-x-0" class="absolute inset-0 flex flex-col bg-white">
-        <div class="relative h-44 bg-gradient-to-br from-[#3a2f2a] to-[#1a1410]">
-          <div class="absolute left-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-black/40 text-white"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></div>
-          <span class="absolute left-3 bottom-3 rounded-lg bg-emerald px-2 py-1 text-[11px] font-extrabold text-white">25% OFF</span>
-        </div>
-        <div class="flex-1 px-4 pt-4">
-          <div class="text-[15px] font-extrabold text-ink">The Corner Café</div>
-          <div class="mt-0.5 flex items-center gap-1 text-[10px] text-muted"><span class="text-amber-500">★</span> 4.9 · Coffee · 0.3 mi</div>
-          <div class="mt-3 rounded-xl border border-emerald-soft bg-emerald-soft/40 p-3">
-            <div class="text-[12px] font-bold text-ink">Any breakfast, all week</div>
-            <div class="mt-0.5 text-[10px] text-muted">Show the code at the till. One per visit.</div>
+      {{-- PERSISTENT bottom tab bar - the single biggest "this is the app" cue --}}
+      @php $tabs = [['Home','<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'],['Map','<polygon points="1 6 8 3 16 6 23 3 23 18 16 21 8 18 1 21"/>'],['Scan','<path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/>'],['Saved','<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/>']]; @endphp
+      <div class="mx-3 mb-3 flex items-center justify-around rounded-2xl bg-white/95 py-2 shadow-lg ring-1 ring-black/5 backdrop-blur">
+        @foreach ($tabs as $ti => $t)
+          <div class="aw-tab flex flex-col items-center gap-0.5 text-[8px] font-semibold" :class="{{ \Illuminate\Support\Js::from($activeTab) }}[i] === {{ $ti }} ? 'text-emerald' : 'text-ink/40'">
+            <svg class="h-4 w-4 transition-transform duration-300" :class="{{ \Illuminate\Support\Js::from($activeTab) }}[i] === {{ $ti }} ? '-translate-y-px scale-110' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{!! $t[1] !!}</svg>{{ $t[0] }}
           </div>
-          <div class="mt-3 rounded-xl border-2 border-dashed border-emerald/40 bg-white p-3 text-center">
-            <div class="text-[9px] font-bold uppercase tracking-widest text-muted">Your code</div>
-            <div class="mt-1 font-mono text-xl font-extrabold tracking-[0.2em] text-emerald">LOCO-7K2</div>
-          </div>
-        </div>
-        <div class="px-4 pb-5">
-          <div class="rounded-xl bg-emerald py-3 text-center text-[13px] font-bold text-white shadow-lg shadow-emerald/30">Reveal &amp; redeem</div>
-        </div>
+        @endforeach
       </div>
 
-      {{-- ============ SCREEN 2 · SCAN AT TILL ============ --}}
-      <div x-show="i === 2" x-transition:enter="transition duration-500" x-transition:enter-start="opacity-0 translate-x-6" x-transition:enter-end="opacity-100 translate-x-0" class="absolute inset-0 flex flex-col items-center justify-center bg-[#0a0a0a] px-6 text-center text-white">
-        <div class="text-[13px] font-bold uppercase tracking-[0.18em] text-emerald-soft">Show this at the till</div>
-        <div class="relative mt-5 h-44 w-44 overflow-hidden rounded-2xl bg-white p-3">
-          {!! $qr !!}
-          <div class="pointer-events-none absolute inset-x-0 h-0.5 bg-emerald/80 shadow-[0_0_12px_4px_rgba(5,150,105,.7)]" style="animation: scanline 2.2s ease-in-out infinite;"></div>
-        </div>
-        <div class="mt-5 font-mono text-lg font-extrabold tracking-[0.2em]">LOCO-7K2</div>
-        <div class="mt-1 text-[11px] text-white/50">The Corner Café · 25% off breakfast</div>
-      </div>
-
-      {{-- ============ SCREEN 3 · SAVINGS ============ --}}
-      <div x-show="i === 3" x-transition:enter="transition duration-500" x-transition:enter-start="opacity-0 translate-x-6" x-transition:enter-end="opacity-100 translate-x-0" class="absolute inset-0 flex flex-col bg-[#eef1f4]">
-        <div class="bg-[#0a0a0a] px-4 pb-4 pt-3 text-white">
-          <div class="text-[11px] font-semibold text-white/60">Your locolie</div>
-          <div class="mt-1 flex items-end gap-1.5"><span class="text-3xl font-extrabold">£42.50</span><span class="mb-1 text-[11px] text-emerald-soft">saved this month</span></div>
-        </div>
-        <div class="flex-1 px-3 pt-3">
-          <div class="mb-2 text-[12px] font-extrabold text-ink">Recently redeemed</div>
-          @foreach ([['The Corner Café','25% off breakfast','£4.20'],['Bones Barbers','Free fringe trim','£8.00'],['Newcastle Fitness','Free class taster','£12.00']] as $row)
-            <div class="mb-2 flex items-center justify-between rounded-xl bg-white p-2.5 shadow-sm">
-              <div class="flex items-center gap-2.5">
-                <span class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-soft text-emerald"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
-                <div><div class="text-[11px] font-bold text-ink">{{ $row[0] }}</div><div class="text-[9px] text-muted">{{ $row[1] }}</div></div>
-              </div>
-              <span class="text-[11px] font-extrabold text-emerald">{{ $row[2] }}</span>
-            </div>
-          @endforeach
-        </div>
-      </div>
-
-      {{-- faux tap cursor: nudges toward the primary action on each screen --}}
-      <div class="pointer-events-none absolute z-20 h-7 w-7 rounded-full border-2 border-white/90 bg-white/30 shadow-lg backdrop-blur-sm"
-           style="animation: tapcursor 2.8s ease-in-out infinite;"></div>
-
-      <div class="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center pb-3 opacity-0 transition group-hover:opacity-100">
-        <span class="rounded-full bg-ink/85 px-3 py-1.5 text-[10px] font-semibold text-white">Open the live app ↗</span>
+      <div class="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center pb-2 opacity-0 transition group-hover:opacity-100">
+        <span class="rounded-full bg-ink/85 px-3 py-1.5 text-[10px] font-semibold text-white backdrop-blur">Open the live app ↗</span>
       </div>
     </div>
   </a>
@@ -165,7 +215,7 @@
     <template x-for="k in [0,1,2,3]" :key="k">
       <button type="button" @click="go(k)" :aria-label="'Step ' + (k+1)"
               :class="i === k ? 'w-6 bg-emerald' : 'w-2 {{ $dark ? 'bg-white/30' : 'bg-ink/15' }}'"
-              class="h-2 rounded-full transition-all"></button>
+              class="aw-dot h-2 rounded-full"></button>
     </template>
   </div>
 </div>
@@ -173,15 +223,32 @@
 @once
 @push('head')
 <style>
+  /* Brand motion: the same smooth easing as the logo + reveals. */
+  .aw-tr   { transition: opacity .55s cubic-bezier(.16,.8,.3,1), transform .55s cubic-bezier(.16,.8,.3,1); will-change: opacity, transform; }
+  .aw-from { opacity: 0; transform: translateX(20px) scale(.985); }
+  .aw-to   { opacity: 1; transform: translateX(0) scale(1); }
+  .aw-leave{ opacity: 0; transform: translateX(-20px) scale(.985); }
+  .aw-cap   { transition: opacity .45s cubic-bezier(.16,.8,.3,1), transform .45s cubic-bezier(.16,.8,.3,1); }
+  .aw-cap-0 { opacity: 0; transform: translate(-50%, 6px); }
+  .aw-cap-1 { opacity: 1; transform: translate(-50%, 0); }
+  .aw-dot   { transition: width .45s cubic-bezier(.16,.8,.3,1), background-color .45s ease; }
+
+  /* Map-pin sonar ping - the exact motif from the logo / hero chips. */
+  .aw-ping { height: 10px; width: 10px; border-radius: 9999px; background: #059669; }
+  .aw-ping::before, .aw-ping::after { content: ''; position: absolute; inset: 0; border-radius: 9999px; border: 2px solid #059669; animation: awPing 1.8s cubic-bezier(.16,.8,.3,1) infinite; }
+  .aw-ping::after { animation-delay: .9s; }
+  .aw-ping-light { background: #fff; }
+  .aw-ping-light::before, .aw-ping-light::after { border-color: rgba(255,255,255,.9); }
+  .aw-ping-xl { height: 11rem; width: 11rem; background: transparent; }
+  .aw-ping-xl::before, .aw-ping-xl::after { border-color: rgba(5,150,105,.5); animation-duration: 2.4s; }
+  .aw-ping-d2::before { animation-delay: 1.2s; }
+  @keyframes awPing { 0% { opacity: .55; transform: scale(.55); } 80% { opacity: 0; } 100% { opacity: 0; transform: scale(2.6); } }
+
   @keyframes scanline { 0%,100% { top: 8%; } 50% { top: 88%; } }
-  @keyframes tapcursor {
-    0%, 18%   { opacity: 0; top: 64%; left: 50%; transform: translate(-50%,-50%) scale(1.4); }
-    24%       { opacity: .9; }
-    30%       { transform: translate(-50%,-50%) scale(.8); }
-    36%, 100% { opacity: 0; transform: translate(-50%,-50%) scale(1.4); }
-  }
+
   @media (prefers-reduced-motion: reduce) {
-    [style*="scanline"], [style*="tapcursor"] { animation: none !important; }
+    .aw-tr, .aw-cap, .aw-dot { transition: none !important; }
+    .aw-ping::before, .aw-ping::after, [style*="scanline"] { animation: none !important; }
   }
 </style>
 @endpush
