@@ -2,6 +2,28 @@
 @section('title', $category->name.' in Newcastle NE1 - independent '.$category->name.' on locolie')
 @section('meta_description', 'Discover independent '.strtolower($category->name).' in Newcastle NE1 on locolie - see live offers, ratings and redeem deals at the till.')
 
+@push('head')
+@php
+    $catLower = strtolower($category->name);
+    $catFaqs = [
+        ['q' => "Are these {$category->name} in Newcastle independent?", 'a' => "Yes - every business listed here is a genuine independent {$catLower} in or around Newcastle NE1, never a national chain."],
+        ['q' => "Do independent {$catLower} in Newcastle offer discounts?", 'a' => "Many do. Businesses on locolie publish exclusive offers - look for the offer badge on a listing, then show the code or QR at the till to redeem it."],
+        ['q' => "Is locolie free to use to find {$catLower}?", 'a' => "Completely free for shoppers. Discover independent {$catLower} near you and save with offers that keep money on your local high street."],
+    ];
+@endphp
+@include('site.seo._jsonld', [
+    'breadcrumbs' => array_values(array_filter([
+        ['name' => 'Home', 'url' => url('/')],
+        ['name' => 'Categories', 'url' => url('/').'#categories'],
+        (\App\Models\Category::supportsHierarchy() && $category->parent)
+            ? ['name' => $category->parent->name, 'url' => route('site.category', $category->parent->slug)] : null,
+        ['name' => $category->name, 'url' => url()->current()],
+    ])),
+    'businesses' => $businesses,
+    'faqs' => $catFaqs,
+])
+@endpush
+
 @section('content')
 
 {{-- Hero --}}
@@ -98,6 +120,22 @@
                 <a href="/for-business" class="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald hover:text-ink">Run an independent {{ strtolower($category->name) }} business? Be the first to list it, free →</a>
             </div>
         @endif
+
+        {{-- FAQ (mirrors the FAQPage rich snippet) --}}
+        <div class="mt-16 max-w-3xl">
+            <h2 class="text-2xl font-extrabold tracking-tight text-ink">Frequently asked questions</h2>
+            <div class="mt-5 divide-y divide-hair overflow-hidden rounded-card border border-hair bg-white">
+                @foreach ($catFaqs as $i => $faq)
+                    <details class="group" @if($i === 0) open @endif>
+                        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-left text-base font-semibold text-ink transition hover:bg-black/[0.015]">
+                            <span>{{ $faq['q'] }}</span>
+                            <svg class="h-4 w-4 shrink-0 text-muted transition-transform duration-300 group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                        </summary>
+                        <div class="px-5 pb-5 text-base leading-relaxed text-muted">{{ $faq['a'] }}</div>
+                    </details>
+                @endforeach
+            </div>
+        </div>
 
         {{-- Other categories --}}
         <div class="mt-16">

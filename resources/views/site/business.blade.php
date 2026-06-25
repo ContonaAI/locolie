@@ -3,11 +3,58 @@
 @section('meta_description', \Illuminate\Support\Str::limit('Independent '.$business->category?->name.' in Newcastle - '.($business->description ?: $business->name.' on locolie. See offers, ratings and redeem deals at the till.'), 155))
 
 @push('head')
-@php $img = $business->photos[0] ?? null; @endphp
+@php
+    $img = $business->photos[0] ?? null;
+
+    $biz = [
+        '@type' => 'LocalBusiness',
+        '@id' => url()->current().'#business',
+        'name' => $business->name,
+        'url' => url()->current(),
+        'image' => $img ? url($img) : url('/og.png'),
+        'address' => array_filter([
+            '@type' => 'PostalAddress',
+            'streetAddress' => $business->address ?: null,
+            'addressLocality' => 'Newcastle upon Tyne',
+            'postalCode' => $business->postcode,
+            'addressCountry' => 'GB',
+        ]),
+    ];
+    if ($business->description) $biz['description'] = \Illuminate\Support\Str::limit($business->description, 300, '');
+    if ($business->phone) $biz['telephone'] = $business->phone;
+    if ($business->website) $biz['sameAs'] = [$business->website];
+    if ($business->lat && $business->lng) {
+        $biz['geo'] = ['@type' => 'GeoCoordinates', 'latitude' => $business->lat, 'longitude' => $business->lng];
+    }
+    if ($business->rating) {
+        $biz['aggregateRating'] = [
+            '@type' => 'AggregateRating',
+            'ratingValue' => (float) $business->rating,
+            'reviewCount' => (int) ($business->reviews_count ?: 1),
+        ];
+    }
+    if ($business->activeOffers->count()) {
+        $biz['makesOffer'] = $business->activeOffers->map(fn ($o) => array_filter([
+            '@type' => 'Offer',
+            'name' => $o->title,
+            'description' => trim($o->badge.($o->terms ? ' - '.$o->terms : '')),
+        ]))->values()->all();
+    }
+
+    $ld = ['@context' => 'https://schema.org', '@graph' => [
+        $biz,
+        [
+            '@type' => 'BreadcrumbList',
+            'itemListElement' => [
+                ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => url('/')],
+                ['@type' => 'ListItem', 'position' => 2, 'name' => $business->category?->name, 'item' => url('/category/'.$business->category?->slug)],
+                ['@type' => 'ListItem', 'position' => 3, 'name' => $business->name, 'item' => url()->current()],
+            ],
+        ],
+    ]];
+@endphp
 @if($img)<meta property="og:image" content="{{ url($img) }}">@endif
-<script type="application/ld+json">
-{"@@context":"https://schema.org","@@type":"LocalBusiness","name":{!! json_encode($business->name) !!},"image":{!! json_encode($img ? url($img) : url('/og.png')) !!},"address":{"@@type":"PostalAddress","addressLocality":"Newcastle upon Tyne","postalCode":{!! json_encode($business->postcode) !!},"addressCountry":"GB"},"url":"{{ url()->current() }}"@if($business->rating),"aggregateRating":{"@@type":"AggregateRating","ratingValue":{{ (float) $business->rating }},"reviewCount":{{ (int) $business->reviews_count }}}@endif}
-</script>
+<script type="application/ld+json">{!! json_encode($ld, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
 @endpush
 
 @section('content')
