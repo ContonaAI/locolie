@@ -81,16 +81,20 @@ class SyncPush extends Command
             $up['categories'], $up['businesses'], $up['offers']));
 
         // ── Push images ──────────────────────────────────────────────────────
+        // Photos now live in the git-tracked public/img/biz dir, so they already
+        // ship to prod with the code. This upload is a belt-and-braces fallback
+        // for hosts where the repo images are not present.
         if (! $this->option('skip-images')) {
-            $files = Storage::disk('public')->exists('biz') ? Storage::disk('public')->files('biz') : [];
+            $dir = public_path('img/biz');
+            $files = is_dir($dir) ? glob($dir.'/*') : [];
             if ($files) {
                 $this->line('  Uploading '.count($files).' photos...');
                 $bar = $this->output->createProgressBar(count($files));
                 $failed = 0;
                 foreach ($files as $file) {
                     $r = Http::withToken($token)
-                        ->attach('file', Storage::disk('public')->get($file), basename($file))
-                        ->post("{$target}/api/sync/image", ['path' => $file]);
+                        ->attach('file', file_get_contents($file), basename($file))
+                        ->post("{$target}/api/sync/image", ['path' => 'biz/'.basename($file)]);
                     $failed += $r->failed() ? 1 : 0;
                     $bar->advance();
                 }

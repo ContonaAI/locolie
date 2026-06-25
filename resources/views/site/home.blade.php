@@ -219,10 +219,16 @@
     {!! $pinMark('-left-16 -top-10 h-72 w-72 opacity-[0.05]', '0.05') !!}
     {!! $pinMark('-right-12 bottom-0 h-56 w-56 opacity-[0.04]', '-0.04') !!}
     <div class="relative z-10 mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
-        <div class="mx-auto max-w-3xl text-center reveal">
-            <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald">The problem</h2>
-            <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-balance">Indies are brilliant. Getting noticed isn't.</p>
-            <p class="mt-4 text-lg text-muted">The chains and online giants have apps, loyalty cards and ad budgets. The indie down the road - <span class="font-semibold text-ink">better coffee, fairer prices, bags more character</span> - has a chalkboard and a lot of hope. <span class="font-semibold text-ink">locolie evens things up.</span></p>
+        <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
+            <div class="reveal relative">
+                <div class="absolute -inset-4 -z-10 rounded-[2.5rem] bg-gradient-to-tr from-emerald-soft to-transparent blur-2xl"></div>
+                <img src="/images/marketing/indie-cafe.jpg" alt="Inside a bustling independent café on the high street" loading="lazy" decoding="async" class="aspect-[4/3] w-full rounded-card object-cover shadow-2xl shadow-emerald/10">
+            </div>
+            <div class="reveal" data-d="1">
+                <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald">The problem</h2>
+                <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-balance">Indies are brilliant. Getting noticed isn't.</p>
+                <p class="mt-4 text-lg text-muted">The chains and online giants have apps, loyalty cards and ad budgets. The indie down the road - <span class="font-semibold text-ink">better coffee, fairer prices, bags more character</span> - has a chalkboard and a lot of hope. <span class="font-semibold text-ink">locolie evens things up.</span></p>
+            </div>
         </div>
         <div class="mt-14 grid gap-6 md:grid-cols-3">
             @php
@@ -254,14 +260,12 @@
         <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             @php
                 $usps = [
-                    ['t' => 'Live local map', 'b' => 'A clean map of every indie near you - names, categories and offers on the pin. No chains cluttering it up.',
+                    ['t' => 'Live local map', 'b' => 'A clean map of the independents around you - just the indies, none of the chains crowding the view.',
                      'i' => '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/>'],
-                    ['t' => 'Real, redeemable discounts', 'b' => 'Tap to reveal a one-time code, scan at the till. Every redemption is tracked - proof a deal really drove footfall.',
+                    ['t' => 'Real, redeemable discounts', 'b' => 'Genuine money off, not gimmicks - and every redemption is tracked, so footfall is proven rather than guessed.',
                      'i' => '<path d="M20.59 13.41 13.42 20.6a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82Z"/><line x1="7" y1="7" x2="7.01" y2="7"/>'],
                     ['t' => 'Loyalty that follows you', 'b' => 'Collect stamps and unlock rewards at your favourite indies. Progress is tracked automatically by the codes you redeem - no plastic card to lose.',
                      'i' => '<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>'],
-                    ['t' => 'Customers you own', 'b' => 'Every redemption captures a real customer you can market to again - the loyalty data the chains have, finally for indies.',
-                     'i' => '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>'],
                     ['t' => 'Smart, instant search', 'b' => 'Filter by distance, category, rating, open-now and offer type. Find exactly what\'s near you, right now.',
                      'i' => '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>'],
                     ['t' => 'Email, SMS and push that land', 'b' => 'Nearby shoppers get pinged about fresh offers; retailers bring regulars back in real time. Reach you don\'t rent from Big Tech.',
@@ -476,13 +480,13 @@
         <div class="mt-14 grid gap-6 lg:grid-cols-3">
             @php
                 $stories = [
-                    ['cat' => 'Food & Drink', 'icon' => 'food-drink', 'name' => 'A Quayside café', 'img' => '/storage/marketing/cafe-owner.jpg',
+                    ['cat' => 'Food & Drink', 'icon' => 'food-drink', 'name' => 'A Quayside café', 'img' => '/images/marketing/cafe-owner.jpg',
                      'quote' => 'A “20% off before noon” offer filled our quietest hours. We captured 140 regulars in a month - now we just text them when the cakes come out of the oven.',
                      'stat' => '+38%', 'statlabel' => 'weekday morning covers'],
-                    ['cat' => 'Hairdressers', 'icon' => 'hairdressers', 'name' => 'A Grainger St barber', 'img' => '/storage/marketing/barber-owner.jpg',
+                    ['cat' => 'Hairdressers', 'icon' => 'hairdressers', 'name' => 'A Grainger St barber', 'img' => '/images/marketing/barber-owner.jpg',
                      'quote' => 'New-client cuts via the app, then automated win-back texts at the 5-week mark. Our chairs are full and the rebookings run themselves.',
                      'stat' => '210', 'statlabel' => 'customers on their list'],
-                    ['cat' => 'Fitness', 'icon' => 'fitness', 'name' => 'An independent gym', 'img' => '/storage/marketing/gym-owner.jpg',
+                    ['cat' => 'Fitness', 'icon' => 'fitness', 'name' => 'An independent gym', 'img' => '/images/marketing/gym-owner.jpg',
                      'quote' => 'Free class taster on locolie, push notification to anyone within a mile. We turned taster sign-ups into members for the price of zero ad spend.',
                      'stat' => '£0', 'statlabel' => 'spent on ads'],
                 ];

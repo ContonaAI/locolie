@@ -69,7 +69,15 @@ class PlacesService
         return $resp->successful() ? $resp->json() : null;
     }
 
-    /** Download a Places photo and return a host-relative URL, or null. */
+    /**
+     * Download a Places photo into the git-tracked public/img/biz directory and
+     * return a host-relative URL, or null.
+     *
+     * Imported photos are written under public/ (NOT storage/app/public) so they
+     * ship with the repo like the compiled assets do, and therefore survive every
+     * production redeploy. The old /storage symlink approach lost images whenever
+     * a release recreated the storage dir / dropped the symlink.
+     */
     public function downloadPhoto(?string $photoName, int $businessId): ?string
     {
         if (! $photoName || ! $this->enabled()) {
@@ -83,16 +91,29 @@ class PlacesService
             ]);
             $ct = (string) $img->header('Content-Type');
             if ($img->successful() && str_starts_with($ct, 'image/')) {
-                $path = "biz/{$businessId}.jpg";
-                Storage::disk('public')->put($path, $this->recompress($img->body()));
-
-                return '/storage/'.$path;
+                return static::storePhoto($businessId, $this->recompress($img->body()));
             }
         } catch (\Throwable $e) {
             // ignore
         }
 
         return null;
+    }
+
+    /**
+     * Persist a business photo's bytes to public/img/biz/{id}.jpg and return its
+     * host-relative URL. Shared by the importer, the seeder and the data sync so
+     * every path stores images the same, durable way.
+     */
+    public static function storePhoto(int $businessId, string $bytes): string
+    {
+        $dir = public_path('img/biz');
+        if (! is_dir($dir)) {
+            @mkdir($dir, 0755, true);
+        }
+        file_put_contents("{$dir}/{$businessId}.jpg", $bytes);
+
+        return "/img/biz/{$businessId}.jpg";
     }
 
     /** Resize to max 360px wide + JPEG q60 so cards stay tiny (~20KB). */

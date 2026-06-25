@@ -99,7 +99,7 @@ class SyncController extends Controller
         ]);
     }
 
-    /** Receive a single photo file and store it under storage/app/public/<path>. */
+    /** Receive a single photo file and store it under public/img/biz/<file>. */
     public function image(Request $request)
     {
         $request->validate([
@@ -113,13 +113,15 @@ class SyncController extends Controller
             return response()->json(['message' => 'Illegal image path.'], 422);
         }
 
-        Storage::disk('public')->putFileAs(
-            dirname($path),
-            $request->file('file'),
-            basename($path),
-        );
+        // Store in the git-tracked public dir (durable across redeploys), matching
+        // where the importer + seeder save photos.
+        $dir = public_path('img/biz');
+        if (! is_dir($dir)) {
+            @mkdir($dir, 0755, true);
+        }
+        $request->file('file')->move($dir, basename($path));
 
-        return response()->json(['ok' => true, 'path' => $path]);
+        return response()->json(['ok' => true, 'path' => 'img/'.$path]);
     }
 
     private function counts(): array

@@ -13,6 +13,11 @@ Route::get('/for-business', [SiteController::class, 'forBusiness'])->name('site.
 Route::get('/category/{slug}', [SiteController::class, 'category'])->name('site.category');
 Route::get('/shop/{slug}', [SiteController::class, 'business'])->name('site.business');
 
+// ── Programmatic local SEO: "{category} in {area}" landing pages + hubs ──────
+Route::get('/local', [\App\Http\Controllers\SeoController::class, 'index'])->name('seo.index');
+Route::get('/local/{area}', [\App\Http\Controllers\SeoController::class, 'area'])->name('seo.area');
+Route::get('/local/{area}/{category}', [\App\Http\Controllers\SeoController::class, 'categoryInArea'])->name('seo.landing');
+
 // ── Legal ────────────────────────────────────────────────────────────────────
 Route::get('/terms', [LegalController::class, 'terms'])->name('legal.terms');
 Route::get('/privacy', [LegalController::class, 'privacy'])->name('legal.privacy');
@@ -26,10 +31,30 @@ Route::match(['get', 'post'], '/unsubscribe', [SubscriptionController::class, 'u
 // ── SEO: robots + sitemap ────────────────────────────────────────────────────
 Route::get('/robots.txt', fn () => response("User-agent: *\nAllow: /\nDisallow: /portal\nDisallow: /admin\nDisallow: /business\nSitemap: ".url('/sitemap.xml')."\n", 200, ['Content-Type' => 'text/plain']));
 Route::get('/sitemap.xml', function () {
-    $urls = ['/', '/for-business', '/app', '/terms', '/privacy', '/cookies'];
+    $urls = ['/', '/for-business', '/app', '/local', '/terms', '/privacy', '/cookies'];
+
+    // Every category, every shop, and every generated "{category} in {area}" page
+    // that actually has businesses - so the programmatic SEO pages get crawled.
+    foreach (\App\Models\Category::all() as $cat) {
+        $urls[] = '/category/'.$cat->slug;
+    }
+    foreach (\App\Models\Business::live()->pluck('slug') as $slug) {
+        $urls[] = '/shop/'.$slug;
+    }
+    foreach (\App\Services\LocationService::all() as $loc) {
+        $urls[] = '/local/'.$loc['slug'];
+        foreach (\App\Services\LocationService::businesses($loc) as $b) {
+            // Index by the business's parent + leaf category for this area.
+            foreach (array_filter([$b->category?->slug, $b->category?->parent?->slug]) as $cslug) {
+                $urls['/local/'.$loc['slug'].'/'.$cslug] = '/local/'.$loc['slug'].'/'.$cslug;
+            }
+        }
+    }
+    $urls = array_values(array_unique($urls));
+
     $xml = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
     foreach ($urls as $u) {
-        $xml .= '<url><loc>'.url($u).'</loc><changefreq>weekly</changefreq></url>';
+        $xml .= '<url><loc>'.e(url($u)).'</loc><changefreq>weekly</changefreq></url>';
     }
     $xml .= '</urlset>';
 

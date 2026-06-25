@@ -145,11 +145,11 @@ class GooglePlacesSeeder extends Seeder
                         ]);
                         $ct = (string) $img->header('Content-Type');
                         if ($img->successful() && str_starts_with($ct, 'image/')) {
-                            $ext = str_contains($ct, 'png') ? 'png' : 'jpg';
-                            $path = "biz/{$business->id}.{$ext}";
-                            Storage::disk('public')->put($path, $img->body());
-                            // Store a host-relative URL so images load on any host (ngrok, 127.0.0.1, etc.).
-                            $business->update(['photos' => ['/storage/'.$path]]);
+                            // Save into the git-tracked public/img/biz dir so the
+                            // image ships with the repo and survives prod redeploys
+                            // (the old /storage symlink kept dropping images).
+                            $url = \App\Services\PlacesService::storePhoto($business->id, $img->body());
+                            $business->update(['photos' => [$url]]);
                         }
                     } catch (\Throwable $e) {
                         // ignore — fall back to gradient placeholder
