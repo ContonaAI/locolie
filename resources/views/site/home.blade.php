@@ -54,7 +54,7 @@
         </div>
 
         {{-- Hero device --}}
-        <div class="relative flex justify-center lg:justify-end">
+        <div class="relative flex justify-center lg:justify-center xl:pr-8">
             <div class="absolute -inset-10 rounded-[3rem] bg-gradient-to-tr from-emerald-soft via-white to-transparent blur-3xl" data-parallax="0.05"></div>
             <div class="relative animate-floaty">
                 @include('site._phone', ['src' => '/app', 'class' => 'relative', 'cards' => $featured])
