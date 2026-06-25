@@ -2,11 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Business;
+use App\Models\Campaign;
+use App\Models\Category;
 use App\Models\Idea;
+use App\Models\Offer;
+use App\Models\PushSubscription;
+use App\Models\Redemption;
+use App\Services\PlacesService;
+use App\Services\PushService;
+use App\Support\Seo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class PortalController extends Controller
 {
@@ -75,26 +86,26 @@ class PortalController extends Controller
     {
         return view('portal.admin', [
             'stats' => [
-                'businesses' => \App\Models\Business::count(),
-                'onboarded' => \App\Models\Business::where('onboarded', true)->count(),
-                'leads' => \App\Models\Business::where('onboarded', false)->count(),
-                'paid' => \App\Models\Business::whereIn('plan', ['featured', 'premium'])->count(),
-                'offers' => \App\Models\Offer::where('status', 'active')->count(),
-                'redemptions' => \App\Models\Redemption::count(),
-                'redeemed' => \App\Models\Redemption::where('status', 'redeemed')->count(),
-                'push_subs' => \App\Models\PushSubscription::count(),
+                'businesses' => Business::count(),
+                'onboarded' => Business::where('onboarded', true)->count(),
+                'leads' => Business::where('onboarded', false)->count(),
+                'paid' => Business::whereIn('plan', ['featured', 'premium'])->count(),
+                'offers' => Offer::where('status', 'active')->count(),
+                'redemptions' => Redemption::count(),
+                'redeemed' => Redemption::where('status', 'redeemed')->count(),
+                'push_subs' => PushSubscription::count(),
             ],
             'planCounts' => [
-                'free' => \App\Models\Business::where('plan', 'free')->count(),
-                'featured' => \App\Models\Business::where('plan', 'featured')->count(),
-                'premium' => \App\Models\Business::where('plan', 'premium')->count(),
+                'free' => Business::where('plan', 'free')->count(),
+                'featured' => Business::where('plan', 'featured')->count(),
+                'premium' => Business::where('plan', 'premium')->count(),
             ],
-            'categories' => \App\Models\Category::orderBy('name')->get(),
-            'businesses' => \App\Models\Business::with('category')
+            'categories' => Category::orderBy('name')->get(),
+            'businesses' => Business::with('category')
                 ->withCount(['offers' => fn ($q) => $q->where('status', 'active')])
                 ->orderByDesc('onboarded')->orderByDesc('priority')->orderBy('name')->get(),
-            'campaigns' => \App\Models\Campaign::with('business')->latest('id')->limit(15)->get(),
-            'redemptions' => \App\Models\Redemption::with('offer.business')
+            'campaigns' => Campaign::with('business')->latest('id')->limit(15)->get(),
+            'redemptions' => Redemption::with('offer.business')
                 ->latest('id')->limit(15)->get(),
         ]);
     }
@@ -105,8 +116,8 @@ class PortalController extends Controller
     public function settings()
     {
         $token = (string) config('sync.token');
-        $bizDir = \Illuminate\Support\Facades\Storage::disk('public')->exists('biz')
-            ? \Illuminate\Support\Facades\Storage::disk('public')->files('biz') : [];
+        $bizDir = Storage::disk('public')->exists('biz')
+            ? Storage::disk('public')->files('biz') : [];
 
         return view('portal.settings', [
             'sync' => [
@@ -115,27 +126,31 @@ class PortalController extends Controller
                     ? substr($token, 0, 6).str_repeat('•', 10).substr($token, -4)
                     : null,
                 'endpoint' => url('/api/sync'),
-                'last_sync' => \Illuminate\Support\Facades\Cache::get('sync.last_at'),
+                'last_sync' => Cache::get('sync.last_at'),
                 'counts' => [
-                    'businesses' => \App\Models\Business::count(),
-                    'offers' => \App\Models\Offer::count(),
-                    'categories' => \App\Models\Category::count(),
+                    'businesses' => Business::count(),
+                    'offers' => Offer::count(),
+                    'categories' => Category::count(),
                     'images' => count($bizDir),
                 ],
             ],
             'gsc' => [
-                'tags' => \App\Support\Seo::storedTags(),
-                'files' => \App\Support\Seo::htmlFiles(),
-                'verified' => count(\App\Support\Seo::verificationTags()) > 0 || count(\App\Support\Seo::htmlFiles()) > 0,
+                'tags' => Seo::storedTags(),
+                'files' => Seo::htmlFiles(),
+                'verified' => count(Seo::verificationTags()) > 0 || count(Seo::htmlFiles()) > 0,
                 'home_url' => url('/'),
                 'sitemap_url' => url('/sitemap.xml'),
                 'robots_url' => url('/robots.txt'),
+            ],
+            'scripts' => [
+                'head' => \App\Support\HeadScripts::head(),
+                'active' => \App\Support\HeadScripts::isActive(),
             ],
         ]);
     }
 
     /** CRM: flip a business between live (onboarded) and lead. */
-    public function adminToggleOnboard(\App\Models\Business $business)
+    public function adminToggleOnboard(Business $business)
     {
         $business->update([
             'onboarded' => ! $business->onboarded,
@@ -146,45 +161,45 @@ class PortalController extends Controller
     }
 
     /** CRM: set a business's paid tier (priority + featured follow the plan). */
-    public function adminSetPlan(Request $request, \App\Models\Business $business)
+    public function adminSetPlan(Request $request, Business $business)
     {
-        $data = $request->validate(['plan' => ['required', \Illuminate\Validation\Rule::in(array_keys(\App\Models\Business::PLANS))]]);
-        $cfg = \App\Models\Business::PLANS[$data['plan']];
+        $data = $request->validate(['plan' => ['required', Rule::in(array_keys(Business::PLANS))]]);
+        $cfg = Business::PLANS[$data['plan']];
         $business->update(['plan' => $data['plan'], 'priority' => $cfg['priority'], 'featured' => $cfg['featured']]);
 
         return back()->with('status', $business->name.' set to '.$cfg['label'].'.');
     }
 
     /** CRM prospecting: live Google Maps search to build the onboarding list. */
-    public function adminProspectSearch(Request $request, \App\Services\PlacesService $places)
+    public function adminProspectSearch(Request $request, PlacesService $places)
     {
         $request->validate(['q' => ['required', 'string', 'min:2', 'max:120']]);
 
         $results = collect($places->search($request->input('q')))->map(function ($p) {
             $pid = data_get($p, 'place_id') ?? data_get($p, 'id');
 
-            return array_merge((array) $p, ['already_added' => \App\Models\Business::where('google_place_id', $pid)->exists()]);
+            return array_merge((array) $p, ['already_added' => Business::where('google_place_id', $pid)->exists()]);
         });
 
         return response()->json($results);
     }
 
     /** CRM prospecting: add a Google place as a lead (NOT onboarded yet). */
-    public function adminAddProspect(Request $request, \App\Services\PlacesService $places)
+    public function adminAddProspect(Request $request, PlacesService $places)
     {
         $data = $request->validate([
             'place_id' => ['required', 'string', 'max:300'],
-            'category_id' => ['nullable', \Illuminate\Validation\Rule::exists('categories', 'id')],
+            'category_id' => ['nullable', Rule::exists('categories', 'id')],
         ]);
 
         $place = $places->details($data['place_id']);
         abort_unless($place, 422, 'Could not load that place.');
 
-        $business = \App\Models\Business::updateOrCreate(
+        $business = Business::updateOrCreate(
             ['google_place_id' => data_get($place, 'id')],
             [
                 'name' => data_get($place, 'displayName.text', 'Unknown'),
-                'category_id' => $data['category_id'] ?? \App\Models\Category::value('id'),
+                'category_id' => $data['category_id'] ?? Category::value('id'),
                 'address' => data_get($place, 'formattedAddress'),
                 'lat' => data_get($place, 'location.latitude'),
                 'lng' => data_get($place, 'location.longitude'),
@@ -201,19 +216,19 @@ class PortalController extends Controller
     }
 
     /** CRM: log + "send" an email or push campaign (Stripe/VAPID wiring is scaffolded). */
-    public function adminSendCampaign(Request $request, \App\Services\PushService $push)
+    public function adminSendCampaign(Request $request, PushService $push)
     {
         $data = $request->validate([
-            'channel' => ['required', \Illuminate\Validation\Rule::in(['email', 'push'])],
+            'channel' => ['required', Rule::in(['email', 'push'])],
             'subject' => ['nullable', 'string', 'max:160'],
             'body' => ['required', 'string', 'max:1000'],
         ]);
 
         $sent = $data['channel'] === 'push'
             ? $push->broadcast($data['subject'] ?? 'locolie', $data['body'])
-            : \App\Models\Business::where('onboarded', true)->whereNotNull('owner_email')->count();
+            : Business::where('onboarded', true)->whereNotNull('owner_email')->count();
 
-        \App\Models\Campaign::create($data + ['sent_count' => $sent]);
+        Campaign::create($data + ['sent_count' => $sent]);
 
         return back()->with('status', ucfirst($data['channel']).' campaign queued to '.$sent.' recipients.');
     }
@@ -224,7 +239,7 @@ class PortalController extends Controller
      */
     public function qrRedirect(string $token)
     {
-        $business = \App\Models\Business::where('qr_token', $token)->firstOr(fn () => abort(404));
+        $business = Business::where('qr_token', $token)->firstOr(fn () => abort(404));
 
         return redirect()->route('app', ['b' => $business->slug]);
     }
@@ -234,7 +249,7 @@ class PortalController extends Controller
      */
     public function sticker(string $secret)
     {
-        $business = \App\Models\Business::where('owner_secret', $secret)->firstOr(fn () => abort(404));
+        $business = Business::where('owner_secret', $secret)->firstOr(fn () => abort(404));
 
         return view('demo.sticker', [
             'business' => $business,

@@ -55,6 +55,8 @@
         }
     </style>
     @stack('head')
+    {{-- Custom head scripts (analytics / pixels), managed in admin Settings. --}}
+    {!! \App\Support\HeadScripts::head() !!}
 </head>
 <body class="gl-bg h-full text-slate-800 antialiased @yield('bodyClass')">
     @if (session('portal_authed'))

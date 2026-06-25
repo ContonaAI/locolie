@@ -35,36 +35,7 @@ Route::get('/{gscfile}', [\App\Http\Controllers\SearchConsoleController::class, 
 
 // ── SEO: robots + sitemap ────────────────────────────────────────────────────
 Route::get('/robots.txt', fn () => response("User-agent: *\nAllow: /\nDisallow: /portal\nDisallow: /admin\nDisallow: /business\nSitemap: ".url('/sitemap.xml')."\n", 200, ['Content-Type' => 'text/plain']));
-Route::get('/sitemap.xml', function () {
-    $urls = ['/', '/for-business', '/app', '/local', '/terms', '/privacy', '/cookies'];
-
-    // Every category, every shop, and every generated "{category} in {area}" page
-    // that actually has businesses - so the programmatic SEO pages get crawled.
-    foreach (\App\Models\Category::all() as $cat) {
-        $urls[] = '/category/'.$cat->slug;
-    }
-    foreach (\App\Models\Business::live()->pluck('slug') as $slug) {
-        $urls[] = '/shop/'.$slug;
-    }
-    foreach (\App\Services\LocationService::all() as $loc) {
-        $urls[] = '/local/'.$loc['slug'];
-        foreach (\App\Services\LocationService::businesses($loc) as $b) {
-            // Index by the business's parent + leaf category for this area.
-            foreach (array_filter([$b->category?->slug, $b->category?->parent?->slug]) as $cslug) {
-                $urls['/local/'.$loc['slug'].'/'.$cslug] = '/local/'.$loc['slug'].'/'.$cslug;
-            }
-        }
-    }
-    $urls = array_values(array_unique($urls));
-
-    $xml = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-    foreach ($urls as $u) {
-        $xml .= '<url><loc>'.e(url($u)).'</loc><changefreq>weekly</changefreq></url>';
-    }
-    $xml .= '</urlset>';
-
-    return response($xml, 200, ['Content-Type' => 'application/xml']);
-});
+Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
 
 // ── The app (same responsive build; consumer + business roles) ───────────────
 Route::get('/app', [PortalController::class, 'mobile'])->name('app');
@@ -144,6 +115,9 @@ Route::middleware('portal')->group(function () {
 
     // Google Search Console verification settings
     Route::post('/admin/search-console', [\App\Http\Controllers\SearchConsoleController::class, 'save'])->name('admin.search-console');
+
+    // Custom <head> scripts (analytics / pixels), injected site-wide
+    Route::post('/admin/scripts', [\App\Http\Controllers\ScriptsController::class, 'save'])->name('admin.scripts');
 
     // Admin CRM
     Route::get('/admin', [PortalController::class, 'admin'])->name('portal.admin');

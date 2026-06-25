@@ -1,17 +1,39 @@
+@php
+    // Launch-market values (config/locolie.php) shared across head + body.
+    $ll = config('locolie.launch');
+    $llPlace = $ll['place'];                 // "Newcastle NE1"
+    $llCity = $ll['city'];                   // "Newcastle"
+    $llFeaturedPrice = \App\Models\Business::PLANS['featured']['price'] ?? 19;
+@endphp
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'locolie') - Back your high street. Discover the indies near you</title>
-    <meta name="description" content="@yield('meta_description', 'locolie helps you discover real discounts from independent shops near you - and helps the indies fight back against the chains. Free listings for businesses, priority placement from £19/mo. Launching in Newcastle NE1.')">
-    <link rel="canonical" href="{{ url()->current() }}">
+    <meta name="description" content="@yield('meta_description', 'locolie helps you discover real discounts from independent shops near you - and helps the indies fight back against the chains. Free listings for businesses, priority placement from £'.$llFeaturedPrice.'/mo. Launching in '.$llPlace.'.')">
+    @php
+        // Self-canonical (including a valid ?hl= language so translated variants
+        // are their own canonical), plus hreflang alternates for en-GB, x-default
+        // and the community languages we translate into.
+        $hl = request('hl');
+        $hl = ($hl !== 'en' && in_array($hl, \App\Support\Locales::switcherCodes(), true)) ? $hl : null;
+        $canonical = url()->current().($hl ? '?hl='.$hl : '');
+    @endphp
+    <link rel="canonical" href="{{ $canonical }}">
+    @foreach (\App\Support\Locales::alternatesFor(url()->current()) as $alt)
+        <link rel="alternate" hreflang="{{ $alt['hreflang'] }}" href="{{ $alt['href'] }}">
+    @endforeach
     <meta name="theme-color" content="#0a0a0a">
+    <meta property="og:locale" content="en_GB">
+    @foreach (\App\Support\Locales::ALTERNATES as $hreflang => $meta)
+        <meta property="og:locale:alternate" content="{{ str_replace('-', '_', $hreflang) }}">
+    @endforeach
     <meta property="og:site_name" content="locolie">
     <meta property="og:title" content="@yield('title', 'locolie')">
-    <meta property="og:description" content="Back your high street. Discover real discounts from the independents near you. Launching in Newcastle NE1.">
+    <meta property="og:description" content="Back your high street. Discover real discounts from the independents near you. Launching in {{ $llPlace }}.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:url" content="{{ $canonical }}">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="@yield('title', 'locolie')">
     <meta name="twitter:description" content="Back your high street. Discover real discounts from the independents near you.">
@@ -21,9 +43,9 @@
       "@@context": "https://schema.org",
       "@@type": "Organization",
       "name": "locolie",
-      "description": "Discover real discounts from independent local businesses near you, and help bring back the indies. Launching in Newcastle NE1.",
+      "description": "Discover real discounts from independent local businesses near you, and help bring back the indies. Launching in {{ $llPlace }}.",
       "url": "{{ url('/') }}",
-      "areaServed": "Newcastle upon Tyne, NE1",
+      "areaServed": "{{ $ll['area_served'] }}",
       "founders": [{"@@type":"Person","name":"Tom"},{"@@type":"Person","name":"Joe"},{"@@type":"Person","name":"Roddy"}]
     }
     </script>
@@ -104,6 +126,8 @@
         <meta name="google-site-verification" content="{{ $gscToken }}">
     @endforeach
     @stack('head')
+    {{-- Custom head scripts (analytics / pixels), managed in admin Settings. --}}
+    {!! \App\Support\HeadScripts::head() !!}
 </head>
 <body class="antialiased text-ink">
 {{-- Free Google Translate (website widget) - powers the language switcher, no key/billing --}}
@@ -129,6 +153,21 @@
     }
     location.reload();
   };
+
+  // Honour a ?hl=<code> link (used by hreflang alternates + shareable language
+  // URLs) by auto-translating into that language on load - once, no reload loop.
+  (function () {
+    try {
+      var hl = new URLSearchParams(location.search).get('hl');
+      if (!hl) return;
+      var map = { en: 'en', pl: 'pl', es: 'es', fr: 'fr', ur: 'ur', zh: 'zh-CN' };
+      var g = map[hl];
+      if (!g) return;
+      var active = (document.cookie.match(/googtrans=\/en\/([^;]+)/) || [])[1];
+      if (g === 'en') { if (active) window.flTranslate('en'); return; }
+      if (active !== g) window.flTranslate(hl);
+    } catch (e) {}
+  })();
 </script>
 <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
@@ -140,7 +179,7 @@
     // Roll-out roadmap - a region/county is "live" or "soon".
     $regions = [
         'United Kingdom' => [
-            ['Newcastle upon Tyne', 'Tyne & Wear', true],
+            [$ll['city_full'], $ll['region'], true],
             ['Durham', 'County Durham', false],
             ['Leeds', 'West Yorkshire', false],
             ['Manchester', 'Greater Manchester', false],
@@ -223,7 +262,7 @@
                                     <div class="h-28 bg-cover bg-center" style="background-image:url('{{ $navFeatured->photos[0] ?? '' }}')"></div>
                                     <div class="p-3">
                                         <div class="truncate text-sm font-bold text-ink group-hover:text-emerald">{{ $navFeatured->name }}</div>
-                                        <div class="truncate text-xs text-muted">{{ $navFeatured->category?->name }} · {{ $navFeatured->city ?? 'Newcastle' }}</div>
+                                        <div class="truncate text-xs text-muted">{{ $navFeatured->category?->name }} · {{ $navFeatured->city ?? $llCity }}</div>
                                         @if ($navFeaturedOffer)
                                             <div class="mt-2 inline-block rounded-lg bg-emerald-soft px-2 py-1 text-[11px] font-bold text-emerald">{{ $navFeaturedOffer->badge }}</div>
                                         @endif
@@ -239,7 +278,7 @@
         {{-- Right actions --}}
         <div class="hidden items-center gap-1.5 lg:flex">
             {{-- Region + language selector (globe) --}}
-            <div x-data="{ o:false, lang:(localStorage.getItem('fl_lang')||'en'), place:(localStorage.getItem('fl_place')||'Newcastle') }"
+            <div x-data="{ o:false, lang:(localStorage.getItem('fl_lang')||'en'), place:(localStorage.getItem('fl_place')||'{{ $llCity }}') }"
                  @mouseenter="o=true" @mouseleave="o=false" class="relative">
                 <button @click="o=!o" class="flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-2 text-sm font-semibold text-ink transition hover:bg-black/[0.05]" aria-label="Region and language">
                     <svg class="h-4 w-4 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20Z"/></svg>
@@ -305,7 +344,7 @@
                 <a href="{{ $l[0] }}" @click="open=false" class="rounded-xl px-3 py-2.5 text-sm font-medium text-ink hover:bg-black/[0.05]">{{ $l[1] }}</a>
             @endforeach
             {{-- Region + language (mobile) --}}
-            <div x-data="{ place:(localStorage.getItem('fl_place')||'Newcastle'), lang:(localStorage.getItem('fl_lang')||'en') }" class="mt-1 border-t border-hair pt-2">
+            <div x-data="{ place:(localStorage.getItem('fl_place')||'{{ $llCity }}'), lang:(localStorage.getItem('fl_lang')||'en') }" class="mt-1 border-t border-hair pt-2">
                 <div class="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-muted">Area</div>
                 <div class="grid grid-cols-2 gap-1">
                     @foreach ($regions as $country => $places)
@@ -366,7 +405,7 @@
                 <p class="mt-3 max-w-xs text-sm leading-relaxed text-muted">Bringing back the indies. Discover real discounts from the independent shops, pubs and makers on your high street.</p>
                 <p class="mt-4 inline-flex items-center gap-2 rounded-full bg-emerald-soft px-3 py-1.5 text-xs font-semibold text-emerald">
                     <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1.6C7.3 1.6 3.5 5.4 3.5 10.1c0 5.6 8.5 12.3 8.5 12.3s8.5-6.7 8.5-12.3C20.5 5.4 16.7 1.6 12 1.6Zm0 5.9a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4Z"/></svg>
-                    Newcastle NE1 · indies only, always
+                    {{ $llPlace }} · indies only, always
                 </p>
                 <div class="mt-6">
                     <x-seal variant="light" class="h-24 w-24" />
@@ -439,8 +478,8 @@
   // recognise the town/postcode they're in. Falls back gracefully if denied.
   function geoArea(initialCount){
     return {
-      label: 'Now backing the indies in Newcastle NE1',
-      place: 'Newcastle',
+      label: 'Now backing the indies in {{ $llPlace }}',
+      place: '{{ $llCity }}',
       count: initialCount,
       live: true,
       detect(){
@@ -461,7 +500,7 @@
             for (const k in cities) {
               if (town && (town.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(town.toLowerCase()))) { key = k; break; }
             }
-            const liveHere = /^NE/i.test(outward) || /newcastle/i.test(town);
+            const liveHere = new RegExp('^{{ $ll['outward_prefix'] }}', 'i').test(outward) || new RegExp('{{ \Illuminate\Support\Str::lower($llCity) }}', 'i').test(town);
 
             if (key) {
               this.count = cities[key].count;

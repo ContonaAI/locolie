@@ -151,9 +151,32 @@
   </form>
 </section>
 
+{{-- ── Custom head scripts (analytics / pixels) ────────────────────────── --}}
+<section class="rounded-2xl border border-slate-200 bg-white p-6 mb-6">
+  <div class="flex items-start justify-between gap-4 mb-4">
+    <div>
+      <h2 class="text-lg font-bold text-slate-900">Tracking &amp; head scripts</h2>
+      <p class="text-sm text-slate-500 mt-1">Code injected into the <code class="font-mono text-xs bg-slate-100 px-1 rounded">&lt;head&gt;</code> of every page - analytics, pixels, verification snippets. Pre-loaded with your Google Analytics tag. Saves live, no redeploy.</p>
+    </div>
+    <span class="px-2.5 py-1 rounded-full text-xs font-bold shrink-0 {{ $scripts['active'] ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600' }}">
+      {{ $scripts['active'] ? 'Live on site' : 'None set' }}
+    </span>
+  </div>
+
+  <form method="POST" action="{{ route('admin.scripts') }}" class="space-y-3">
+    @csrf
+    <textarea name="head_scripts" rows="11" spellcheck="false"
+              class="w-full rounded-lg border border-slate-300 px-3 py-2.5 font-mono text-xs leading-relaxed focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Paste <script> tags here">{{ $scripts['head'] }}</textarea>
+    <div class="rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-800">
+      <span class="font-semibold">Owners only.</span> This runs raw code on every visitor's page, so it must stay behind the portal password gate. Only paste scripts you trust.
+    </div>
+    <button class="rounded-lg bg-emerald-600 text-white text-sm font-bold px-5 py-2.5 hover:bg-emerald-700">Save scripts</button>
+  </form>
+</section>
+
 {{-- ── Security note: the portal gate is open ──────────────────────────── --}}
 <section class="rounded-2xl border border-amber-200 bg-amber-50 p-5">
   <h2 class="text-sm font-bold text-amber-900">Heads up: this portal is currently public</h2>
-  <p class="text-sm text-amber-800 mt-1">The shared-password gate is disabled, so anyone can reach these admin pages. The sync token is masked here for that reason and lives only in your env files. Re-enable the password gate before relying on this in production.</p>
+  <p class="text-sm text-amber-800 mt-1">The shared-password gate is disabled, so anyone can reach these admin pages - including the head-scripts editor above, which runs code site-wide. The sync token is masked here for that reason and lives only in your env files. <strong>Re-enable the password gate before relying on this in production.</strong></p>
 </section>
 @endsection
