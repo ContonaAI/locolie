@@ -59,6 +59,18 @@
             <button class="text-sm font-semibold text-slate-600 hover:text-slate-900">Log out</button>
           </form>
         </div>
+      @else
+        {{-- Public nav for logged-out retailers browsing the onboarding page --}}
+        <nav class="hidden md:flex items-center gap-1 text-sm flex-1 ml-6">
+          <a href="{{ route('business.join') }}#why" class="px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition">Why locolie</a>
+          <a href="{{ route('business.join') }}#features" class="px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition">Features</a>
+          <a href="{{ route('business.join') }}#pricing" class="px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition">Pricing</a>
+          <a href="/for-business" class="px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition">Full tour</a>
+        </nav>
+        <div class="flex items-center gap-2 sm:gap-3">
+          <a href="{{ route('business.join') }}#signin" class="text-sm font-semibold text-slate-600 hover:text-slate-900 px-2">Log in</a>
+          <a href="{{ route('business.join') }}#register" class="rounded-full bg-emerald-600 hover:bg-emerald-700 px-4 py-2 text-sm font-bold text-white transition">List your shop</a>
+        </div>
       @endauth
     </div>
   </header>

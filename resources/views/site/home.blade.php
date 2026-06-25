@@ -5,9 +5,51 @@
 @push('head')
 <script>window.FL_CITIES = @json($cityData); window.FL_POINTS = @json($mapPoints);</script>
 @include('partials.google-maps', ['key' => $mapsKey ?? null])
+<style>
+    /* ---- Hero notification chips: brand-pin launch + sonar ping on hover ---- */
+    .chip .chip-card { transition: box-shadow .5s, border-color .5s, transform .5s cubic-bezier(.16,.8,.3,1); }
+    .chip:hover { z-index: 30; }
+    .chip:hover .chip-card {
+        transform: translateY(-6px) scale(1.05);
+        box-shadow: 0 28px 60px -14px rgba(5,150,105,.6), inset 0 1px 0 rgba(255,255,255,.75);
+        border-color: rgba(5,150,105,.45);
+    }
+    .chip-badge { position: relative; }
+    .chip-icon, .chip-pin { transition: opacity .35s ease, transform .45s cubic-bezier(.16,.8,.3,1); }
+    .chip-pin { position: absolute; inset: 0; margin: auto; height: 1.05rem; width: 1.05rem; color: #059669; opacity: 0; transform: translateY(6px) scale(.5); }
+    .chip:hover .chip-icon { opacity: 0; transform: scale(.35); }
+    .chip:hover .chip-pin { animation: pinLaunch .6s cubic-bezier(.16,.8,.3,1) forwards; filter: drop-shadow(0 3px 4px rgba(5,150,105,.55)); }
+    .ping-ring { position: absolute; inset: 0; border-radius: 9999px; border: 2px solid #059669; opacity: 0; transform: scale(.4); pointer-events: none; }
+    .chip:hover .ping-ring { animation: chipPing 1.5s ease-out infinite; }
+    .chip:hover .ping-ring.r2 { animation-delay: .5s; }
+    .chip:hover .ping-ring.r3 { animation-delay: 1s; }
+    @keyframes chipPing { 0% { transform: scale(.4); opacity: .6; } 80% { opacity: 0; } 100% { transform: scale(2.7); opacity: 0; } }
+    @keyframes pinLaunch {
+        0%   { opacity: 0; transform: translateY(7px) scale(.5); }
+        45%  { opacity: 1; transform: translateY(-4px) scale(1.18); }
+        70%  { transform: translateY(1px) scale(.94); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* ---- Brand-pin watermarks: parallax-drifting marks that deepen the green wash ---- */
+    .pin-mark { position: absolute; color: #059669; pointer-events: none; z-index: 0; will-change: transform; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .chip:hover .ping-ring { animation: none; }
+        .chip:hover .chip-pin { animation: none; opacity: 1; transform: none; }
+    }
+</style>
 @endpush
 
 @section('content')
+
+@php
+    // Brand pin used as a drifting background watermark (parallax handled by data-pin-parallax in layout JS).
+    $pinPath = 'M12 1.6C7.3 1.6 3.5 5.4 3.5 10.1c0 5.6 8.5 12.3 8.5 12.3s8.5-6.7 8.5-12.3C20.5 5.4 16.7 1.6 12 1.6Zm0 5.9a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4Z';
+    $pinMark = function ($classes, $parallax = '0.06', $style = '') use ($pinPath) {
+        return '<svg class="pin-mark '.$classes.'" data-pin-parallax="'.$parallax.'" style="'.$style.'" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="'.$pinPath.'"/></svg>';
+    };
+@endphp
 
 {{-- ============================================================ HERO --}}
 <section class="relative overflow-hidden hero-grid">
@@ -57,7 +99,7 @@
         <div class="relative flex justify-center lg:justify-center xl:pr-8">
             <div class="absolute -inset-10 rounded-[3rem] bg-gradient-to-tr from-emerald-soft via-white to-transparent blur-3xl" data-parallax="0.05"></div>
             <div class="relative animate-floaty">
-                @include('site._phone', ['src' => '/app', 'class' => 'relative', 'cards' => $featured])
+                @include('site._appwalk', ['src' => '/app', 'class' => 'relative', 'cards' => $featured])
             </div>
             {{-- Floating feature chips - the marketing tools businesses get --}}
             @php $heroChips = [
@@ -67,10 +109,16 @@
                 ['-right-3 bottom-16', '-2.2s', '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>', '+ New customer', 'added to your list'],
             ]; @endphp
             @foreach ($heroChips as $chip)
-                <div class="absolute {{ $chip[0] }} hidden glass-card rounded-2xl px-3.5 py-2.5 lg:block animate-floaty2" style="animation-delay:{{ $chip[1] }}">
-                    <div class="flex items-center gap-2">
-                        <span class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-soft text-emerald"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{!! $chip[2] !!}</svg></span>
-                        <div class="text-xs leading-tight"><div class="font-bold text-ink">{{ $chip[3] }}</div><div class="text-muted">{{ $chip[4] }}</div></div>
+                <div class="chip absolute {{ $chip[0] }} hidden cursor-default lg:block animate-floaty2" style="animation-delay:{{ $chip[1] }}">
+                    <div class="chip-card glass-card rounded-2xl px-3.5 py-2.5">
+                        <div class="flex items-center gap-2.5">
+                            <span class="chip-badge flex h-8 w-8 items-center justify-center rounded-full bg-emerald-soft text-emerald">
+                                <span class="ping-ring"></span><span class="ping-ring r2"></span><span class="ping-ring r3"></span>
+                                <svg class="chip-icon h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{!! $chip[2] !!}</svg>
+                                <svg class="chip-pin" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1.6C7.3 1.6 3.5 5.4 3.5 10.1c0 5.6 8.5 12.3 8.5 12.3s8.5-6.7 8.5-12.3C20.5 5.4 16.7 1.6 12 1.6Zm0 5.9a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4Z"/></svg>
+                            </span>
+                            <div class="text-xs leading-tight"><div class="font-bold text-ink">{{ $chip[3] }}</div><div class="text-muted">{{ $chip[4] }}</div></div>
+                        </div>
                     </div>
                 </div>
             @endforeach
@@ -167,12 +215,14 @@
 </script>
 
 {{-- ============================================================ PROBLEM / WHY --}}
-<section class="relative border-y border-hair bg-[#fafafa] py-20 sm:py-28">
-    <div class="mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
+<section class="relative overflow-hidden border-y border-hair bg-[#fafafa] py-20 sm:py-28">
+    {!! $pinMark('-left-16 -top-10 h-72 w-72 opacity-[0.05]', '0.05') !!}
+    {!! $pinMark('-right-12 bottom-0 h-56 w-56 opacity-[0.04]', '-0.04') !!}
+    <div class="relative z-10 mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
         <div class="mx-auto max-w-3xl text-center reveal">
             <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald">The problem</h2>
             <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-balance">Indies are brilliant. Getting noticed isn't.</p>
-            <p class="mt-4 text-lg text-muted">The chains and online giants have apps, loyalty cards and ad budgets. The indie down the road - better coffee, fairer prices, bags more character - has a chalkboard and a lot of hope. locolie evens things up.</p>
+            <p class="mt-4 text-lg text-muted">The chains and online giants have apps, loyalty cards and ad budgets. The indie down the road - <span class="font-semibold text-ink">better coffee, fairer prices, bags more character</span> - has a chalkboard and a lot of hope. <span class="font-semibold text-ink">locolie evens things up.</span></p>
         </div>
         <div class="mt-14 grid gap-6 md:grid-cols-3">
             @php
@@ -326,6 +376,8 @@
 {{-- ============================================================ LIVE DEMO --}}
 <section id="demo" class="relative overflow-hidden border-y border-hair bg-ink py-20 text-white sm:py-28">
     <div class="mesh" aria-hidden="true" style="opacity:.18" data-parallax="0.08"><i class="b1"></i><i class="b2"></i><i class="b3"></i></div>
+    {!! $pinMark('-left-20 top-4 h-80 w-80 opacity-[0.10] blur-[1px]', '0.07') !!}
+    {!! $pinMark('-right-16 bottom-0 h-64 w-64 opacity-[0.08] blur-[1px]', '-0.05') !!}
     <div class="relative z-10 mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
         <div class="mx-auto max-w-2xl text-center reveal">
             <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald-soft">See it live</h2>
@@ -419,7 +471,7 @@
         <div class="mx-auto max-w-2xl text-center reveal">
             <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald">Case studies</h2>
             <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Indies, winning.</p>
-            <p class="mt-4 text-muted">How real NE1 indies use locolie to pull in footfall and keep customers coming back.</p>
+            <p class="mt-4 text-muted">How real NE1 indies use locolie to <span class="font-semibold text-ink">pull in footfall</span> and <span class="font-semibold text-ink">keep customers coming back</span>.</p>
         </div>
         <div class="mt-14 grid gap-6 lg:grid-cols-3">
             @php
@@ -436,13 +488,14 @@
                 ];
             @endphp
             @foreach ($stories as $i => $s)
-                <figure class="reveal card-hover flex flex-col rounded-card border border-hair bg-white p-7" data-d="{{ $i+1 }}">
-                    <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-emerald">
-                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">{!! \App\Models\Category::iconPath($s['icon']) !!}</svg>
-                        {{ $s['cat'] }}
+                <figure class="reveal card-hover flex flex-col overflow-hidden rounded-card border border-hair bg-white" data-d="{{ $i+1 }}">
+                    <div class="relative flex items-center gap-3 overflow-hidden bg-gradient-to-br from-emerald-soft to-white px-7 pb-5 pt-6">
+                        <svg class="absolute -right-5 -top-4 h-28 w-28 text-emerald/10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">{!! \App\Models\Category::iconPath($s['icon']) !!}</svg>
+                        <span class="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-emerald shadow-sm"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">{!! \App\Models\Category::iconPath($s['icon']) !!}</svg></span>
+                        <span class="relative text-xs font-semibold uppercase tracking-wide text-emerald">{{ $s['cat'] }}</span>
                     </div>
-                    <blockquote class="mt-4 flex-1 text-[15px] leading-relaxed text-ink/80">“{{ $s['quote'] }}”</blockquote>
-                    <figcaption class="mt-5 flex items-center justify-between border-t border-hair pt-4">
+                    <blockquote class="flex-1 px-7 pt-5 text-[15px] leading-relaxed text-ink/80">“{{ $s['quote'] }}”</blockquote>
+                    <figcaption class="mx-7 mb-7 mt-5 flex items-center justify-between border-t border-hair pt-4">
                         <span class="text-sm font-semibold text-ink">{{ $s['name'] }}</span>
                         <span class="text-right"><span class="block text-2xl font-extrabold gradient-text">{{ $s['stat'] }}</span><span class="block text-[11px] text-muted">{{ $s['statlabel'] }}</span></span>
                     </figcaption>
@@ -454,8 +507,9 @@
 </section>
 
 {{-- ============================================================ COMPARISON --}}
-<section class="border-y border-hair bg-[#fafafa] py-20 sm:py-28">
-    <div class="mx-auto max-w-4xl px-5 sm:px-6">
+<section class="relative overflow-hidden border-y border-hair bg-[#fafafa] py-20 sm:py-28">
+    {!! $pinMark('-right-20 -top-8 h-72 w-72 opacity-[0.05]', '0.05') !!}
+    <div class="relative z-10 mx-auto max-w-4xl px-5 sm:px-6">
         <div class="mx-auto max-w-2xl text-center reveal">
             <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald">The difference</h2>
             <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-balance">Everything the chains have, without becoming one.</p>
@@ -517,6 +571,7 @@
 {{-- ============================================================ STATS BAND --}}
 <section class="relative overflow-hidden bg-ink py-16 text-white">
     <div class="mesh" aria-hidden="true" style="opacity:.16"><i class="b1"></i><i class="b2"></i></div>
+    {!! $pinMark('left-[calc(50%-9rem)] -top-16 h-72 w-72 opacity-[0.07] blur-[1px]', '0.06') !!}
     <div class="relative z-10 mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
         <div class="grid gap-8 text-center sm:grid-cols-3">
             <div class="reveal"><div class="text-5xl font-extrabold tracking-tight"><span data-count="{{ $stats['businesses'] }}">{{ $stats['businesses'] }}</span></div><div class="mt-2 text-sm font-medium text-white/60">Independent shops</div></div>
@@ -542,8 +597,10 @@
 </section>
 
 {{-- ============================================================ FOUNDERS --}}
-<section id="founders" class="border-y border-hair bg-[#fafafa] py-20 sm:py-28">
-    <div class="mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
+<section id="founders" class="relative overflow-hidden border-y border-hair bg-[#fafafa] py-20 sm:py-28">
+    {!! $pinMark('-left-16 top-0 h-64 w-64 opacity-[0.05]', '0.05') !!}
+    {!! $pinMark('-right-16 -bottom-8 h-72 w-72 opacity-[0.04]', '-0.05') !!}
+    <div class="relative z-10 mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
         <div class="mx-auto max-w-2xl text-center reveal">
             <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald">The team</h2>
             <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Three founders who love their high street.</p>

@@ -276,7 +276,7 @@
                     </div>
                 </div>
             </div>
-            <a href="/business/login" class="whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold text-ink transition hover:bg-black/[0.05]">Business login</a>
+            <a href="/business/join" class="whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold text-ink transition hover:bg-black/[0.05]">Business login</a>
             <a href="/app" class="group inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald">
                 Launch app
                 <svg class="h-3.5 w-3.5 transition group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
@@ -338,7 +338,7 @@
                 @endforeach
             </div>
             <div class="mt-2 flex flex-col gap-2 border-t border-hair pt-3">
-                <a href="/business/login" class="rounded-full border border-hair px-4 py-2.5 text-center text-sm font-semibold text-ink">Business login</a>
+                <a href="/business/join" class="rounded-full border border-hair px-4 py-2.5 text-center text-sm font-semibold text-ink">Business login</a>
                 <a href="/app" class="rounded-full bg-ink px-4 py-2.5 text-center text-sm font-semibold text-white">Launch app</a>
                 <a href="/portal" class="flex items-center justify-center gap-1.5 rounded-full px-4 py-2.5 text-center text-sm font-medium text-muted">
                     <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
@@ -382,7 +382,7 @@
                 <ul class="mt-4 space-y-2.5 text-sm">
                     <li><a href="/for-business" class="text-ink/80 transition hover:text-emerald">For business</a></li>
                     <li><a href="/#pricing" class="text-ink/80 transition hover:text-emerald">Pricing</a></li>
-                    <li><a href="/business/login" class="text-ink/80 transition hover:text-emerald">Business login</a></li>
+                    <li><a href="/business/join" class="text-ink/80 transition hover:text-emerald">Business login</a></li>
                 </ul>
             </div>
             <div>
@@ -498,6 +498,28 @@
         });
       };
       window.addEventListener('scroll', onScroll, { passive: true });
+    }
+
+    // Viewport-local parallax for brand-pin watermarks: drift relative to each
+    // element's own position (not absolute scrollY), so they stay put per-section.
+    const pins = [...document.querySelectorAll('[data-pin-parallax]')];
+    if (pins.length && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      let pticking = false;
+      const movePins = () => {
+        if (pticking) return; pticking = true;
+        requestAnimationFrame(() => {
+          const vh = window.innerHeight;
+          pins.forEach((p) => {
+            const r = p.getBoundingClientRect();
+            const off = ((r.top + r.height / 2) - vh / 2) * parseFloat(p.dataset.pinParallax);
+            p.style.transform = `translate3d(0, ${off.toFixed(1)}px, 0)`;
+          });
+          pticking = false;
+        });
+      };
+      window.addEventListener('scroll', movePins, { passive: true });
+      window.addEventListener('resize', movePins, { passive: true });
+      movePins();
     }
 
     // Count-up stats

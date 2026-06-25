@@ -16,7 +16,7 @@
             locolie puts your shop in front of nearby shoppers hunting for independents, not chains. List free, post offers that bring real footfall through the door, and stay in touch by email, SMS and push. Only pay when you want more reach.
         </p>
         <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <a href="/business/login" class="inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-ink/10 transition hover:bg-emerald">
+            <a href="/business/join" class="inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-ink/10 transition hover:bg-emerald">
                 List my shop free
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
             </a>
@@ -67,7 +67,7 @@
                 <p class="mt-4 text-lg leading-relaxed text-white/70">
                     Stop renting reach from Facebook and Deliveroo. Bring your regulars back with your own email &amp; push offers, and keep that relationship for good.
                 </p>
-                <a href="/business/login" class="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-ink transition hover:bg-emerald hover:text-white">
+                <a href="/business/join" class="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-ink transition hover:bg-emerald hover:text-white">
                     Start building your list, free
                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
                 </a>
@@ -147,7 +147,7 @@
                         </li>
                     @endforeach
                 </ul>
-                <a href="/business/login" class="mt-8 inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald">
+                <a href="/business/join" class="mt-8 inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald">
                     Set up loyalty
                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
                 </a>
@@ -453,7 +453,7 @@
     <div class="mx-auto max-w-2xl px-5 sm:px-6">
         <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl text-balance">Put your shop on the map.</h2>
         <p class="mt-4 text-white/70">Join the independents already backing local on locolie in Newcastle NE1. Free to start.</p>
-        <a href="/business/login" class="mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-ink transition hover:bg-emerald hover:text-white">
+        <a href="/business/join" class="mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-ink transition hover:bg-emerald hover:text-white">
             List my shop free
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>

@@ -30,7 +30,7 @@
                     </li>
                 @endforeach
             </ul>
-            <a href="/business/login"
+            <a href="/business/join"
                class="mt-7 inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition
                       {{ $highlight ? 'bg-emerald text-white hover:bg-ink' : 'border border-hair text-ink hover:border-ink' }}">
                 {{ $key === 'free' ? 'List my shop free' : 'Choose '.$plan['label'] }}

@@ -42,8 +42,12 @@ Route::get('/app', [PortalController::class, 'mobile'])->name('app');
 Route::get('/m', fn (\Illuminate\Http\Request $r) => redirect('/app'.($r->getQueryString() ? '?'.$r->getQueryString() : '')));
 
 // ── Business self-serve CRM (email + password) ───────────────────────────────
-Route::get('/business/login', [BusinessPortalController::class, 'showLogin'])->name('business.login');
+// Retailer onboarding lives at /business/join (USPs + inline sign-in / sign-up).
+// /business/login is kept as a back-compat alias so existing links keep working.
+Route::get('/business/join', [BusinessPortalController::class, 'onboard'])->name('business.join');
+Route::get('/business/login', fn () => redirect()->route('business.join'))->name('business.login');
 Route::post('/business/login', [BusinessPortalController::class, 'login'])->middleware('throttle:5,1')->name('business.login.submit');
+Route::post('/business/register', [BusinessPortalController::class, 'register'])->middleware('throttle:5,1')->name('business.register.submit');
 Route::post('/business/logout', [BusinessPortalController::class, 'logout'])->name('business.logout');
 Route::middleware('auth:business')->group(function () {
     Route::get('/business', [BusinessPortalController::class, 'dashboard'])->name('business.dashboard');

@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Business;
 use App\Models\Campaign;
+use App\Models\ConsentLog;
 use App\Models\DeviceToken;
 use App\Models\PushSubscription;
 use App\Models\Redemption;
+use App\Models\Subscription;
 use App\Services\BillingService;
 use App\Services\Messaging\MessagingService;
 use App\Services\ReportingService;
@@ -21,21 +23,25 @@ use Illuminate\Validation\Rule;
  */
 class BusinessPortalController extends Controller
 {
-    public function showLogin()
+    /** Public retailer onboarding page: the USPs plus inline sign-in / sign-up. */
+    public function onboard()
     {
         if (Auth::guard('business')->check()) {
             return redirect()->route('business.dashboard');
         }
 
-        // A known demo account so the login can be shown live.
+        // A known demo account so the sign-in can be shown live.
         $demo = Business::where('owner_email', 'demo@locolie.test')->first();
 
-        return view('business.login', ['demo' => $demo]);
+        return view('business.join', [
+            'demo' => $demo,
+            'plans' => Business::PLANS,
+        ]);
     }
 
     public function login(Request $request)
     {
-        $data = $request->validate([
+        $data = $request->validateWithBag('login', [
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
         ]);
@@ -46,7 +52,45 @@ class BusinessPortalController extends Controller
             return redirect()->intended(route('business.dashboard'));
         }
 
-        return back()->withErrors(['email' => 'Those details don’t match a business account.'])->onlyInput('email');
+        return back()
+            ->withErrors(['email' => 'Those details don’t match a business account.'], 'login')
+            ->onlyInput('email');
+    }
+
+    /** Self-serve registration: spin up a free listing and sign the owner straight in. */
+    public function register(Request $request)
+    {
+        $data = $request->validateWithBag('register', [
+            'name' => ['required', 'string', 'max:120'],
+            'city' => ['required', 'string', 'max:80'],
+            'email' => ['required', 'email', 'max:160', Rule::unique('businesses', 'owner_email')],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'terms' => ['accepted'],
+        ]);
+
+        $business = Business::create([
+            'name' => $data['name'],
+            'city' => $data['city'],
+            'owner_email' => $data['email'],
+            'password' => $data['password'], // hashed via cast
+            'plan' => 'free',
+            'status' => 'active',
+            'onboarded' => false,
+        ]);
+
+        // Consent + default subscription preferences (mirrors the API signup).
+        ConsentLog::record('terms_accepted', $data['email'], [
+            'source' => 'business_self_serve',
+            'document_version' => config('legal.terms_version'),
+            'meta' => ['business_id' => $business->id],
+        ]);
+        Subscription::setTopic($data['email'], 'business_updates', true, ['source' => 'business_self_serve', 'ip_address' => $request->ip()]);
+
+        Auth::guard('business')->login($business);
+        $request->session()->regenerate();
+
+        return redirect()->route('business.dashboard')
+            ->with('status', 'Welcome to locolie. Your free listing is live — add your details to get found.');
     }
 
     public function logout(Request $request)
@@ -55,7 +99,7 @@ class BusinessPortalController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('business.login');
+        return redirect()->route('business.join');
     }
 
     public function dashboard()

@@ -219,6 +219,230 @@
     </div>
 </div>
 
+{{-- ============================ 20 STAMP EXPLORATIONS ============================ --}}
+@php
+    // One pin glyph for every stamp - the SAME silhouette as the wordmark's "o"s, so the
+    // logo and the trust-mark finally share a single geometry. Solid pin holds a tick.
+    $pinD  = 'M12 1.6C7.3 1.6 3.5 5.4 3.5 10.1c0 5.6 8.5 12.3 8.5 12.3s8.5-6.7 8.5-12.3C20.5 5.4 16.7 1.6 12 1.6Z';
+    $tickD = 'M8.4 10 11 12.6 15.7 7.2';
+
+    // pin+tick mark, centred at (cx,cy), $h tall in viewBox units.
+    $mark = function ($cx, $cy, $h, $pinC, $tickC, $sw = 2.05) use ($pinD, $tickD) {
+        $s = $h / 24;
+        $tx = round($cx - 12 * $s, 2);
+        $ty = round($cy - 12 * $s, 2);
+        return '<g transform="translate('.$tx.' '.$ty.') scale('.round($s, 4).')">'
+            .'<path d="'.$pinD.'" fill="'.$pinC.'"/>'
+            .'<path d="'.$tickD.'" fill="none" stroke="'.$tickC.'" stroke-width="'.$sw.'" stroke-linecap="round" stroke-linejoin="round"/>'
+            .'</g>';
+    };
+    // pin as a clean outline (for mono / etched marks).
+    $markLine = function ($cx, $cy, $h, $c, $sw = 1.6) use ($pinD, $tickD) {
+        $s = $h / 24;
+        $tx = round($cx - 12 * $s, 2);
+        $ty = round($cy - 12 * $s, 2);
+        return '<g transform="translate('.$tx.' '.$ty.') scale('.round($s, 4).')" fill="none" stroke="'.$c.'" stroke-width="'.$sw.'" stroke-linecap="round" stroke-linejoin="round">'
+            .'<path d="'.$pinD.'"/><path d="'.$tickD.'"/></g>';
+    };
+
+    $E = '#059669'; $D = '#0a0a0a'; $W = '#ffffff'; $M = '#6ee7b7'; $G = '#d97706';
+
+    // Each stamp: [name, note, card background class/style, svg].
+    $stamps = [];
+
+    // 01 Classic ring (refined current) ---------------------------------------
+    $stamps[] = ['Classic ring', 'Refined version of today\'s mark - thinner rings, tighter type.', 'bg-white',
+        '<svg viewBox="0 0 120 120" class="h-full w-full"><defs><path id="s1" d="M18 60a42 42 0 0 1 84 0" fill="none"/></defs>'
+        .'<circle cx="60" cy="60" r="55" fill="none" stroke="'.$E.'" stroke-width="1.4"/>'
+        .'<circle cx="60" cy="60" r="47" fill="none" stroke="'.$E.'" stroke-opacity=".3" stroke-width="1"/>'
+        .'<text font-family="Inter" font-size="8" font-weight="700" letter-spacing="2.4" fill="'.$D.'"><textPath href="#s1" startOffset="50%" text-anchor="middle">VERIFIED LOCAL</textPath></text>'
+        .$mark(60, 50, 32, $E, $W)
+        .'<text x="60" y="80" text-anchor="middle" font-family="Inter" font-size="14" font-weight="800" letter-spacing="-.5" fill="'.$D.'">locolie</text></svg>'];
+
+    // 02 Solid disc ----------------------------------------------------------
+    $stamps[] = ['Solid disc', 'Filled emerald coin, knockout mark. Boldest at small sizes.', 'bg-white',
+        '<svg viewBox="0 0 120 120" class="h-full w-full"><defs><path id="s2" d="M20 60a40 40 0 0 1 80 0" fill="none"/></defs>'
+        .'<circle cx="60" cy="60" r="55" fill="'.$E.'"/>'
+        .'<circle cx="60" cy="60" r="47" fill="none" stroke="'.$W.'" stroke-opacity=".4" stroke-width="1"/>'
+        .'<text font-family="Inter" font-size="8" font-weight="700" letter-spacing="2.4" fill="'.$W.'"><textPath href="#s2" startOffset="50%" text-anchor="middle">VERIFIED LOCAL</textPath></text>'
+        .$mark(60, 50, 32, $W, $E)
+        .'<text x="60" y="80" text-anchor="middle" font-family="Inter" font-size="14" font-weight="800" letter-spacing="-.5" fill="'.$W.'">locolie</text></svg>'];
+
+    // 03 Ink disc (current default) ------------------------------------------
+    $stamps[] = ['Ink disc', 'Black coin, emerald pin. The current default - premium, app-icon ready.', 'bg-white',
+        '<svg viewBox="0 0 120 120" class="h-full w-full"><defs><path id="s3" d="M20 60a40 40 0 0 1 80 0" fill="none"/></defs>'
+        .'<circle cx="60" cy="60" r="55" fill="'.$D.'"/>'
+        .'<circle cx="60" cy="60" r="47" fill="none" stroke="'.$W.'" stroke-opacity=".14" stroke-width="1"/>'
+        .'<text font-family="Inter" font-size="8" font-weight="700" letter-spacing="2.4" fill="'.$W.'"><textPath href="#s3" startOffset="50%" text-anchor="middle">VERIFIED LOCAL</textPath></text>'
+        .$mark(60, 50, 32, $E, $W)
+        .'<text x="60" y="80" text-anchor="middle" font-family="Inter" font-size="14" font-weight="800" letter-spacing="-.5" fill="'.$W.'">locolie</text></svg>'];
+
+    // 04 Rosette (award) -----------------------------------------------------
+        $ros = ''; for ($i = 0; $i < 24; $i++) { $a = deg2rad($i * 15); $rr = ($i % 2 === 0) ? 56 : 50; $ros .= round(60 + $rr * cos($a), 2).','.round(60 + $rr * sin($a), 2).' '; }
+    $stamps[] = ['Rosette', 'Scalloped award edge - "best of local" energy. Feels earned.', 'bg-white',
+        '<svg viewBox="0 0 120 120" class="h-full w-full">'
+        .'<polygon points="'.$ros.'" fill="'.$E.'"/>'
+        .'<circle cx="60" cy="60" r="44" fill="'.$W.'"/>'
+        .'<circle cx="60" cy="60" r="44" fill="none" stroke="'.$E.'" stroke-opacity=".25" stroke-width="1"/>'
+        .$mark(60, 54, 38, $E, $W)
+        .'<text x="60" y="84" text-anchor="middle" font-family="Inter" font-size="9" font-weight="800" letter-spacing="1" fill="'.$E.'">LOCAL</text></svg>'];
+
+    // 05 Sunburst ------------------------------------------------------------
+        $rays = ''; for ($i = 0; $i < 36; $i++) { $a = deg2rad($i * 10); $rays .= '<line x1="'.round(60 + 44 * cos($a), 2).'" y1="'.round(60 + 44 * sin($a), 2).'" x2="'.round(60 + 55 * cos($a), 2).'" y2="'.round(60 + 55 * sin($a), 2).'" stroke="'.$E.'" stroke-width="2.4" stroke-linecap="round"/>'; }
+    $stamps[] = ['Sunburst', 'Radiating rays - a stamp that pops off the page. Energetic.', 'bg-white',
+        '<svg viewBox="0 0 120 120" class="h-full w-full">'.$rays
+        .'<circle cx="60" cy="60" r="40" fill="'.$D.'"/>'
+        .$mark(60, 54, 34, $E, $W)
+        .'<text x="60" y="82" text-anchor="middle" font-family="Inter" font-size="8.5" font-weight="800" letter-spacing=".5" fill="'.$W.'">locolie</text></svg>'];
+
+    // 06 Hexagon -------------------------------------------------------------
+        $hex = ''; for ($i = 0; $i < 6; $i++) { $a = deg2rad(60 * $i - 90); $hex .= round(60 + 54 * cos($a), 2).','.round(60 + 54 * sin($a), 2).' '; }
+    $stamps[] = ['Hexagon', 'Geometric, techy, modern-software. Tiles and scales cleanly.', 'bg-white',
+        '<svg viewBox="0 0 120 120" class="h-full w-full"><polygon points="'.$hex.'" fill="none" stroke="'.$E.'" stroke-width="2.4" stroke-linejoin="round"/>'
+        .$mark(60, 52, 38, $E, $W)
+        .'<text x="60" y="84" text-anchor="middle" font-family="Inter" font-size="11" font-weight="800" letter-spacing="-.4" fill="'.$D.'">locolie</text></svg>'];
+
+    // 07 Shield --------------------------------------------------------------
+    $stamps[] = ['Shield', 'Protection + trust. Heritage badge, "officially backed".', 'bg-white',
+        '<svg viewBox="0 0 120 120" class="h-full w-full"><path d="M60 8 18 22v34c0 28 22 44 42 56 20-12 42-28 42-56V22Z" fill="'.$E.'"/>'
+        .'<path d="M60 8 18 22v34c0 28 22 44 42 56 20-12 42-28 42-56V22Z" fill="none" stroke="'.$D.'" stroke-opacity=".15" stroke-width="1.5"/>'
+        .$mark(60, 52, 40, $W, $E)
+        .'<text x="60" y="92" text-anchor="middle" font-family="Inter" font-size="10.5" font-weight="800" letter-spacing="-.3" fill="'.$W.'">locolie</text></svg>'];
+
+    // 08 Postage stamp -------------------------------------------------------
+        $perf = ''; $n = 11; for ($i = 0; $i <= $n; $i++) { $p = round(14 + $i * (92 / $n), 2); $perf .= '<circle cx="'.$p.'" cy="14" r="2.4" fill="#fff"/><circle cx="'.$p.'" cy="106" r="2.4" fill="#fff"/><circle cx="14" cy="'.$p.'" r="2.4" fill="#fff"/><circle cx="106" cy="'.$p.'" r="2.4" fill="#fff"/>'; }
+    $stamps[] = ['Postage stamp', 'Perforated edge - collectible, "limited" feel. Playful but premium.', 'bg-white',
+        '<svg viewBox="0 0 120 120" class="h-full w-full"><rect x="14" y="14" width="92" height="92" rx="3" fill="'.$E.'"/>'
+        .'<rect x="22" y="22" width="76" height="76" rx="2" fill="none" stroke="'.$W.'" stroke-opacity=".4" stroke-width="1"/>'
+        .$mark(60, 50, 34, $W, $E)
+        .'<text x="60" y="84" text-anchor="middle" font-family="Inter" font-size="12" font-weight="800" letter-spacing="-.4" fill="'.$W.'">locolie</text>'
+        .$perf.'</svg>'];
+
+    // 09 Rubber stamp (rough, rotated) ---------------------------------------
+    $stamps[] = ['Rubber stamp', 'Inky, hand-stamped, slightly off-kilter. Honest and indie.', 'bg-white',
+        '<svg viewBox="0 0 120 120" class="h-full w-full"><defs><path id="s9" d="M22 60a38 38 0 0 1 76 0" fill="none"/><path id="s9b" d="M24 60a36 36 0 0 0 72 0" fill="none"/></defs>'
+        .'<g transform="rotate(-7 60 60)" opacity=".92">'
+        .'<circle cx="60" cy="60" r="52" fill="none" stroke="'.$E.'" stroke-width="3.5"/>'
+        .'<circle cx="60" cy="60" r="44" fill="none" stroke="'.$E.'" stroke-width="1.4"/>'
+        .'<text font-family="Inter" font-size="8" font-weight="800" letter-spacing="3" fill="'.$E.'"><textPath href="#s9" startOffset="50%" text-anchor="middle">VERIFIED LOCAL</textPath></text>'
+        .'<text font-family="Inter" font-size="7" font-weight="700" letter-spacing="2" fill="'.$E.'"><textPath href="#s9b" startOffset="50%" text-anchor="middle">LOCOLIE</textPath></text>'
+        .$markLine(60, 58, 40, $E, 2.4).'</g></svg>'];
+
+    // 10 Postmark ------------------------------------------------------------
+    $stamps[] = ['Postmark', 'Date-stamp cancellation lines. Quietly official.', 'bg-white',
+        '<svg viewBox="0 0 120 120" class="h-full w-full"><defs><path id="s10" d="M24 60a36 36 0 0 1 72 0" fill="none"/><path id="s10b" d="M26 60a34 34 0 0 0 68 0" fill="none"/></defs>'
+        .'<circle cx="60" cy="60" r="50" fill="none" stroke="'.$D.'" stroke-width="2"/>'
+        .'<circle cx="60" cy="60" r="42" fill="none" stroke="'.$D.'" stroke-width="1"/>'
+        .'<text font-family="Inter" font-size="7" font-weight="700" letter-spacing="2.5" fill="'.$D.'"><textPath href="#s10" startOffset="50%" text-anchor="middle">LOCOLIE</textPath></text>'
+        .'<text font-family="Inter" font-size="6.5" font-weight="600" letter-spacing="2" fill="'.$D.'"><textPath href="#s10b" startOffset="50%" text-anchor="middle">VERIFIED LOCAL</textPath></text>'
+        .'<line x1="14" y1="54" x2="44" y2="54" stroke="'.$D.'" stroke-width="2"/><line x1="14" y1="60" x2="44" y2="60" stroke="'.$D.'" stroke-width="2"/><line x1="14" y1="66" x2="44" y2="66" stroke="'.$D.'" stroke-width="2"/>'
+        .'<line x1="76" y1="54" x2="106" y2="54" stroke="'.$D.'" stroke-width="2"/><line x1="76" y1="60" x2="106" y2="60" stroke="'.$D.'" stroke-width="2"/><line x1="76" y1="66" x2="106" y2="66" stroke="'.$D.'" stroke-width="2"/>'
+        .$mark(60, 60, 30, $E, $W).'</svg>'];
+
+    // 11 Banner ribbon -------------------------------------------------------
+    $stamps[] = ['Banner ribbon', 'Circle + ribbon to drop the town name in. Localisable.', 'bg-white',
+        '<svg viewBox="0 0 120 120" class="h-full w-full">'
+        .'<circle cx="60" cy="52" r="40" fill="'.$E.'"/>'
+        .$mark(60, 48, 36, $W, $E)
+        .'<path d="M16 84 H104 L96 104 H24 Z" fill="'.$D.'"/>'
+        .'<path d="M16 84 L8 96 L24 104 Z" fill="'.$D.'" opacity=".6"/><path d="M104 84 L112 96 L96 104 Z" fill="'.$D.'" opacity=".6"/>'
+        .'<text x="60" y="98" text-anchor="middle" font-family="Inter" font-size="9.5" font-weight="800" letter-spacing="1.5" fill="'.$W.'">LOCOLIE</text></svg>'];
+
+    // 12 Cog / notched -------------------------------------------------------
+        $cog = ''; for ($i = 0; $i < 48; $i++) { $a = deg2rad($i * 7.5); $rr = ($i % 2 === 0) ? 55 : 49; $cog .= round(60 + $rr * cos($a), 2).','.round(60 + $rr * sin($a), 2).' '; }
+    $stamps[] = ['Notched coin', 'Fine milled edge like a minted coin. Tactile, valuable.', 'bg-white',
+        '<svg viewBox="0 0 120 120" class="h-full w-full"><polygon points="'.$cog.'" fill="'.$D.'"/>'
+        .'<circle cx="60" cy="60" r="44" fill="none" stroke="'.$E.'" stroke-width="1.4"/>'
+        .$mark(60, 52, 34, $E, $W)
+        .'<text x="60" y="82" text-anchor="middle" font-family="Inter" font-size="9" font-weight="800" letter-spacing=".5" fill="'.$W.'">locolie</text></svg>'];
+
+    // 13 Octagon -------------------------------------------------------------
+        $oct = ''; for ($i = 0; $i < 8; $i++) { $a = deg2rad(45 * $i - 22.5); $oct .= round(60 + 54 * cos($a), 2).','.round(60 + 54 * sin($a), 2).' '; }
+    $stamps[] = ['Octagon', 'Confident, sign-like. Strong silhouette from across the street.', 'bg-white',
+        '<svg viewBox="0 0 120 120" class="h-full w-full"><polygon points="'.$oct.'" fill="'.$E.'"/>'
+        .'<polygon points="'.$oct.'" fill="none" stroke="'.$D.'" stroke-opacity=".12" stroke-width="6"/>'
+        .$mark(60, 52, 38, $W, $E)
+        .'<text x="60" y="86" text-anchor="middle" font-family="Inter" font-size="11" font-weight="800" letter-spacing="-.4" fill="'.$W.'">locolie</text></svg>'];
+
+    // 14 Medallion (bevelled rings) ------------------------------------------
+    $stamps[] = ['Medallion', 'Concentric bevels - a struck medal. Most "trophy" of the set.', 'bg-white',
+        '<svg viewBox="0 0 120 120" class="h-full w-full">'
+        .'<circle cx="60" cy="60" r="55" fill="'.$E.'"/>'
+        .'<circle cx="60" cy="60" r="49" fill="none" stroke="'.$D.'" stroke-opacity=".12" stroke-width="2"/>'
+        .'<circle cx="60" cy="60" r="42" fill="'.$D.'"/>'
+        .'<circle cx="60" cy="60" r="36" fill="none" stroke="'.$M.'" stroke-opacity=".5" stroke-width="1"/>'
+        .$mark(60, 54, 32, $E, $W)
+        .'<text x="60" y="82" text-anchor="middle" font-family="Inter" font-size="8.5" font-weight="800" letter-spacing=".5" fill="'.$W.'">locolie</text></svg>'];
+
+    // 15 Laurel --------------------------------------------------------------
+    $stamps[] = ['Laurel', 'Two laurel branches - classic "award winner". Warm, celebratory.', 'bg-white',
+        '<svg viewBox="0 0 120 120" class="h-full w-full">'
+        .'<g fill="none" stroke="'.$E.'" stroke-width="2.2" stroke-linecap="round">'
+        .'<path d="M40 98 C24 84 22 56 34 30"/><path d="M80 98 C96 84 98 56 86 30"/>'
+        .'<path d="M34 44l-9-3M33 54l-9-2M34 64l-8-1M37 74l-8 0M41 84l-7 2"/>'
+        .'<path d="M86 44l9-3M87 54l9-2M86 64l8-1M83 74l8 0M79 84l7 2"/></g>'
+        .$mark(60, 52, 38, $E, $W)
+        .'<text x="60" y="86" text-anchor="middle" font-family="Inter" font-size="10" font-weight="800" letter-spacing="-.3" fill="'.$D.'">locolie</text></svg>'];
+
+    // 16 Wax seal ------------------------------------------------------------
+        $wax = ''; for ($i = 0; $i < 40; $i++) { $a = deg2rad($i * 9); $rr = 50 + 4 * sin($i * 1.7) + 2 * cos($i * 0.9); $wax .= round(60 + $rr * cos($a), 2).','.round(60 + $rr * sin($a), 2).' '; }
+    $stamps[] = ['Wax seal', 'Pressed-wax blob, embossed pin. Crafted, ceremonial.', 'bg-white',
+        '<svg viewBox="0 0 120 120" class="h-full w-full"><polygon points="'.$wax.'" fill="'.$E.'"/>'
+        .'<polygon points="'.$wax.'" fill="none" stroke="'.$D.'" stroke-opacity=".1" stroke-width="3"/>'
+        .'<circle cx="60" cy="60" r="40" fill="none" stroke="#047857" stroke-width="1.5"/>'
+        .$markLine(60, 56, 38, '#065f46', 2.2)
+        .'<text x="60" y="88" text-anchor="middle" font-family="Inter" font-size="9" font-weight="800" letter-spacing=".5" fill="#065f46">locolie</text></svg>'];
+
+    // 17 Minimal lockup (no frame) -------------------------------------------
+    $stamps[] = ['Minimal lockup', 'No frame at all - mark + word. Cleanest, most "app".', 'bg-white',
+        '<svg viewBox="0 0 120 120" class="h-full w-full">'
+        .$mark(60, 44, 44, $E, $W)
+        .'<text x="60" y="92" text-anchor="middle" font-family="Inter" font-size="15" font-weight="800" letter-spacing="-.6" fill="'.$D.'">locolie</text>'
+        .'<text x="60" y="106" text-anchor="middle" font-family="Inter" font-size="7" font-weight="700" letter-spacing="3" fill="'.$E.'">VERIFIED LOCAL</text></svg>'];
+
+    // 18 Tag / label ---------------------------------------------------------
+    $stamps[] = ['Swing tag', 'A shop tag with a hole - retail-native, hangs anywhere.', 'bg-white',
+        '<svg viewBox="0 0 120 120" class="h-full w-full"><path d="M30 24 H92 a6 6 0 0 1 6 6 V90 a6 6 0 0 1-6 6 H30 a6 6 0 0 1-6-6 V46 Z" fill="'.$E.'" transform="rotate(-4 60 60)"/>'
+        .'<circle cx="40" cy="42" r="5" fill="'.$W.'" transform="rotate(-4 60 60)"/>'
+        .$mark(63, 56, 34, $W, $E)
+        .'<text x="62" y="88" text-anchor="middle" font-family="Inter" font-size="11" font-weight="800" letter-spacing="-.4" fill="'.$W.'" transform="rotate(-4 60 60)">locolie</text></svg>'];
+
+    // 19 Twin pins (ties to logo) --------------------------------------------
+    $stamps[] = ['Twin pins', 'The two-pin motif from the wordmark, ringed. Most on-brand.', 'bg-white',
+        '<svg viewBox="0 0 120 120" class="h-full w-full"><circle cx="60" cy="60" r="55" fill="none" stroke="'.$E.'" stroke-width="1.4"/>'
+        .'<circle cx="60" cy="60" r="47" fill="'.$E.'" fill-opacity=".06"/>'
+        .$mark(46, 54, 34, $E, $W).$mark(74, 54, 34, '#047857', $W)
+        .'<text x="60" y="86" text-anchor="middle" font-family="Inter" font-size="12" font-weight="800" letter-spacing="-.5" fill="'.$D.'">locolie</text></svg>'];
+
+    // 20 Mono / etched -------------------------------------------------------
+    $stamps[] = ['Mono etch', 'Single-weight outline for one-colour print, foil and laser etch.', 'bg-[#0a0a0a] text-white',
+        '<svg viewBox="0 0 120 120" class="h-full w-full"><defs><path id="s20" d="M20 60a40 40 0 0 1 80 0" fill="none"/></defs>'
+        .'<circle cx="60" cy="60" r="55" fill="none" stroke="'.$W.'" stroke-width="1.2"/>'
+        .'<circle cx="60" cy="60" r="48" fill="none" stroke="'.$W.'" stroke-opacity=".4" stroke-width="1"/>'
+        .'<text font-family="Inter" font-size="8" font-weight="700" letter-spacing="2.4" fill="'.$W.'"><textPath href="#s20" startOffset="50%" text-anchor="middle">VERIFIED LOCAL</textPath></text>'
+        .$markLine(60, 52, 32, $W, 1.6)
+        .'<text x="60" y="82" text-anchor="middle" font-family="Inter" font-size="13" font-weight="800" letter-spacing="-.5" fill="'.$W.'">locolie</text></svg>'];
+@endphp
+
+<h2 id="stamps" class="scroll-mt-24 text-xs font-semibold uppercase tracking-wider text-emerald-700 mt-12 mb-2">The stamp - 20 explorations</h2>
+<p class="text-slate-500 mb-5 max-w-2xl text-sm">The current seal is a bit flat, so here are twenty directions. <strong class="text-slate-700">Every one is built on the exact same map-pin glyph as the wordmark&rsquo;s &ldquo;o&rdquo;s</strong> - so whichever we pick, the logo and the stamp finally share one geometry. Pick a favourite and it becomes the canonical <code class="rounded bg-slate-100 px-1.5 py-0.5 text-[11px]">&lt;x-seal&gt;</code>.</p>
+<div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+    @foreach ($stamps as $i => $st)
+        <div class="rounded-2xl border {{ str_contains($st[2], '#0a0a0a') ? 'border-slate-800' : 'border-slate-200' }} {{ $st[2] }} p-5 shadow-sm flex flex-col items-center text-center">
+            <div class="h-28 w-28">{!! $st[3] !!}</div>
+            <div class="mt-3 flex items-center gap-1.5">
+                <span class="inline-flex h-4 w-4 items-center justify-center rounded-full bg-emerald-600 text-[9px] font-bold text-white">{{ $i + 1 }}</span>
+                <span class="text-sm font-bold {{ str_contains($st[2], '#0a0a0a') ? 'text-white' : 'text-slate-900' }}">{{ $st[0] }}</span>
+            </div>
+            <p class="mt-1 text-[11px] leading-snug {{ str_contains($st[2], '#0a0a0a') ? 'text-slate-400' : 'text-slate-500' }}">{{ $st[1] }}</p>
+        </div>
+    @endforeach
+</div>
+<div class="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-6">
+    <div class="font-semibold text-emerald-900">Recommendation</div>
+    <p class="text-sm text-emerald-900/80 mt-1">For the trust-mark, <strong>19 · Twin pins</strong> or <strong>01 · Classic ring</strong> tie most tightly to the wordmark. For the app icon and small sizes, <strong>02 · Solid disc</strong> / <strong>03 · Ink disc</strong> stay legible. Tell me the number and I&rsquo;ll wire it into <code class="rounded bg-emerald-100 px-1.5 py-0.5 text-[11px]">&lt;x-seal&gt;</code> everywhere (window decal, till card, footer).</p>
+</div>
+
 {{-- ============================ STYLE DIRECTIONS ============================ --}}
 <h2 id="styles" class="scroll-mt-24 text-xs font-semibold uppercase tracking-wider text-emerald-700 mt-12 mb-4">02 · App style directions</h2>
 <p class="text-slate-500 -mt-2 mb-5 max-w-2xl text-sm">Each direction is shown as a live &ldquo;offer card&rdquo; - what a deal would actually look like in the app.</p>
