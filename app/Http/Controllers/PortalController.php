@@ -123,6 +123,14 @@ class PortalController extends Controller
                     'images' => count($bizDir),
                 ],
             ],
+            'gsc' => [
+                'tags' => \App\Support\Seo::storedTags(),
+                'files' => \App\Support\Seo::htmlFiles(),
+                'verified' => count(\App\Support\Seo::verificationTags()) > 0 || count(\App\Support\Seo::htmlFiles()) > 0,
+                'home_url' => url('/'),
+                'sitemap_url' => url('/sitemap.xml'),
+                'robots_url' => url('/robots.txt'),
+            ],
         ]);
     }
 

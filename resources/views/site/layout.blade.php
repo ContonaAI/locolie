@@ -99,6 +99,10 @@
         body { top: 0 !important; }
         .skiptranslate iframe { display: none !important; }
     </style>
+    {{-- Google Search Console ownership verification (managed in admin Settings). --}}
+    @foreach (\App\Support\Seo::verificationTags() as $gscToken)
+        <meta name="google-site-verification" content="{{ $gscToken }}">
+    @endforeach
     @stack('head')
 </head>
 <body class="antialiased text-ink">

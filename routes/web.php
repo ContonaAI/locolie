@@ -28,6 +28,11 @@ Route::get('/preferences', [SubscriptionController::class, 'preferences'])->name
 Route::post('/preferences', [SubscriptionController::class, 'update'])->name('subscriptions.update');
 Route::match(['get', 'post'], '/unsubscribe', [SubscriptionController::class, 'unsubscribe'])->name('subscriptions.unsubscribe');
 
+// ── Google Search Console: serve the googleXXXX.html ownership file ──────────
+Route::get('/{gscfile}', [\App\Http\Controllers\SearchConsoleController::class, 'file'])
+    ->where('gscfile', 'google[A-Za-z0-9_]+\.html')
+    ->name('gsc.file');
+
 // ── SEO: robots + sitemap ────────────────────────────────────────────────────
 Route::get('/robots.txt', fn () => response("User-agent: *\nAllow: /\nDisallow: /portal\nDisallow: /admin\nDisallow: /business\nSitemap: ".url('/sitemap.xml')."\n", 200, ['Content-Type' => 'text/plain']));
 Route::get('/sitemap.xml', function () {
@@ -136,6 +141,9 @@ Route::middleware('portal')->group(function () {
 
     // Go-live / integration setup status
     Route::get('/setup', [\App\Http\Controllers\SetupController::class, 'index'])->name('portal.setup');
+
+    // Google Search Console verification settings
+    Route::post('/admin/search-console', [\App\Http\Controllers\SearchConsoleController::class, 'save'])->name('admin.search-console');
 
     // Admin CRM
     Route::get('/admin', [PortalController::class, 'admin'])->name('portal.admin');
