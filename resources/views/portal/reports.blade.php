@@ -63,6 +63,9 @@
             <div class="flex items-center gap-2 mb-3">
                 <span class="w-2.5 h-2.5 rounded-full" style="background: {{ $ch['color'] }}"></span>
                 <span class="font-bold text-slate-900">{{ $ch['label'] }}</span>
+                <span class="ml-auto px-2 py-0.5 rounded-full text-[10px] font-bold {{ ($ch['measured'] ?? false) ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">
+                    {{ ($ch['measured'] ?? false) ? 'Measured' : 'Estimated' }}
+                </span>
             </div>
             <div class="text-3xl font-extrabold text-slate-900">{{ number_format($ch['sent']) }}</div>
             <div class="text-xs text-slate-400 mb-3">messages sent across {{ $ch['campaigns'] }} campaign{{ $ch['campaigns'] === 1 ? '' : 's' }}</div>
@@ -73,7 +76,11 @@
         </div>
     @endforeach
 </div>
-<p class="text-xs text-slate-400 mb-8">Engagement figures are indicative industry benchmarks until live open/click tracking is connected. Money figures are estimates based on offer value.</p>
+@php $anyMeasured = collect($report['channels'])->contains(fn ($c) => $c['measured'] ?? false); @endphp
+<p class="text-xs text-slate-400 mb-8">
+    @if ($anyMeasured)Channels marked "Measured" use real open/click tracking; "Estimated" ones use industry benchmarks until they have tracked sends.@else Engagement figures are indicative industry benchmarks until live open/click tracking is connected.@endif
+    Money figures are estimates based on offer value.
+</p>
 
 {{-- Shopper-facing report preview --}}
 <div class="rounded-2xl border border-emerald-200 bg-emerald-50/50 p-5 mb-8 flex flex-wrap items-center justify-between gap-3">

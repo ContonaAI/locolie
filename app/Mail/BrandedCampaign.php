@@ -7,6 +7,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Queue\SerializesModels;
 
 /**
@@ -20,8 +21,8 @@ class BrandedCampaign extends Mailable
     use Queueable, SerializesModels;
 
     /**
-     * @param  array  $preview     normalised email data (subject, body_html, brand_color, ...)
-     * @param  array  $recipient   ['email' => ..., 'name' => ...]
+     * @param  array  $preview  normalised email data (subject, body_html, brand_color, ...)
+     * @param  array  $recipient  ['email' => ..., 'name' => ...]
      */
     public function __construct(
         public array $preview,
@@ -39,6 +40,18 @@ class BrandedCampaign extends Mailable
             replyTo: filled($replyTo) ? [new Address($replyTo, $fromName)] : [],
             subject: $this->preview['subject'] ?? 'A message from locolie',
         );
+    }
+
+    /** RFC 8058 one-click unsubscribe so inbox providers show a native control. */
+    public function headers(): Headers
+    {
+        $text = [];
+        if (filled($this->preview['unsubscribe_url'] ?? null)) {
+            $text['List-Unsubscribe'] = '<'.$this->preview['unsubscribe_url'].'>';
+            $text['List-Unsubscribe-Post'] = 'List-Unsubscribe=One-Click';
+        }
+
+        return new Headers(text: $text);
     }
 
     public function content(): Content

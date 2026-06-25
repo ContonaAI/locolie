@@ -57,12 +57,24 @@ Route::middleware('auth:business')->group(function () {
     Route::get('/business/reports', [BusinessPortalController::class, 'reports'])->name('business.reports');
     Route::get('/business/reports.csv', [BusinessPortalController::class, 'reportsExport'])->name('business.reports.export');
 
+    // Loyalty scheme: customisable rules engine the retailer configures.
+    Route::get('/business/loyalty', [\App\Http\Controllers\Business\LoyaltyController::class, 'index'])->name('business.loyalty');
+    Route::post('/business/loyalty', [\App\Http\Controllers\Business\LoyaltyController::class, 'saveProgram'])->name('business.loyalty.save');
+    Route::post('/business/loyalty/rules', [\App\Http\Controllers\Business\LoyaltyController::class, 'storeRule'])->name('business.loyalty.rules.store');
+    Route::post('/business/loyalty/rules/{rule}/toggle', [\App\Http\Controllers\Business\LoyaltyController::class, 'toggleRule'])->name('business.loyalty.rules.toggle');
+    Route::delete('/business/loyalty/rules/{rule}', [\App\Http\Controllers\Business\LoyaltyController::class, 'destroyRule'])->name('business.loyalty.rules.destroy');
+    Route::post('/business/loyalty/rewards/{reward}/redeem', [\App\Http\Controllers\Business\LoyaltyController::class, 'redeemReward'])->name('business.loyalty.rewards.redeem');
+
     // Retailer self-serve messaging: brand + send email/SMS/push to own customers
     Route::get('/business/messaging', [BusinessPortalController::class, 'messaging'])->name('business.messaging');
     Route::post('/business/brand', [BusinessPortalController::class, 'saveBrand'])->name('business.brand');
     Route::post('/business/messaging/preview', [BusinessPortalController::class, 'messagingPreview'])->name('business.messaging.preview');
     Route::post('/business/messaging/send', [BusinessPortalController::class, 'messagingSend'])->name('business.messaging.send');
 });
+
+// ── Email open + click tracking (encrypted tokens, public) ───────────────────
+Route::get('/e/open', [\App\Http\Controllers\TrackingController::class, 'open'])->name('track.open');
+Route::get('/e/click', [\App\Http\Controllers\TrackingController::class, 'click'])->name('track.click');
 
 // ── Customer-facing report ("Your locolie" - savings & impact) ───────────────
 Route::get('/my-locolie', [\App\Http\Controllers\CustomerReportController::class, 'entry'])->name('customer.report.entry');
@@ -92,6 +104,9 @@ Route::middleware('portal')->group(function () {
 
     // Platform reporting (team)
     Route::get('/reports', [\App\Http\Controllers\ReportsController::class, 'platform'])->name('portal.reports');
+
+    // Go-live / integration setup status
+    Route::get('/setup', [\App\Http\Controllers\SetupController::class, 'index'])->name('portal.setup');
 
     // Admin CRM
     Route::get('/admin', [PortalController::class, 'admin'])->name('portal.admin');

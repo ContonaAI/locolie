@@ -2,8 +2,10 @@
 
 namespace App\Services\Messaging;
 
+use App\Http\Controllers\TrackingController;
 use App\Mail\BrandedCampaign;
 use App\Models\Business;
+use App\Models\Subscription;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -126,11 +128,15 @@ class EmailChannel extends BaseChannel
 
         // --- Live path: actually deliver via the BrandedCampaign mailable ---
         $provider = $this->activeProvider() ?? $this->inferredProvider();
+        $campaignId = $message['_campaign_id'] ?? null;
+        $topic = $message['_topic'] ?? 'offers';
 
         try {
             $sent = 0;
             foreach ($list as $recipient) {
-                $mailable = new BrandedCampaign($preview, $recipient);
+                // Per-recipient copy carrying tracking + a signed unsubscribe link.
+                $recipientPreview = $this->withTracking($preview, $recipient['email'], $campaignId, $topic);
+                $mailable = new BrandedCampaign($recipientPreview, $recipient);
 
                 if ($mailer = $this->mailerFor($provider)) {
                     Mail::mailer($mailer)->to($recipient['email'], $recipient['name'] ?? null)->send($mailable);
@@ -146,6 +152,32 @@ class EmailChannel extends BaseChannel
 
             return SendResult::failed('Email send failed: '.$e->getMessage(), $provider);
         }
+    }
+
+    /**
+     * Add per-recipient tracking + a signed unsubscribe/preferences link to a
+     * copy of the brand preview. The open pixel and click-wrapped CTA only apply
+     * when we have a campaign id to attribute them to.
+     */
+    protected function withTracking(array $preview, string $email, ?int $campaignId, string $topic): array
+    {
+        $preview['topic'] = $topic; // drives the legal footer partial's unsubscribe link
+        $preview['unsubscribe_url'] = Subscription::unsubscribeUrl($email, $topic);
+        $preview['preferences_url'] = Subscription::preferencesUrl($email);
+
+        if ($campaignId) {
+            $preview['open_pixel_url'] = route('track.open', [
+                't' => TrackingController::token($campaignId, $email),
+            ]);
+
+            if (filled($preview['cta_url'] ?? '')) {
+                $preview['cta_url'] = route('track.click', [
+                    't' => TrackingController::token($campaignId, $email, $preview['cta_url']),
+                ]);
+            }
+        }
+
+        return $preview;
     }
 
     /** Best-guess provider slug when none is explicitly connected. */

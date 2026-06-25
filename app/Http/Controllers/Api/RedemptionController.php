@@ -69,16 +69,23 @@ class RedemptionController extends Controller
         $data = $request->validate([
             'secret' => ['required', 'string'],
             'code' => ['required', 'string', 'size:6'],
+            'spend' => ['nullable', 'numeric', 'min:0', 'max:100000'], // optional £ spent, for spend-based loyalty
         ]);
 
         $business = Business::where('owner_secret', $data['secret'])->firstOr(fn () => abort(403, 'Invalid business key.'));
 
-        $result = $this->service->verify($business, $data['code']);
+        $spendPence = (int) round((float) ($data['spend'] ?? 0) * 100);
+        $result = $this->service->verify($business, $data['code'], $spendPence);
+
+        // Surface any loyalty rewards the customer just unlocked, so the till can read them out.
+        $earned = collect($result['loyalty']['earned'] ?? [])
+            ->map(fn ($r) => ['code' => $r->code, 'label' => $r->label])->values();
 
         return response()->json([
             'ok' => $result['ok'],
             'message' => $result['message'],
             'offer' => $result['redemption']?->offer?->title,
+            'loyalty_earned' => $earned,
         ], $result['ok'] ? 200 : 422);
     }
 

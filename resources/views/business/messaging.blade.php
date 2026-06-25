@@ -107,6 +107,16 @@
                     </div>
                 </template>
 
+                {{-- Optional schedule --}}
+                <div x-data="{ later: false }" class="rounded-lg border border-slate-200 bg-slate-50/60 px-3 py-2.5">
+                    <label class="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+                        <input type="checkbox" x-model="later" class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
+                        Schedule for later
+                    </label>
+                    <input x-show="later" x-cloak type="datetime-local" name="scheduled_at"
+                           class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                </div>
+
                 <div class="flex items-center justify-between gap-3 pt-1">
                     <p class="text-xs text-slate-500">Sends to <span class="font-bold text-slate-700" x-text="audienceCount()"></span> <span x-text="audienceLabel()"></span>.</p>
                     <button class="rounded-xl bg-emerald-600 text-white font-bold px-5 py-2.5 hover:bg-emerald-700 text-sm">Send <span x-text="channelLabel().toLowerCase()"></span></button>

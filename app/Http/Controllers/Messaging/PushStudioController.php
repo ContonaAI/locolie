@@ -74,9 +74,11 @@ class PushStudioController extends Controller
         ]);
 
         $brand = $this->resolveBrand($request);
-        $result = $this->messaging->dispatch('push', $this->message($request), [], $brand);
+        $result = $this->messaging->dispatch('push', $this->message($request), [], $brand, [
+            'scheduled_at' => $request->input('scheduled_at'),
+        ]);
 
-        return back()->with('status', "Push sent to {$result->sent} device(s)/browser(s) ({$result->status}).");
+        return back()->with('status', "Push broadcast: {$result->note}");
     }
 
     /** Pull the compose payload off the request into the channel message shape. */

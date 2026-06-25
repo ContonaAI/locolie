@@ -201,13 +201,14 @@
                             <div class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">messages sent</div>
                         </div>
                         <div class="grid grid-cols-2 gap-3 mt-4 text-sm">
+                            @php $m = $c['measured'] ?? false; @endphp
                             <div>
                                 <div class="font-bold text-slate-800">{{ number_format($c['est_opens']) }}</div>
-                                <div class="text-xs text-slate-400">est. opens · {{ $c['open_rate'] }}%</div>
+                                <div class="text-xs text-slate-400">{{ $m ? '' : 'est. ' }}opens · {{ $c['open_rate'] }}%</div>
                             </div>
                             <div>
                                 <div class="font-bold text-slate-800">{{ number_format($c['est_clicks']) }}</div>
-                                <div class="text-xs text-slate-400">est. clicks · {{ $c['click_rate'] }}%</div>
+                                <div class="text-xs text-slate-400">{{ $m ? '' : 'est. ' }}clicks · {{ $c['click_rate'] }}%</div>
                             </div>
                         </div>
                     @else
@@ -216,7 +217,8 @@
                 </div>
             @endforeach
         </div>
-        <p class="text-[11px] text-slate-400 mt-3">Open and click figures are indicative benchmarks until live tracking is connected - they are not measured yet.</p>
+        @php $anyMeasured = collect($report['channels'])->contains(fn ($c) => $c['measured'] ?? false); @endphp
+        <p class="text-[11px] text-slate-400 mt-3">{{ $anyMeasured ? 'Email open and click figures are measured from real tracking. SMS and push use indicative benchmarks until their tracking is connected.' : 'Open and click figures are indicative benchmarks until live tracking is connected - they are not measured yet.' }}</p>
     </div>
 
     {{-- 6. Top offers --}}

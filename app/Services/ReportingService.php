@@ -145,25 +145,38 @@ class ReportingService
         })->sortByDesc('redemptions')->take(8)->values()->all();
     }
 
-    /** Per-channel message stats from the campaign log. */
+    /**
+     * Per-channel message stats from the campaign log. Uses MEASURED opens/clicks
+     * (from email tracking) when any exist; otherwise falls back to clearly
+     * labelled industry benchmarks. The 'measured' flag lets the UI say which.
+     */
     protected function channelStats(Collection $campaigns): array
     {
         $out = [];
         foreach (self::CHANNELS as $key => $meta) {
             $rows = $campaigns->where('channel', $key);
             $sent = (int) $rows->sum('sent_count');
-            // Modelled engagement benchmarks (clearly indicative, not measured yet).
-            $openRate = ['email' => 0.42, 'sms' => 0.94, 'push' => 0.61][$key];
-            $clickRate = ['email' => 0.11, 'sms' => 0.19, 'push' => 0.14][$key];
+            $realOpens = (int) $rows->sum('opens');
+            $realClicks = (int) $rows->sum('clicks');
+            $measured = $realOpens > 0 || $realClicks > 0;
+
+            // Benchmarks used only until real tracking data exists.
+            $openBench = ['email' => 0.42, 'sms' => 0.94, 'push' => 0.61][$key];
+            $clickBench = ['email' => 0.11, 'sms' => 0.19, 'push' => 0.14][$key];
+
+            $opens = $measured ? $realOpens : (int) round($sent * $openBench);
+            $clicks = $measured ? $realClicks : (int) round($sent * $clickBench);
+
             $out[$key] = [
                 'label' => $meta['label'],
                 'color' => $meta['color'],
                 'campaigns' => $rows->count(),
                 'sent' => $sent,
-                'est_opens' => (int) round($sent * $openRate),
-                'est_clicks' => (int) round($sent * $clickRate),
-                'open_rate' => (int) round($openRate * 100),
-                'click_rate' => (int) round($clickRate * 100),
+                'measured' => $measured,
+                'est_opens' => $opens,
+                'est_clicks' => $clicks,
+                'open_rate' => $sent ? (int) round($opens / $sent * 100) : (int) round($openBench * 100),
+                'click_rate' => $sent ? (int) round($clicks / $sent * 100) : (int) round($clickBench * 100),
             ];
         }
 

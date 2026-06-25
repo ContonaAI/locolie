@@ -26,6 +26,33 @@
         ::selection { background: rgba(5,150,105,.18); }
         .mono { font-family: 'JetBrains Mono', monospace; }
         [x-cloak] { display:none !important; }
+
+        /* Animated map-pin "o"s in the locolie wordmark */
+        .gl-logo .gl-pin {
+            transform-origin: 50% 92%;
+            animation: gl-pin-bob 3.2s ease-in-out infinite;
+            will-change: transform;
+            filter: drop-shadow(0 1px 2px rgba(5,150,105,.35));
+            transition: filter .25s ease;
+        }
+        .gl-logo .gl-pin:nth-of-type(2) { animation-delay: .55s; }
+        .gl-logo:hover .gl-pin { animation: gl-pin-hop .6s ease-in-out; }
+        .gl-logo:hover .gl-pin:nth-of-type(2) { animation-delay: .08s; }
+        .gl-logo:hover .gl-pin { filter: drop-shadow(0 3px 5px rgba(5,150,105,.5)); }
+        @keyframes gl-pin-bob {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            45%      { transform: translateY(-0.16em) rotate(-4deg); }
+            70%      { transform: translateY(-0.03em) rotate(2deg); }
+        }
+        @keyframes gl-pin-hop {
+            0%   { transform: translateY(0) scale(1); }
+            35%  { transform: translateY(-0.32em) scale(1.06); }
+            65%  { transform: translateY(0.02em) scale(.97); }
+            100% { transform: translateY(0) scale(1); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .gl-logo .gl-pin, .gl-logo:hover .gl-pin { animation: none; }
+        }
     </style>
     @stack('head')
 </head>
@@ -45,6 +72,7 @@
             ['route' => 'portal.admin', 'label' => 'Admin'],
             ['route' => 'messaging.studio', 'label' => 'Messaging'],
             ['route' => 'portal.reports', 'label' => 'Reports'],
+            ['route' => 'portal.setup', 'label' => 'Setup'],
             ['route' => 'portal.settings', 'label' => 'Settings'],
             ['route' => 'portal.mockups', 'label' => 'Mockups'],
             ['route' => 'portal.ideas', 'label' => 'Ideas'],
@@ -53,8 +81,8 @@
     @endphp
     <header class="gl-glass border-b border-white/60 shadow-[0_1px_0_rgba(0,0,0,.02)] sticky top-0 z-30" x-data="{ mobile:false, design:false }">
         <div class="mx-auto w-full max-w-[1400px] px-4 sm:px-6 h-16 flex items-center gap-3">
-            @php $ppin = '<svg style="height:0.78em;width:auto;display:inline-block;vertical-align:-0.04em;margin:0 -0.01em" viewBox="0 0 24 24" fill="#059669" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1.6C7.3 1.6 3.5 5.4 3.5 10.1c0 5.6 8.5 12.3 8.5 12.3s8.5-6.7 8.5-12.3C20.5 5.4 16.7 1.6 12 1.6Zm0 5.9a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4Z"/></svg>'; @endphp
-            <a href="{{ route('portal.home') }}" class="font-extrabold lowercase text-lg tracking-tight text-slate-900 shrink-0 inline-flex items-center">l{!! $ppin !!}c{!! $ppin !!}lie</a>
+            @php $ppin = '<svg class="gl-pin" style="height:0.78em;width:auto;display:inline-block;vertical-align:-0.04em;margin:0 -0.01em" viewBox="0 0 24 24" fill="#059669" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1.6C7.3 1.6 3.5 5.4 3.5 10.1c0 5.6 8.5 12.3 8.5 12.3s8.5-6.7 8.5-12.3C20.5 5.4 16.7 1.6 12 1.6Zm0 5.9a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4Z"/></svg>'; @endphp
+            <a href="{{ route('portal.home') }}" class="gl-logo font-extrabold lowercase text-lg tracking-tight text-slate-900 shrink-0 inline-flex items-center">l{!! $ppin !!}c{!! $ppin !!}lie</a>
 
             {{-- Desktop nav --}}
             <nav class="hidden md:flex items-center gap-1 text-sm flex-1">

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Business;
+use App\Models\Campaign;
 use App\Models\DeviceToken;
 use App\Models\MessageTemplate;
 use App\Models\PushSubscription;
@@ -23,6 +24,7 @@ class MessagingDemoSeeder extends Seeder
         $this->seedPushDevices();
         $this->seedBrandColours();
         $this->seedTemplates();
+        $this->seedEngagement();
 
         $this->command?->info('Messaging demo data seeded.');
     }
@@ -75,6 +77,22 @@ class MessagingDemoSeeder extends Seeder
         $palette = ['#059669', '#2563eb', '#db2777', '#d97706', '#7c3aed', '#dc2626', '#0891b2', '#ca8a04'];
         foreach (Business::where('onboarded', true)->whereNull('brand_color')->get() as $b) {
             $b->update(['brand_color' => $palette[$b->id % count($palette)]]);
+        }
+    }
+
+    /** Give sent email campaigns realistic measured opens/clicks for the demo. */
+    protected function seedEngagement(): void
+    {
+        $campaigns = Campaign::where('channel', 'email')
+            ->where('sent_count', '>', 0)
+            ->where('opens', 0)
+            ->get();
+
+        foreach ($campaigns as $c) {
+            // ~45% open, ~12% click - deterministic from the id so reruns are stable.
+            $opens = (int) round($c->sent_count * (0.40 + ($c->id % 10) / 100));
+            $clicks = (int) round($opens * 0.28);
+            $c->update(['opens' => $opens, 'clicks' => $clicks]);
         }
     }
 

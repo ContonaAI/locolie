@@ -126,6 +126,67 @@
     </div>
 </section>
 
+{{-- ============================================================ LOYALTY --}}
+<section class="border-t border-hair bg-[#fafafa] py-20 sm:py-28">
+    <div class="mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">
+        <div class="grid gap-12 lg:grid-cols-2 lg:items-center">
+            <div class="reveal">
+                <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald">Loyalty, built in</h2>
+                <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-balance">Turn first-timers into regulars.</p>
+                <p class="mt-4 text-lg text-muted">Set your own rules and locolie does the counting. No plastic stamp cards, no extra app - every code you verify at the till moves that customer closer to a reward, automatically.</p>
+                <ul class="mt-6 space-y-3 text-sm">
+                    @foreach ([
+                        'Your rules: "scan 5 times, get one free" or "spend £50, unlock 10% off"',
+                        'Counts itself - a visit lands every time you verify a code',
+                        'Shoppers watch their progress fill up in the app',
+                        'Rewards arrive as a code you scan to redeem in store',
+                    ] as $point)
+                        <li class="flex items-start gap-3">
+                            <svg class="mt-0.5 h-5 w-5 shrink-0 text-emerald" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                            <span class="text-ink/80">{{ $point }}</span>
+                        </li>
+                    @endforeach
+                </ul>
+                <a href="/business/login" class="mt-8 inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald">
+                    Set up loyalty
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </a>
+            </div>
+            <div class="reveal space-y-4">
+                {{-- Example: stamp card --}}
+                <div class="rounded-card border border-hair bg-white p-6 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-xs font-semibold uppercase tracking-wider text-emerald">Coffee Club</div>
+                            <div class="mt-1 font-bold text-ink">Buy 5, get 1 free</div>
+                        </div>
+                        <span class="rounded-full bg-emerald-soft px-3 py-1 text-xs font-bold text-emerald">3 / 5</span>
+                    </div>
+                    <div class="mt-4 flex gap-2">
+                        @for ($i = 1; $i <= 5; $i++)
+                            <span class="flex h-9 flex-1 items-center justify-center rounded-lg {{ $i <= 3 ? 'bg-emerald text-white' : 'border border-dashed border-hair text-hair' }}">
+                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
+                            </span>
+                        @endfor
+                    </div>
+                    <p class="mt-3 text-xs text-muted">2 more visits for a free coffee.</p>
+                </div>
+                {{-- Example: spend target --}}
+                <div class="rounded-card border border-hair bg-white p-6 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div class="font-bold text-ink">Spend £50, unlock 10% off</div>
+                        <span class="rounded-full bg-emerald-soft px-3 py-1 text-xs font-bold text-emerald">£32 / £50</span>
+                    </div>
+                    <div class="mt-4 h-2.5 w-full overflow-hidden rounded-full bg-[#eef1f4]">
+                        <div class="h-full rounded-full bg-emerald" style="width:64%"></div>
+                    </div>
+                    <p class="mt-3 text-xs text-muted">£18 more to unlock the reward.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 {{-- ============================================================ REPLACE YOUR STACK --}}
 <section class="border-t border-hair py-20 sm:py-28">
     <div class="mx-auto max-w-7xl 2xl:max-w-[1500px] px-5 sm:px-6">

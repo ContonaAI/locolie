@@ -9,8 +9,8 @@ use App\Models\Redemption;
 use App\Services\Messaging\MessagingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 /**
  * Email vertical of the Messaging Studio: compose, live preview, test send and
@@ -101,11 +101,17 @@ class EmailStudioController extends Controller
             return back()->with('status', 'No opted-in recipients found for that audience yet - nothing sent.');
         }
 
-        $result = $this->messaging->dispatch('email', $data, $recipients->all(), $brand);
+        // Shopper sends use the 'offers' topic; business-owner (platform) sends
+        // use 'business_updates', so consent + unsubscribe map to the right topic.
+        $options = array_filter([
+            'topic' => $brand ? null : 'business_updates',
+            'scheduled_at' => $request->input('scheduled_at'),
+        ]);
+        $result = $this->messaging->dispatch('email', $data, $recipients->all(), $brand, $options);
 
         $scope = $brand ? "{$brand->name} customers" : 'the platform audience';
 
-        return back()->with('status', "Email sent to {$result->sent} recipient(s) across {$scope} ({$result->status}).");
+        return back()->with('status', "Email to {$scope}: {$result->note}");
     }
 
     /**
@@ -151,15 +157,37 @@ class EmailStudioController extends Controller
 
         try {
             $code = $request->input('code');
-            $account = config('services.google.gmail_from') ?: 'connected@gmail.com';
+            $clientId = config('services.google.gmail_client_id');
+            $clientSecret = config('services.google.gmail_client_secret');
 
-            $this->messaging->connect('email', 'google', [
-                'account' => $account,
-                'code' => $code ? Str::limit($code, 6, '••••') : null,
-            ], 'Google Workspace');
+            // Real token exchange when OAuth credentials are configured.
+            if ($code && filled($clientId) && filled($clientSecret)) {
+                $resp = Http::asForm()->post('https://oauth2.googleapis.com/token', [
+                    'code' => $code,
+                    'client_id' => $clientId,
+                    'client_secret' => $clientSecret,
+                    'redirect_uri' => route('messaging.email.google.callback'),
+                    'grant_type' => 'authorization_code',
+                ]);
+
+                if ($resp->successful() && $refresh = $resp->json('refresh_token')) {
+                    // The refresh token is the long-lived secret. We never persist
+                    // secrets to the DB; log it once (server-side) so the operator
+                    // can paste it into .env as GOOGLE_GMAIL_REFRESH_TOKEN.
+                    Log::info('[email] Gmail refresh token obtained - add to .env as GOOGLE_GMAIL_REFRESH_TOKEN', ['refresh_token' => $refresh]);
+                    $account = config('services.google.gmail_from') ?: 'your Gmail account';
+                    $this->messaging->connect('email', 'google', ['account' => $account], 'Google Workspace');
+
+                    return redirect()->route('messaging.email')->with('status',
+                        'Google authorised. The refresh token has been written to the application log - add it to .env as GOOGLE_GMAIL_REFRESH_TOKEN to send live.');
+                }
+            }
+
+            // No real exchange possible (missing keys) - demo connect.
+            $this->messaging->connect('email', 'google', ['account' => 'demo@locolie.com'], 'Google Workspace (demo)');
 
             return redirect()->route('messaging.email')->with('status',
-                "Connected to Google as {$account}. Emails now route through Gmail.");
+                'Connected to Google (demo) - add OAuth keys to .env to complete live Gmail sending.');
         } catch (\Throwable $e) {
             Log::warning('[email] google callback degraded to demo', ['error' => $e->getMessage()]);
 

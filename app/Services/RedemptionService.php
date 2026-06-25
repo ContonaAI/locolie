@@ -33,7 +33,7 @@ class RedemptionService
      *
      * @return array{ok: bool, message: string, redemption: ?Redemption}
      */
-    public function verify(Business $business, string $code): array
+    public function verify(Business $business, string $code, int $spendPence = 0): array
     {
         $redemption = Redemption::with('offer')
             ->whereHas('offer', fn ($q) => $q->where('business_id', $business->id))
@@ -42,17 +42,17 @@ class RedemptionService
             ->first();
 
         if (! $redemption) {
-            return ['ok' => false, 'message' => 'No matching code for this business.', 'redemption' => null];
+            return ['ok' => false, 'message' => 'No matching code for this business.', 'redemption' => null, 'loyalty' => null];
         }
 
         if ($redemption->status === 'redeemed') {
-            return ['ok' => false, 'message' => 'Code already redeemed.', 'redemption' => $redemption];
+            return ['ok' => false, 'message' => 'Code already redeemed.', 'redemption' => $redemption, 'loyalty' => null];
         }
 
         if ($redemption->isExpired()) {
             $redemption->update(['status' => 'expired']);
 
-            return ['ok' => false, 'message' => 'Code has expired.', 'redemption' => $redemption];
+            return ['ok' => false, 'message' => 'Code has expired.', 'redemption' => $redemption, 'loyalty' => null];
         }
 
         $redemption->update(['status' => 'redeemed', 'redeemed_at' => now()]);
@@ -62,7 +62,10 @@ class RedemptionService
             $redemption->offer->increment('redeemed_count');
         }
 
-        return ['ok' => true, 'message' => 'Valid — redeemed.', 'redemption' => $redemption];
+        // Accrue loyalty for this customer and award any rewards earned this visit.
+        $loyalty = app(LoyaltyService::class)->recordVisit($business, $redemption->customer_email, $spendPence);
+
+        return ['ok' => true, 'message' => 'Valid — redeemed.', 'redemption' => $redemption, 'loyalty' => $loyalty];
     }
 
     /** A 6-digit numeric code not currently live for another pending redemption. */

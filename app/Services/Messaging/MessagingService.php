@@ -2,9 +2,12 @@
 
 namespace App\Services\Messaging;
 
+use App\Jobs\SendCampaignJob;
 use App\Models\Business;
 use App\Models\Campaign;
 use App\Models\MessagingChannel;
+use App\Models\Subscription;
+use Illuminate\Support\Carbon;
 
 /**
  * Registry + facade over the three delivery channels. Resolves a channel by
@@ -47,28 +50,97 @@ class MessagingService
         ])->all();
     }
 
+    /** Default consent topic gated per channel (null = no email/phone consent gate). */
+    public function defaultTopic(string $channelKey): ?string
+    {
+        return ['email' => 'offers', 'sms' => 'sms_alerts', 'push' => null][$channelKey] ?? null;
+    }
+
     /**
      * Send through a channel and log a Campaign row.
      *
+     * Always applies consent (anyone who unsubscribed from the relevant topic is
+     * dropped), records the campaign first (so emails can carry tracking + a
+     * per-recipient unsubscribe link), and sends now - unless the send is large
+     * or scheduled, in which case it is queued so the request never blocks.
+     *
      * @param  array  $message  channel-specific payload (subject/body/title/...)
+     * @param  array  $options  topic, queue (bool), scheduled_at (Carbon|string|null)
      */
-    public function dispatch(string $channelKey, array $message, iterable $recipients, ?Business $brand = null): SendResult
+    public function dispatch(string $channelKey, array $message, iterable $recipients, ?Business $brand = null, array $options = []): SendResult
     {
-        $result = $this->channel($channelKey)->send($message, $recipients, $brand);
+        $topic = $options['topic'] ?? $this->defaultTopic($channelKey);
+        $message['_topic'] = $topic;
+        $list = $this->applyConsent($topic, $recipients);
+        $count = count($list);
 
-        Campaign::create([
+        $scheduledAt = ! empty($options['scheduled_at']) ? Carbon::parse($options['scheduled_at']) : null;
+        if ($scheduledAt && $scheduledAt->isPast()) {
+            $scheduledAt = null; // a past time means "send now"
+        }
+        $queue = ($options['queue'] ?? false) || $scheduledAt !== null || $count > 50;
+
+        $campaign = Campaign::create([
             'business_id' => $brand?->id,
             'channel' => $channelKey,
-            'status' => $result->status,
-            'provider' => $result->provider,
+            'status' => $scheduledAt ? 'scheduled' : ($queue ? 'queued' : 'sending'),
             'template_id' => $message['template_id'] ?? null,
             'subject' => $message['subject'] ?? $message['title'] ?? null,
             'body' => $message['body'] ?? '',
+            'sent_count' => 0,
+            'scheduled_at' => $scheduledAt,
+            'meta' => ['topic' => $topic, 'intended' => $count],
+        ]);
+
+        if ($queue) {
+            $job = new SendCampaignJob($campaign->id, $channelKey, $message, $list, $brand?->id);
+            dispatch($scheduledAt ? $job->delay($scheduledAt) : $job);
+
+            $note = $scheduledAt
+                ? "Scheduled for {$scheduledAt->format('j M, H:i')} - {$count} recipient(s)."
+                : "Queued - sending to {$count} recipient(s) in the background.";
+
+            return new SendResult($count, $scheduledAt ? 'scheduled' : 'queued', null, $note, ['campaign_id' => $campaign->id]);
+        }
+
+        return $this->deliver($campaign, $channelKey, $message, $list, $brand);
+    }
+
+    /**
+     * Perform the actual send for a logged campaign and update its row. Shared by
+     * the synchronous path and SendCampaignJob.
+     */
+    public function deliver(Campaign $campaign, string $channelKey, array $message, array $recipients, ?Business $brand = null): SendResult
+    {
+        $message['_campaign_id'] = $campaign->id;
+        $result = $this->channel($channelKey)->send($message, $recipients, $brand);
+
+        $campaign->update([
+            'status' => $result->status,
+            'provider' => $result->provider,
             'sent_count' => $result->sent,
-            'meta' => $result->meta ?: null,
+            'meta' => array_merge($campaign->meta ?? [], $result->meta ?: []),
         ]);
 
         return $result;
+    }
+
+    /**
+     * Drop anyone who has unsubscribed from this topic. Recipients identified
+     * only by phone (no email) pass through - their opt-in was applied upstream.
+     */
+    protected function applyConsent(?string $topic, iterable $recipients): array
+    {
+        $list = collect($recipients)->map(fn ($r) => is_array($r) ? $r : ['email' => $r])->all();
+        if (! $topic) {
+            return array_values($list);
+        }
+
+        return array_values(array_filter($list, function ($r) use ($topic) {
+            $email = $r['email'] ?? null;
+
+            return $email ? Subscription::isSubscribed($email, $topic) : true;
+        }));
     }
 
     /**

@@ -127,6 +127,23 @@ class Business extends Authenticatable
         return $this->belongsToMany(User::class, 'favourites');
     }
 
+    public function loyaltyProgram(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(LoyaltyProgram::class);
+    }
+
+    public function loyaltyRules(): HasMany
+    {
+        return $this->hasMany(LoyaltyRule::class)->orderBy('sort')->orderBy('id');
+    }
+
+    /** True when the business has loyalty switched on with at least one active rule. */
+    public function loyaltyLive(): bool
+    {
+        return (bool) $this->loyaltyProgram?->active
+            && $this->loyaltyRules()->where('active', true)->exists();
+    }
+
     public function campaigns(): HasMany
     {
         return $this->hasMany(Campaign::class);

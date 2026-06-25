@@ -95,14 +95,22 @@ class SmsStudioController extends Controller
         $brand = ! empty($data['business_id']) ? Business::find($data['business_id']) : null;
         $message = ['body' => $data['body'], 'url' => $data['url'] ?? null];
 
+        // Carry the email too so the consent layer can drop anyone who has
+        // unsubscribed from SMS alerts, on top of the redemption opt-in flag.
         $recipients = $this->audienceQuery($data['business_id'] ?? null)
-            ->get(['customer_phone', 'customer_name'])
-            ->map(fn ($r) => ['phone' => $r->customer_phone, 'name' => $r->customer_name ?: 'Customer'])
+            ->get(['customer_phone', 'customer_name', 'customer_email'])
+            ->map(fn ($r) => array_filter([
+                'phone' => $r->customer_phone,
+                'name' => $r->customer_name ?: 'Customer',
+                'email' => $r->customer_email,
+            ]))
             ->all();
 
-        $result = $this->messaging->dispatch('sms', $message, $recipients, $brand);
+        $result = $this->messaging->dispatch('sms', $message, $recipients, $brand, [
+            'scheduled_at' => $request->input('scheduled_at'),
+        ]);
 
-        return back()->with('status', "SMS sent to {$result->sent} opted-in phones ({$result->status}). {$result->note}");
+        return back()->with('status', "SMS to opted-in phones: {$result->note}");
     }
 
     /**

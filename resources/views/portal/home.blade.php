@@ -595,6 +595,36 @@
                           </div>
                         </template>
                       </div>
+                      {{-- Loyalty scheme + the shopper's progress --}}
+                      <div x-show="loyalty?.active" style="margin-top:18px;" x-cloak>
+                        <div class="sec-title" style="margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                          <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                          <span x-text="loyalty?.headline || 'Loyalty rewards'"></span>
+                        </div>
+                        <div style="background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;">
+                          <div x-show="loyalty?.blurb" style="font-size:12.5px;color:var(--text-2);margin-bottom:12px;" x-text="loyalty?.blurb"></div>
+                          <template x-for="rule in (loyalty?.rules||[])" :key="rule.id">
+                            <div style="margin-bottom:13px;">
+                              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:13px;font-weight:800;color:var(--text);">
+                                <span x-text="rule.reward"></span>
+                                <span style="color:var(--accent);font-variant-numeric:tabular-nums;" x-text="rule.current + ' / ' + rule.threshold_label"></span>
+                              </div>
+                              <div style="height:8px;border-radius:99px;background:var(--surface-2);margin-top:6px;overflow:hidden;">
+                                <div style="height:100%;border-radius:99px;background:var(--accent);transition:width .5s cubic-bezier(.2,.8,.3,1);" :style="'width:'+rule.percent+'%'"></div>
+                              </div>
+                              <div style="font-size:11px;color:var(--muted);margin-top:4px;" x-text="rule.remaining>0 ? (rule.remaining_label+' '+(rule.metric==='spend'?'more to spend':'more') +' for '+rule.reward) : '🎉 Reward ready!'"></div>
+                            </div>
+                          </template>
+                          <template x-for="rw in (loyalty?.rewards||[])" :key="rw.code">
+                            <div style="display:flex;align-items:center;gap:9px;background:var(--accent-soft);border-radius:11px;padding:9px 11px;margin-top:8px;">
+                              <span style="font-size:18px;">🎁</span>
+                              <div style="flex:1;min-width:0;"><div style="font-weight:800;font-size:13px;color:var(--accent);" x-text="rw.label"></div><div style="font-size:11px;color:var(--text-2);">Show <span style="font-family:monospace;font-weight:700;" x-text="rw.code"></span> in store</div></div>
+                            </div>
+                          </template>
+                          <div x-show="!customer?.email" style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5;">Reveal an offer here to start collecting - we track your progress by email.</div>
+                        </div>
+                      </div>
+
                       <div x-show="active?.description" style="font-size:13px;color:var(--text-2);line-height:1.6;margin-top:16px;" x-text="active?.description"></div>
                       <div style="margin-top:18px;"><div class="sec-title" style="margin-bottom:6px;">Opening hours</div><div class="pf-hours"><template x-for="(v,d) in (active?.hours||{})" :key="d"><div><span style="text-transform:capitalize;" x-text="d"></span><span x-text="v"></span></div></template></div></div>
                       <div style="margin-top:18px;" x-show="active?.reviews?.length"><div class="sec-title" style="margin-bottom:4px;">Reviews <span style="font-weight:500;font-size:12px;color:var(--muted);">· via Google</span></div><template x-for="rv in (active?.reviews||[])" :key="rv.author"><div class="review"><div class="review-top"><span class="review-author" x-text="rv.author"></span><span class="star">★ <span x-text="rv.rating"></span></span></div><div class="review-text" x-text="rv.text"></div></div></template></div>
@@ -821,7 +851,7 @@ function goLocalApp() {
     brandNames:['locolie','Vicinity','Patch','TownLoop','Mooch','Highstreet'],
     onb:1, sort:'distance', openNow:false, searchQ:'', device:'mobile',
     filterOpen:false, fDist:null, fRating:null, fOffer:null, fSale:null,
-    parents:[], categories:[], businesses:[], customer:null, business:null, secret:null,
+    parents:[], categories:[], businesses:[], customer:null, business:null, secret:null, loyalty:null,
     bizOffers:[], stats:{redeemed:0,pending:0,recent:[]}, favs:[], prefs:[],
     notifications:[], unread:0, notifOpen:false, seen:[], notifyOn:false,
     gResults:[], tickN:0, map:null, markers:[], bizMap:null,
@@ -1044,8 +1074,10 @@ function goLocalApp() {
       if(el && el.scrollHeight>el.clientHeight+2){ el.scrollTop += e.deltaY; e.preventDefault(); }
     },
 
-    openBusiness(b){ this.stopScan(); this.active=b; this.activeOffer=b.offers?.[0]||null; this.view='profile'; this.tab='home'; this.initBizMap(b);
+    openBusiness(b){ this.stopScan(); this.active=b; this.activeOffer=b.offers?.[0]||null; this.view='profile'; this.tab='home'; this.initBizMap(b); this.loadLoyalty(b);
       this.api('/businesses/'+b.slug).then(full=>{ this.active = Object.assign({}, b, full); this.activeOffer = this.active.offers?.[0]||this.activeOffer; }).catch(()=>{}); },
+    // Fetch this business's loyalty scheme + the shopper's personal progress (by stored email).
+    loadLoyalty(b){ this.loyalty=null; if(!b?.slug) return; const e=this.customer?.email; this.api('/loyalty/progress?business='+encodeURIComponent(b.slug)+(e?'&email='+encodeURIComponent(e):'')).then(d=>{ this.loyalty=d; }).catch(()=>{ this.loyalty=null; }); },
     openSaved(f){ const b=this.businesses.find(x=>x.id===f.id); if(b){ this.openBusiness(b); } else { this.api('/businesses/'+f.slug).then(full=>{ this.active=full; this.activeOffer=full.offers?.[0]||null; this.view='profile'; this.initBizMap(full); }).catch(()=>{}); } },
 
     isFav(id){ return this.favs.some(f=>f.id===id); },

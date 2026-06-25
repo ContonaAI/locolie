@@ -224,6 +224,7 @@ class BusinessPortalController extends Controller
             'body' => ['required', 'string', 'max:2000'],
             'cta_label' => ['nullable', 'string', 'max:40'],
             'cta_url' => ['nullable', 'string', 'max:300'],
+            'scheduled_at' => ['nullable', 'date'],
         ]);
 
         $recipients = match ($data['channel']) {
@@ -234,11 +235,13 @@ class BusinessPortalController extends Controller
             'push' => [], // broadcast to subscribed shoppers + app devices
         };
 
-        $result = $messaging->dispatch($data['channel'], $data, $recipients, $business);
+        $result = $messaging->dispatch($data['channel'], $data, $recipients, $business, [
+            'scheduled_at' => $data['scheduled_at'] ?? null,
+        ]);
 
         $label = ['email' => 'Email', 'sms' => 'SMS', 'push' => 'Push'][$data['channel']];
 
-        return back()->with('status', "{$label} sent to {$result->sent} recipients ({$result->status}).");
+        return back()->with('status', "{$label}: {$result->note}");
     }
 
     /** Retailer reporting suite - this brand's own performance, dynamically. */

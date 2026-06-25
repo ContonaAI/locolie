@@ -38,7 +38,18 @@
     <li>Where you collect customer details through the Platform (for example shoppers who opt in to hear from you), you become a data controller of those details and must handle them lawfully - see our <a href="{{ route('legal.privacy') }}">Privacy Policy</a>.</li>
 </ul>
 
-<h2 id="plans">5. Plans, fees &amp; payment</h2>
+<h2 id="loyalty">5. Loyalty schemes</h2>
+<p>Some businesses run loyalty schemes on locolie - for example "collect a stamp each visit and earn a free item", or "spend a set amount and unlock a discount". Where they do:</p>
+<ul>
+    <li><strong>The scheme is run by the business, not by locolie.</strong> The business sets the rules, rewards and any conditions, and is solely responsible for honouring them. We provide the tools that track progress and issue reward codes.</li>
+    <li>Loyalty progress is tracked against the email you give when you reveal or redeem an offer. Progress and rewards are specific to each business, have no cash value, cannot be exchanged for cash, and are not transferable.</li>
+    <li>A "visit" is normally counted when the business verifies your offer code in store; spend-based rules count the amount the business records at the till. Counting and rewards are generated automatically and may be corrected if a code is cancelled, expires, or is entered in error.</li>
+    <li>A business may change, pause or end its scheme, and may expire or withdraw rewards, at any time - including if it leaves the Platform. We are not liable for rewards a business chooses not to honour, though we will help resolve issues where we reasonably can.</li>
+    <li>Misusing a scheme - for example trying to earn rewards without a genuine qualifying purchase - may result in progress and rewards being voided.</li>
+</ul>
+<p>If you run loyalty as a business, you are the data controller for the customer details you accrue, you must set lawful and clearly stated rules, and you must honour the rewards you advertise in line with consumer-protection law.</p>
+
+<h2 id="plans">6. Plans, fees &amp; payment</h2>
 <p>Basic listings are free. Paid plans (such as priority placement) are charged at the prices shown on our <a href="/for-business">For Business</a> page at the time you subscribe. Unless stated otherwise:</p>
 <ul>
     <li>Paid plans are billed in advance on a recurring basis until cancelled.</li>
@@ -47,16 +58,16 @@
     <li>Prices are stated inclusive or exclusive of VAT as indicated at checkout.</li>
 </ul>
 
-<h2 id="acceptable-use">6. Acceptable use</h2>
+<h2 id="acceptable-use">7. Acceptable use</h2>
 <p>You must not misuse the Platform. In particular you must not: break any law; infringe anyone's rights; upload malware; scrape or harvest data without our permission; attempt to gain unauthorised access; impersonate others; or use the Platform to send spam or unlawful marketing. We may suspend or remove any account or content that breaches these Terms.</p>
 
-<h2 id="ip">7. Intellectual property</h2>
+<h2 id="ip">8. Intellectual property</h2>
 <p>The Platform, including its design, software, and the locolie name and branding, belongs to {{ $L['company'] }} or its licensors and is protected by law. We grant you a limited, non-transferable licence to use the Platform for its intended purpose. You keep ownership of content you submit, but grant us the licence described in section 4.</p>
 
-<h2 id="availability">8. Availability &amp; changes</h2>
+<h2 id="availability">9. Availability &amp; changes</h2>
 <p>We work hard to keep the Platform available but provide it "as is" and "as available". We may change, suspend or withdraw features, and we do not guarantee the Platform will be uninterrupted or error-free.</p>
 
-<h2 id="liability">9. Our liability</h2>
+<h2 id="liability">10. Our liability</h2>
 <p>Nothing in these Terms limits liability that cannot be limited by law (such as for death or personal injury caused by our negligence, or for fraud). Subject to that:</p>
 <ul>
     <li>We are not liable for the acts, omissions, offers, goods or services of any business listed on the Platform.</li>
@@ -65,22 +76,22 @@
     <li>If you are a consumer, you have legal rights that these Terms do not affect.</li>
 </ul>
 
-<h2 id="indemnity">10. Indemnity (business users)</h2>
+<h2 id="indemnity">11. Indemnity (business users)</h2>
 <p>If you use the Platform as a business, you agree to indemnify us against claims, losses and costs arising from your listings, offers, content, or breach of these Terms.</p>
 
-<h2 id="termination">11. Suspension &amp; termination</h2>
+<h2 id="termination">12. Suspension &amp; termination</h2>
 <p>You may stop using the Platform and close your account at any time. We may suspend or end your access if you breach these Terms or if we reasonably need to. On termination, the licences you granted us for content already displayed may continue to the extent needed for our records and legal obligations.</p>
 
-<h2 id="privacy">12. Privacy &amp; marketing</h2>
+<h2 id="privacy">13. Privacy &amp; marketing</h2>
 <p>We process personal data in line with our <a href="{{ route('legal.privacy') }}">Privacy Policy</a>. You can manage or withdraw marketing consent at any time through our <a href="{{ route('subscriptions.preferences') }}">preference centre</a> or the unsubscribe link in any message.</p>
 
-<h2 id="changes">13. Changes to these Terms</h2>
+<h2 id="changes">14. Changes to these Terms</h2>
 <p>We may update these Terms from time to time. If we make material changes we will take reasonable steps to let you know. Continuing to use the Platform after changes take effect means you accept the updated Terms.</p>
 
-<h2 id="law">14. Governing law</h2>
+<h2 id="law">15. Governing law</h2>
 <p>These Terms are governed by the laws of {{ $L['jurisdiction'] }}, and the courts of {{ $L['jurisdiction'] }} have non-exclusive jurisdiction over any dispute.</p>
 
-<h2 id="contact">15. Contact us</h2>
+<h2 id="contact">16. Contact us</h2>
 <p>{{ $L['company'] }}<br>
 @if($L['registered_address']){{ $L['registered_address'] }}<br>@endif
 Email: <a href="mailto:{{ $L['contact_email'] }}">{{ $L['contact_email'] }}</a></p>

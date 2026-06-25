@@ -22,6 +22,9 @@ Route::middleware('throttle:api')->group(function () {
     Route::get('/businesses/by-token/{token}', [BrowseController::class, 'byToken']);
     Route::get('/businesses/{business:slug}', [BrowseController::class, 'business']);
 
+    // Loyalty (public): a business's scheme + a shopper's personal progress by email.
+    Route::get('/loyalty/progress', [\App\Http\Controllers\Api\LoyaltyController::class, 'progress']);
+
     // Retailer (owner-secret scoped)
     // Tighter cap on the billable Google Places proxy and the register endpoint.
     Route::middleware('throttle:20,1')->group(function () {

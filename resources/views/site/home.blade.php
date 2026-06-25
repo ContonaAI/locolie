@@ -208,6 +208,8 @@
                      'i' => '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/>'],
                     ['t' => 'Real, redeemable discounts', 'b' => 'Tap to reveal a one-time code, scan at the till. Every redemption is tracked - proof a deal really drove footfall.',
                      'i' => '<path d="M20.59 13.41 13.42 20.6a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82Z"/><line x1="7" y1="7" x2="7.01" y2="7"/>'],
+                    ['t' => 'Loyalty that follows you', 'b' => 'Collect stamps and unlock rewards at your favourite indies. Progress is tracked automatically by the codes you redeem - no plastic card to lose.',
+                     'i' => '<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>'],
                     ['t' => 'Customers you own', 'b' => 'Every redemption captures a real customer you can market to again - the loyalty data the chains have, finally for indies.',
                      'i' => '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>'],
                     ['t' => 'Smart, instant search', 'b' => 'Filter by distance, category, rating, open-now and offer type. Find exactly what\'s near you, right now.',
