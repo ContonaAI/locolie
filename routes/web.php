@@ -9,8 +9,6 @@ use Illuminate\Support\Facades\Route;
 
 // ── Public presentation / marketing site (ngrok root = our showcase) ─────────
 Route::get('/', [SiteController::class, 'home'])->name('site.home');
-// Alternate homepage concept (revertible A/B) - bold full-screen app showcase.
-Route::get('/home-1', [SiteController::class, 'homeAlt'])->name('site.home.alt');
 Route::get('/for-business', [SiteController::class, 'forBusiness'])->name('site.for-business');
 Route::get('/category/{slug}', [SiteController::class, 'category'])->name('site.category');
 Route::get('/shop/{slug}', [SiteController::class, 'business'])->name('site.business');
