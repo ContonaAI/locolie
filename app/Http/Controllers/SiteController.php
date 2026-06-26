@@ -34,6 +34,25 @@ class SiteController extends Controller
         ]);
     }
 
+    /**
+     * Alternate homepage concept (/home-1) - a bold full-screen hero showcasing
+     * the app. Standalone and revertible; the live homepage is untouched.
+     */
+    public function homeAlt()
+    {
+        return view('site.home-1', [
+            'stats' => [
+                'businesses' => Business::live()->count(),
+                'categories' => Category::supportsHierarchy() ? Category::leaves()->count() : Category::count(),
+                'offers' => \App\Models\Offer::where('status', 'active')->count(),
+            ],
+            'featured' => Business::live()->ranked()
+                ->with(['category', 'activeOffers'])
+                ->whereNotNull('photos')
+                ->take(6)->get(),
+        ]);
+    }
+
     /** Dedicated For-Business marketing page. */
     public function forBusiness()
     {
