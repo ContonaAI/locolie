@@ -68,7 +68,7 @@
                     <h2 class="mb-4 text-2xl font-extrabold tracking-tight text-ink">{{ $catName }}</h2>
                     <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                         @foreach ($group as $b)
-                            @php $offer = $b->activeOffers->first(); @endphp
+                            @php $offer = $b->publicOffers()->first(); @endphp
                             <a href="/app?b={{ $b->slug }}" target="_blank" rel="noopener" class="card-hover group overflow-hidden rounded-card border border-hair bg-white">
                                 <div class="relative h-44 overflow-hidden bg-[#e2e8f0]">
                                     @if ($b->photos)
@@ -76,8 +76,8 @@
                                     @else
                                         <div class="h-full w-full bg-gradient-to-br from-emerald-soft to-[#e2e8f0]"></div>
                                     @endif
-                                    @if ($b->plan !== 'free')<span class="absolute right-3 top-3 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white">Sponsored</span>@endif
-                                    @if ($offer)<span class="absolute left-3 top-3 rounded-lg bg-emerald px-2.5 py-1 text-xs font-extrabold text-white">{{ $offer->badge }}</span>@endif
+                                    @if (config('locolie.offers_public') && $b->plan !== 'free')<span class="absolute right-3 top-3 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white">Sponsored</span>@endif
+                                    @if ($offer)<span class="absolute left-3 top-3 rounded-lg bg-emerald px-2.5 py-1 text-xs font-extrabold text-white">{{ $offer->badge }}</span>@else<span class="absolute left-3 top-3 rounded-full bg-emerald-soft px-2.5 py-1 text-xs font-bold text-emerald">Independent</span>@endif
                                 </div>
                                 <div class="p-5">
                                     <h3 class="text-lg font-bold text-ink">{{ $b->name }}</h3>

@@ -33,8 +33,8 @@
             'reviewCount' => (int) ($business->reviews_count ?: 1),
         ];
     }
-    if ($business->activeOffers->count()) {
-        $biz['makesOffer'] = $business->activeOffers->map(fn ($o) => array_filter([
+    if ($business->publicOffers()->isNotEmpty()) {
+        $biz['makesOffer'] = $business->publicOffers()->map(fn ($o) => array_filter([
             '@type' => 'Offer',
             'name' => $o->title,
             'description' => trim($o->badge.($o->terms ? ' - '.$o->terms : '')),
@@ -76,7 +76,7 @@
                     <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-emerald">
                         <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">{!! \App\Models\Category::iconPath($business->category?->slug) !!}</svg>
                         {{ $business->category?->name }}
-                        @if($business->plan !== 'free')<span class="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] text-amber-800">Sponsored</span>@endif
+                        @if(config('locolie.offers_public') && $business->plan !== 'free')<span class="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] text-amber-800">Sponsored</span>@endif
                     </div>
                     <h1 class="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">{{ $business->name }}</h1>
                     <div class="mt-2 flex items-center gap-2 text-sm text-muted">
@@ -97,17 +97,34 @@
 <div class="mx-auto max-w-5xl 2xl:max-w-6xl px-5 py-12 sm:px-6">
     <div class="grid gap-10 lg:grid-cols-3">
         <div class="lg:col-span-2 space-y-10">
-            {{-- Offers --}}
-            @if($business->activeOffers->count())
+            {{-- Offers (shown only when offers are publicly enabled) --}}
+            @if($business->publicOffers()->isNotEmpty())
                 <div>
                     <h2 class="text-xl font-bold">Live offers</h2>
                     <div class="mt-4 space-y-3">
-                        @foreach($business->activeOffers as $o)
+                        @foreach($business->publicOffers() as $o)
                             <div class="flex items-center gap-4 rounded-card border border-hair bg-white p-4">
                                 <span class="flex-shrink-0 rounded-lg bg-emerald px-3 py-2 text-sm font-extrabold text-white">{{ $o->badge }}</span>
                                 <div><div class="font-semibold text-ink">{{ $o->title }}</div><div class="text-sm text-muted">{{ $o->terms ?: 'Open it in the locolie app and show your code at the till' }}</div></div>
                             </div>
                         @endforeach
+                    </div>
+                </div>
+            @else
+                {{-- No public offer: turn the page into a retailer sign-up hook. --}}
+                <div class="relative overflow-hidden rounded-card border border-hair bg-emerald-soft p-6 sm:p-7">
+                    <div class="flex items-start gap-4">
+                        <span class="hidden h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald text-white sm:flex">
+                            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9 12 3l9 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 21V12h6v9"/></svg>
+                        </span>
+                        <div>
+                            <h2 class="text-xl font-bold text-ink">Own this business?</h2>
+                            <p class="mt-2 max-w-xl leading-relaxed text-muted">Are you the owner of {{ $business->name }}? Claim your free listing and add offers your customers will love.</p>
+                            <a href="{{ route('business.join') }}" class="mt-4 inline-flex items-center gap-2 rounded-full bg-emerald px-5 py-3 text-sm font-bold text-white transition hover:bg-ink">
+                                Claim your free listing
+                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                            </a>
+                        </div>
                     </div>
                 </div>
             @endif

@@ -68,7 +68,7 @@ class BrowseController extends Controller
 
         // Paid placement first, then live-offer count, then rating.
         $businesses = $query->ranked()->get()
-            ->sortByDesc(fn ($b) => [$b->priority, $b->activeOffers->count(), (float) $b->rating])
+            ->sortByDesc(fn ($b) => [$b->priority, $b->publicOffers()->count(), (float) $b->rating])
             ->values();
 
         return $businesses->map(fn ($b) => $this->present($b));
@@ -113,7 +113,7 @@ class BrowseController extends Controller
             'featured' => (bool) $b->featured,
             'plan' => $b->plan,
             'distance' => $this->fakeDistance($b),
-            'offers' => $b->activeOffers->map(fn ($o) => [
+            'offers' => $b->publicOffers()->map(fn ($o) => [
                 'id' => $o->id,
                 'title' => $o->title,
                 'badge' => $o->badge,

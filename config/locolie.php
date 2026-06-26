@@ -19,6 +19,16 @@ $region = env('LOCOLIE_REGION', 'Tyne & Wear');
 return [
     'brand' => env('LOCOLIE_BRAND', 'locolie'),
 
+    /*
+     | Public offers / discounts master switch. FALSE pre-launch: we list the real
+     | independent businesses as a directory but show NO discount badges or
+     | redemption (we have not signed those retailers up, so advertising their
+     | "offer" would be misleading). The /demo page still shows the full offer +
+     | redemption experience with sample data. Flip to TRUE (or extend
+     | Business::showsPublicOffers() to go per-partner) once retailers opt in.
+     */
+    'offers_public' => filter_var(env('OFFERS_PUBLIC', false), FILTER_VALIDATE_BOOLEAN),
+
     'launch' => [
         'city' => $city,
         'city_full' => $cityFull,

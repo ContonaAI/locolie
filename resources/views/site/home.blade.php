@@ -110,7 +110,14 @@
         <div class="relative flex justify-center lg:justify-center xl:pr-8">
             <div class="absolute -inset-10 rounded-[3rem] bg-gradient-to-tr from-emerald-soft via-white to-transparent blur-3xl" data-parallax="0.05"></div>
             <div class="relative animate-floaty">
-                @include('site._appwalk', ['src' => '/app', 'class' => 'relative', 'cards' => $featured])
+                {{-- Offers live: the redemption walkthrough. Pre-launch (offers off):
+                     the clean directory phone, so the hero never implies a real
+                     retailer has a discount. The full offer demo lives at /demo. --}}
+                @if (config('locolie.offers_public'))
+                    @include('site._appwalk', ['src' => '/app', 'class' => 'relative', 'cards' => $featured])
+                @else
+                    @include('site._phone', ['src' => '/app', 'class' => 'relative', 'dark' => true, 'cards' => $featured])
+                @endif
             </div>
             {{-- Floating feature chips - the marketing tools businesses get --}}
             @php $heroChips = [
@@ -359,15 +366,17 @@
         </div>
         <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             @foreach ($featured as $i => $b)
-                @php $offer = $b->activeOffers->first(); @endphp
+                @php $offer = $b->publicOffers()->first(); @endphp
                 <a href="/app?b={{ $b->slug }}" target="_blank" rel="noopener" class="reveal card-hover group overflow-hidden rounded-card border border-hair bg-white" data-d="{{ ($i % 3) + 1 }}">
                     <div class="relative h-44 overflow-hidden bg-[#e2e8f0]">
                         <img src="{{ $b->photos[0] }}" alt="{{ $b->name }} - independent {{ $b->category?->name }} in {{ $b->city ?? $llCity }}" loading="lazy" decoding="async" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
-                        @if ($b->plan !== 'free')
+                        @if (config('locolie.offers_public') && $b->plan !== 'free')
                             <span class="absolute right-3 top-3 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white">Sponsored</span>
                         @endif
                         @if ($offer)
                             <span class="absolute left-3 top-3 rounded-lg bg-emerald px-2.5 py-1 text-xs font-extrabold text-white">{{ $offer->badge }}</span>
+                        @else
+                            <span class="absolute left-3 top-3 rounded-full bg-emerald-soft px-2.5 py-1 text-xs font-bold text-emerald">Independent</span>
                         @endif
                     </div>
                     <div class="p-5">

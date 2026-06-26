@@ -225,7 +225,7 @@
                         ->with(['category', 'activeOffers'])->inRandomOrder()->first()
                     ?? \App\Models\Business::live()->whereNotNull('photos')
                         ->with(['category', 'activeOffers'])->inRandomOrder()->first();
-                $navFeaturedOffer = $navFeatured?->activeOffers->first();
+                $navFeaturedOffer = $navFeatured?->publicOffers()->first();
             @endphp
             <div x-data="{ o: false }" @mouseenter="o=true" @mouseleave="o=false" class="relative">
                 <button @click="o=!o" class="group flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium text-muted transition hover:bg-black/[0.05] hover:text-ink">
@@ -419,6 +419,7 @@
                     <li><a href="/app" class="text-ink/80 transition hover:text-emerald">Launch web app</a></li>
                     <li><a href="{{ route('customer.report.entry') }}" class="text-ink/80 transition hover:text-emerald">Your savings</a></li>
                     <li><a href="{{ route('seo.index') }}" class="text-ink/80 transition hover:text-emerald">Local directory</a></li>
+                    <li><a href="{{ route('site.demo') }}" class="text-ink/80 transition hover:text-emerald">How offers work</a></li>
                 </ul>
             </div>
             <div>

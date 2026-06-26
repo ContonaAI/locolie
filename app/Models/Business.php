@@ -122,6 +122,29 @@ class Business extends Authenticatable
         return $this->offers()->where('status', 'active');
     }
 
+    /**
+     * Whether this business's offers may be shown on PUBLIC consumer surfaces.
+     * Pre-launch this is governed by the global master switch (off), since no
+     * retailer has signed up. The single place to later go per-partner: e.g.
+     * `return config('locolie.offers_public') || $this->isPaid();`.
+     */
+    public function showsPublicOffers(): bool
+    {
+        return (bool) config('locolie.offers_public', false);
+    }
+
+    /**
+     * Active offers safe to show publicly - empty until offers go live, so the
+     * public site lists the business as a directory entry without advertising a
+     * discount it never agreed to. Admin/demo use activeOffers directly.
+     */
+    public function publicOffers(): \Illuminate\Support\Collection
+    {
+        return $this->showsPublicOffers()
+            ? $this->activeOffers->toBase()
+            : collect();
+    }
+
     public function favouritedBy(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'favourites');

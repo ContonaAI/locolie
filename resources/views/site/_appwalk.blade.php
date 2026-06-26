@@ -29,7 +29,7 @@
     $pName = $primary?->name ?? 'The Corner Café';
     $pCat = $primary?->category?->name ?? 'Coffee';
     $pRating = $primary ? number_format((float) $primary->rating, 1) : '4.9';
-    $pOffer = $primary?->activeOffers?->first();
+    $pOffer = $primary?->publicOffers()->first();
     $pBadge = $pOffer?->badge ?? '25% OFF';
     $pTitle = $pOffer?->title ?? 'Any breakfast, all week';
 
@@ -118,7 +118,7 @@
               @forelse ($grid as $g)
                 <div class="overflow-hidden rounded-2xl bg-white shadow-sm">
                   <div class="relative h-14 bg-[#e2e8f0]">{!! $photo($g) !!}</div>
-                  <div class="p-2"><div class="truncate text-[10px] font-bold text-ink">{{ $g->name }}</div><div class="mt-1 truncate rounded bg-emerald-soft px-1.5 py-0.5 text-[8px] font-bold text-emerald">{{ $g->activeOffers->first()?->badge ?? 'Offer' }}</div></div>
+                  <div class="p-2"><div class="truncate text-[10px] font-bold text-ink">{{ $g->name }}</div><div class="mt-1 truncate rounded bg-emerald-soft px-1.5 py-0.5 text-[8px] font-bold text-emerald">{{ $g->publicOffers()->first()?->badge ?? 'Indie' }}</div></div>
                 </div>
               @empty
                 @foreach (['Newcastle Fitness','Bones Barbers'] as $idx => $nm)
@@ -185,7 +185,7 @@
           <div class="flex-1 px-3 pt-3">
             <div class="mb-2 text-[12px] font-extrabold text-ink">Recently redeemed</div>
             @php
-              $recent = $list->take(3)->map(fn ($b) => [$b->name, $b->activeOffers->first()?->title ?? 'Offer redeemed']);
+              $recent = $list->take(3)->map(fn ($b) => [$b->name, $b->publicOffers()->first()?->title ?? 'Offer redeemed']);
               if ($recent->isEmpty()) $recent = collect([['The Corner Café','25% off breakfast'],['Bones Barbers','Free fringe trim'],['Newcastle Fitness','Free class taster']]);
               $amounts = ['£4.20','£8.00','£12.00'];
             @endphp

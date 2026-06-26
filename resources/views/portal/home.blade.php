@@ -487,8 +487,8 @@
                         <div class="hscroll">
                           <template x-for="b in featured" :key="'f'+b.id">
                             <div class="hcard" @click="openBusiness(b)">
-                              <div class="hcard-img" :style="b.image ? ('background-image:url('+b.image+')') : ''"><span class="hcard-tag" x-text="b.offers[0].badge"></span><span class="spon-tag" x-show="b.featured">Sponsored</span></div>
-                              <div class="hcard-body"><div class="hcard-name" x-text="b.name"></div><div class="hcard-meta"><span class="star">★&nbsp;<span x-text="b.rating"></span></span><span x-text="'· '+b.category"></span></div><div class="hcard-offer" x-text="b.offers[0].title"></div></div>
+                              <div class="hcard-img" :style="b.image ? ('background-image:url('+b.image+')') : ''"><span class="hcard-tag" x-show="b.offers[0]" x-text="b.offers[0]?.badge"></span><span class="spon-tag" x-show="b.featured">Sponsored</span></div>
+                              <div class="hcard-body"><div class="hcard-name" x-text="b.name"></div><div class="hcard-meta"><span class="star">★&nbsp;<span x-text="b.rating"></span></span><span x-text="'· '+b.category"></span></div><div class="hcard-offer" x-show="b.offers[0]" x-text="b.offers[0]?.title"></div></div>
                             </div>
                           </template>
                         </div>
@@ -509,8 +509,8 @@
                             <div class="hscroll">
                               <template x-for="b in byCat(c.slug)" :key="c.slug+b.id">
                                 <div class="hcard" @click="openBusiness(b)">
-                                  <div class="hcard-img" :style="b.image ? ('background-image:url('+b.image+')') : ''"><span class="hcard-tag" x-text="b.offers[0].badge"></span></div>
-                                  <div class="hcard-body"><div class="hcard-name" x-text="b.name"></div><div class="hcard-meta"><span class="star">★&nbsp;<span x-text="b.rating"></span></span><span x-text="'· '+dist(b)+' mi'"></span><span x-show="isOpen(b.hours)" class="open">· Open</span></div><div class="hcard-offer" x-text="b.offers[0].title"></div></div>
+                                  <div class="hcard-img" :style="b.image ? ('background-image:url('+b.image+')') : ''"><span class="hcard-tag" x-show="b.offers[0]" x-text="b.offers[0]?.badge"></span></div>
+                                  <div class="hcard-body"><div class="hcard-name" x-text="b.name"></div><div class="hcard-meta"><span class="star">★&nbsp;<span x-text="b.rating"></span></span><span x-text="'· '+dist(b)+' mi'"></span><span x-show="isOpen(b.hours)" class="open">· Open</span></div><div class="hcard-offer" x-show="b.offers[0]" x-text="b.offers[0]?.title"></div></div>
                                 </div>
                               </template>
                             </div>
@@ -527,10 +527,10 @@
                           <div class="row" @click="openBusiness(b)">
                             <div class="row-img" :style="b.image ? ('background-image:url('+b.image+');background-size:cover;background-position:center') : ''"></div>
                             <div class="row-info"><div class="row-name" x-text="b.name"></div><div class="row-meta"><span class="star"><svg class="ic ic-sm ic-filled" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> <span x-text="b.rating"></span></span><span>·</span><span x-text="b.category+' · '+dist(b)+' mi'"></span><span x-show="isOpen(b.hours)" class="open">· Open</span></div></div>
-                            <div class="offer-pill" x-text="b.offers[0].badge"></div>
+                            <div class="offer-pill" x-show="b.offers[0]" x-text="b.offers[0]?.badge"></div>
                           </div>
                         </template>
-                        <p x-show="!visible.length" style="text-align:center;color:var(--muted);font-size:13px;padding:28px 0;">No offers match here.</p>
+                        <p x-show="!visible.length" style="text-align:center;color:var(--muted);font-size:13px;padding:28px 0;">Nothing here yet.</p>
                       </div>
                     </template>
                   </div></div>
@@ -881,7 +881,11 @@ function goLocalApp() {
     get themeVars(){ return Object.entries(this.theme.vars).map(([k,v])=>`${k}:${v}`).join(';'); },
     get locationLabel(){ return this.location==='all'?'Everywhere':'Newcastle'; },
     get devInner(){ const d={ mobile:[390,760], tablet:[768,720], desktop:[1120,680] }[this.device] || [390,760]; return `width:${d[0]}px;height:${d[1]}px;max-width:calc(100vw - 80px);`; },
-    get withOffers(){ return this.businesses.filter(b=>b.offers.length); },
+    // When offers are publicly enabled, surface only businesses that have a live
+    // offer (offer-led discovery). When offers are switched off (none are exposed
+    // by the API), fall back to a plain directory of every business so shops still
+    // appear. Restores offer-led behaviour automatically once offers return.
+    get withOffers(){ const anyOffers=this.businesses.some(b=>b.offers.length); return anyOffers ? this.businesses.filter(b=>b.offers.length) : this.businesses; },
     applyFilters(list){
       if(this.openNow) list = list.filter(b=>this.isOpen(b.hours));
       if(this.fRating) list = list.filter(b=>(+b.rating||0) >= this.fRating);
