@@ -6,7 +6,7 @@
 <script>window.FL_CITIES = @json($cityData); window.FL_POINTS = @json($mapPoints);</script>
 @include('partials.google-maps', ['key' => $mapsKey ?? null])
 <style>
-    /* ---- Hero notification chips: brand-pin launch + sonar ping on hover ---- */
+    /* ---- Hero notification chips: live sonar ping + icon pulse (idle), pin launch on hover ---- */
     .chip .chip-card { transition: box-shadow .5s, border-color .5s, transform .5s cubic-bezier(.16,.8,.3,1); }
     .chip:hover { z-index: 30; }
     .chip:hover .chip-card {
@@ -17,12 +17,22 @@
     .chip-badge { position: relative; }
     .chip-icon, .chip-pin { transition: opacity .35s ease, transform .45s cubic-bezier(.16,.8,.3,1); }
     .chip-pin { position: absolute; inset: 0; margin: auto; height: 1.05rem; width: 1.05rem; color: #059669; opacity: 0; transform: translateY(6px) scale(.5); }
-    .chip:hover .chip-icon { opacity: 0; transform: scale(.35); }
-    .chip:hover .chip-pin { animation: pinLaunch .6s cubic-bezier(.16,.8,.3,1) forwards; filter: drop-shadow(0 3px 4px rgba(5,150,105,.55)); }
+
+    /* Idle: a gentle auto sonar ping + icon "send" pulse so each chip reads as a
+       live notification firing, even without hover. Staggered per chip via --pd. */
     .ping-ring { position: absolute; inset: 0; border-radius: 9999px; border: 2px solid #059669; opacity: 0; transform: scale(.4); pointer-events: none; }
+    .chip .ping-ring { animation: chipPingIdle 5s ease-out infinite; animation-delay: var(--pd, 0s); }
+    .chip .ping-ring.r2, .chip .ping-ring.r3 { animation: none; }   /* extra rings: hover only */
+    .chip .chip-icon { animation: chipIconPulse 5s ease-in-out infinite; animation-delay: var(--pd, 0s); transform-origin: center; }
+    @keyframes chipPingIdle { 0% { transform: scale(.45); opacity: .5; } 65%, 100% { transform: scale(2.1); opacity: 0; } }
+    @keyframes chipIconPulse { 0%, 86%, 100% { transform: scale(1); } 7% { transform: scale(1.22) rotate(-4deg); } 16% { transform: scale(1); } }
+
+    /* Hover: brand pin launches out, three sonar rings fire, icon hides. */
+    .chip:hover .chip-icon { animation: none; opacity: 0; transform: scale(.35); }
+    .chip:hover .chip-pin { animation: pinLaunch .6s cubic-bezier(.16,.8,.3,1) forwards; filter: drop-shadow(0 3px 4px rgba(5,150,105,.55)); }
     .chip:hover .ping-ring { animation: chipPing 1.5s ease-out infinite; }
-    .chip:hover .ping-ring.r2 { animation-delay: .5s; }
-    .chip:hover .ping-ring.r3 { animation-delay: 1s; }
+    .chip:hover .ping-ring.r2 { animation: chipPing 1.5s ease-out infinite; animation-delay: .5s; }
+    .chip:hover .ping-ring.r3 { animation: chipPing 1.5s ease-out infinite; animation-delay: 1s; }
     @keyframes chipPing { 0% { transform: scale(.4); opacity: .6; } 80% { opacity: 0; } 100% { transform: scale(2.7); opacity: 0; } }
     @keyframes pinLaunch {
         0%   { opacity: 0; transform: translateY(7px) scale(.5); }
@@ -35,8 +45,9 @@
     .pin-mark { position: absolute; color: #059669; pointer-events: none; z-index: 0; will-change: transform; }
 
     @media (prefers-reduced-motion: reduce) {
-        .chip:hover .ping-ring { animation: none; }
-        .chip:hover .chip-pin { animation: none; opacity: 1; transform: none; }
+        .chip .ping-ring, .chip .chip-icon, .chip:hover .ping-ring, .chip:hover .chip-pin { animation: none; }
+        .chip .chip-icon { opacity: 1; transform: none; }
+        .chip:hover .chip-pin { opacity: 1; transform: none; }
     }
 </style>
 @endpush
@@ -109,7 +120,7 @@
                 ['-right-3 bottom-16', '-2.2s', '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>', '+ New customer', 'added to your list'],
             ]; @endphp
             @foreach ($heroChips as $chip)
-                <div class="chip absolute {{ $chip[0] }} hidden cursor-default lg:block animate-floaty2" style="animation-delay:{{ $chip[1] }}">
+                <div class="chip absolute {{ $chip[0] }} hidden cursor-default lg:block animate-floaty2" style="animation-delay:{{ $chip[1] }};--pd:{{ $loop->index * 1.25 }}s">
                     <div class="chip-card glass-card rounded-2xl px-3.5 py-2.5">
                         <div class="flex items-center gap-2.5">
                             <span class="chip-badge flex h-8 w-8 items-center justify-center rounded-full bg-emerald-soft text-emerald">

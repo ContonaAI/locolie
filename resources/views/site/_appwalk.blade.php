@@ -78,19 +78,23 @@
     <span class="absolute -right-[14px] top-28 z-30 h-16 w-[3px] rounded-r bg-[#222]"></span>
     <div class="flex items-center justify-center bg-black" style="height:24px;"><span class="h-[16px] w-20 rounded-full bg-[#0a0a0a] ring-1 ring-white/10"></span></div>
 
-    {{-- The app body: a fixed content stage with a persistent bottom tab bar, exactly like the app. --}}
+    {{-- The app body: a fixed content stage with a persistent header + bottom tab bar, exactly like the app. --}}
     <div class="relative flex flex-col bg-[#eef1f4]" style="height:600px;">
+      {{-- PERSISTENT header (location · wordmark · bell) - on every screen, for consistency. --}}
+      <div class="dm-head" style="padding-bottom:12px">
+        <div class="dm-head-row">
+          <span class="dm-loc"><svg class="dm-loc-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 7-8 13-8 13s-8-6-8-13a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><strong>{{ $llCity }}</strong><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:rgba(255,255,255,.5)"><polyline points="6 9 12 15 18 9"/></svg></span>
+          <span class="dm-wm" style="font-size:19px">{!! $awWordmark !!}</span>
+          <svg class="dm-head-bell" style="height:16px;width:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        </div>
+      </div>
       <div class="relative flex-1 overflow-hidden">
 
         {{-- ============ SCREEN 0 · DISCOVER ============ --}}
         <div x-show="i === 0" x-transition:enter="aw-tr" x-transition:enter-start="aw-from" x-transition:enter-end="aw-to" x-transition:leave="aw-tr" x-transition:leave-start="aw-to" x-transition:leave-end="aw-leave" class="absolute inset-0 flex flex-col">
-          <div class="dm-head">
-            <div class="dm-head-row">
-              <span class="dm-loc"><svg class="dm-loc-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 7-8 13-8 13s-8-6-8-13a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><strong>{{ $llCity }}</strong><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:rgba(255,255,255,.5)"><polyline points="6 9 12 15 18 9"/></svg></span>
-              <span class="dm-wm" style="font-size:19px">{!! $awWordmark !!}</span>
-              <svg class="dm-head-bell" style="height:16px;width:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-            </div>
-            <div class="dm-search">
+          {{-- search bar continues seamlessly from the persistent dark header (home only) --}}
+          <div style="background:#0a0a0a;padding:0 14px 13px">
+            <div class="dm-search" style="margin-top:0">
               <div class="dm-search-input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="height:14px;width:14px"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> Search shops &amp; offers</div>
               <div class="dm-search-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="height:15px;width:15px"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg></div>
             </div>
