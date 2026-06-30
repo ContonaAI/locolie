@@ -57,7 +57,14 @@
         .gtext { background:linear-gradient(115deg,#34d399,#10b981 45%,#059669); -webkit-background-clip:text; background-clip:text; color:transparent; }
 
         /* Google Slides widescreen proportions: a 16:9 stage that fits the viewport. */
-        .deck-stage { aspect-ratio:16/9; width:min(94vw, calc((100vh - 148px) * 16 / 9)); max-width:1120px; }
+        .deck-stage { aspect-ratio:16/9; width:min(95vw, calc((100vh - 132px) * 16 / 9)); }
+        /* Present mode: the deck fills the whole screen. */
+        .deck-screen:fullscreen { display:flex; flex-direction:column; justify-content:center; background:#000; }
+        .deck-screen:fullscreen .deck-top, .deck-screen:fullscreen .deck-hint { display:none !important; }
+        .deck-screen:fullscreen .deck-wrap { max-width:none !important; padding:0 !important; }
+        .deck-screen:fullscreen .deck-stage { width:min(100vw, calc(100vh * 16 / 9)); max-width:none; border-radius:0; border:0; }
+        .deck-screen:fullscreen .deck-nav { position:fixed; left:50%; bottom:20px; transform:translateX(-50%); width:auto; gap:1.25rem; background:rgba(0,0,0,.55); padding:.5rem .9rem; border-radius:9999px; backdrop-filter:blur(8px); opacity:0; transition:opacity .3s; }
+        .deck-screen:fullscreen:hover .deck-nav { opacity:1; }
         /* Premium dark canvas: deep ink + emerald glow + faint grid, like the site hero. */
         .slide-dark { background:#070a09; }
         .glow { background:
@@ -108,14 +115,19 @@
      x-data="{ slide:1, total:13,
         next(){ if(this.slide<this.total) this.slide++ },
         prev(){ if(this.slide>1) this.slide-- },
-        go(n){ this.slide=n } }"
+        go(n){ this.slide=n },
+        present(){ const el=this.$root; if(document.fullscreenElement){ document.exitFullscreen() } else { (el.requestFullscreen||el.webkitRequestFullscreen||el.msRequestFullscreen)?.call(el) } } }"
      @keydown.window.arrow-right="next()" @keydown.window.arrow-left="prev()" @keydown.window.space.prevent="next()">
 
     {{-- Top bar --}}
-    <header class="mx-auto flex max-w-[1120px] items-center justify-between px-4 py-3 sm:px-2">
+    <header class="deck-top mx-auto flex max-w-[1120px] items-center justify-between px-4 py-3 sm:px-2">
         <a href="/business" class="text-lg">{!! $wm() !!}</a>
         <div class="flex items-center gap-2 sm:gap-3">
             <span class="rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/80">Slide <span x-text="slide"></span> / <span x-text="total"></span></span>
+            <button type="button" @click="present()" class="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-xs font-bold text-white transition hover:bg-white/10">
+                <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+                Present
+            </button>
             <button type="button" onclick="window.print()" class="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-bold text-[#0a0a0a] transition hover:bg-emerald-500 hover:text-white">
                 <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
                 Print / Save as PDF
@@ -124,7 +136,7 @@
     </header>
 
     {{-- Stage --}}
-    <div class="mx-auto flex max-w-[1120px] flex-col items-center px-4 pb-5 sm:px-2">
+    <div class="deck-wrap mx-auto flex max-w-[1120px] flex-col items-center px-4 pb-5 sm:px-2">
         <div class="deck-stage relative overflow-hidden rounded-3xl border hair shadow-2xl">
 
             {{-- ===== 1 · COVER ===== --}}
@@ -425,7 +437,7 @@
         </div>
 
         {{-- Nav --}}
-        <div class="mt-4 flex w-full max-w-[1120px] items-center justify-between">
+        <div class="deck-nav mt-4 flex w-full max-w-[1120px] items-center justify-between">
             <button type="button" @click="prev()" :disabled="slide===1" class="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-30"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>Back</button>
             <div class="flex flex-wrap items-center justify-center gap-1.5">
                 <template x-for="n in total" :key="n"><button type="button" @click="go(n)" :class="slide===n ? 'w-6 bg-emerald-500' : 'w-2 bg-white/25 hover:bg-white/45'" class="h-2 rounded-full transition-all" :aria-label="'Go to slide ' + n"></button></template>
@@ -433,7 +445,7 @@
             <button type="button" @click="next()" x-show="slide<total" class="inline-flex items-center gap-1.5 rounded-full bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-400">Next<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
             <a href="{{ $signupUrl }}" x-show="slide===total" x-cloak class="inline-flex items-center gap-1.5 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[#0a0a0a] transition hover:bg-emerald-500 hover:text-white">Get started<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
         </div>
-        <p class="mt-3 text-center text-xs text-white/40">Use the arrow keys, or click. Print to a PDF anytime with the button up top.</p>
+        <p class="deck-hint mt-3 text-center text-xs text-white/40">Use the arrow keys, or click. Present for fullscreen, or print to a PDF anytime with the buttons up top.</p>
     </div>
 </div>
 
