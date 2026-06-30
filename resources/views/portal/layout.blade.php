@@ -72,6 +72,7 @@
         ];
         $trailing = [
             ['route' => 'portal.admin', 'label' => 'Admin'],
+            ['route' => 'portal.content', 'label' => 'Content'],
             ['route' => 'messaging.studio', 'label' => 'Messaging'],
             ['route' => 'portal.reports', 'label' => 'Reports'],
             ['route' => 'portal.setup', 'label' => 'Setup'],
