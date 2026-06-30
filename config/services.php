@@ -22,6 +22,16 @@ return [
         'key' => env('RESEND_API_KEY'),
     ],
 
+    // Mailjet (Messaging Studio email provider). Sends via the Mailjet Send API
+    // v3.1 over HTTPS (no SDK needed) - used for both transactional and campaign
+    // email. All optional: the email channel logs + counts until a key/secret pair
+    // is present, then delivery goes live with no caller change.
+    'mailjet' => [
+        'key' => env('MAILJET_KEY'),
+        'secret' => env('MAILJET_SECRET'),
+        'from' => env('MAILJET_FROM'),
+    ],
+
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
@@ -81,9 +91,15 @@ return [
     ],
 
     // ── Native push for the future iOS / Android apps ──
+    // FCM is the chosen push client (Android + web). Two ways to authenticate:
+    //   - FCM HTTP v1 (preferred): project_id + a service-account JSON (path OR
+    //     inline JSON). We mint a short-lived OAuth token from it server-side.
+    //   - Legacy HTTP API (fallback): a single FCM server key.
+    // All optional - the push channel logs + counts until creds exist.
     'fcm' => [
         'project_id' => env('FCM_PROJECT_ID'),
-        'credentials' => env('FCM_CREDENTIALS'), // path to service-account JSON
+        'credentials' => env('FCM_CREDENTIALS'), // path to (or inline) service-account JSON
+        'server_key' => env('FCM_SERVER_KEY'),   // legacy HTTP API key (fallback)
     ],
     'apns' => [
         'key_id' => env('APNS_KEY_ID'),

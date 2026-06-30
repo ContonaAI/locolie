@@ -46,6 +46,11 @@ return [
                     'blurb' => 'Modern transactional email API.',
                     'fields' => ['api_key', 'from_address'],
                 ],
+                'mailjet' => [
+                    'label' => 'Mailjet',
+                    'blurb' => 'EU-based transactional + campaign email API. Cheap, GDPR-friendly.',
+                    'fields' => ['api_key', 'secret_key', 'from_address'],
+                ],
             ],
         ],
 
@@ -54,10 +59,15 @@ return [
             'icon' => 'chat',
             'blurb' => 'Text offers straight to a customer\'s phone - the highest open rate there is.',
             'providers' => [
+                'clicksend' => [
+                    'label' => 'ClickSend',
+                    'blurb' => 'UK-friendly, simple per-message billing. Our recommended cheap default.',
+                    'recommended' => true,
+                    'fields' => ['username', 'api_key', 'from'],
+                ],
                 'twilio' => [
                     'label' => 'Twilio',
                     'blurb' => 'Global SMS leader. Per-message pricing, great deliverability.',
-                    'recommended' => true,
                     'fields' => ['account_sid', 'auth_token', 'from'],
                 ],
                 'vonage' => [
@@ -80,11 +90,6 @@ return [
                     'blurb' => 'Pay-as-you-go SMS on AWS infrastructure.',
                     'fields' => ['key', 'secret', 'region'],
                 ],
-                'clicksend' => [
-                    'label' => 'ClickSend',
-                    'blurb' => 'UK-friendly, simple per-message billing.',
-                    'fields' => ['username', 'api_key', 'from'],
-                ],
             ],
         ],
 
@@ -102,7 +107,8 @@ return [
                 ],
                 'fcm' => [
                     'label' => 'Firebase Cloud Messaging',
-                    'blurb' => 'Android (and web) native push via Firebase.',
+                    'blurb' => 'Our chosen native client. Android + web push via Firebase (FCM HTTP v1).',
+                    'recommended' => true,
                     'platforms' => ['android', 'web'],
                     'fields' => ['project_id', 'service_account'],
                 ],
