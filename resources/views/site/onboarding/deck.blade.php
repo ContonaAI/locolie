@@ -83,15 +83,18 @@
         .scanline { animation:dScan 2.6s ease-in-out infinite; }
         @media (prefers-reduced-motion: reduce){ .r,.pp,.fl,.ping::after,.scanline{ animation:none !important; } }
 
-        /* Print: light, one slide per A4 landscape page, visuals kept. */
+        /* Print: the real premium-dark slides, one per A4 landscape page. */
         @media print {
-            @page { size:A4 landscape; margin:11mm; }
-            html, body { background:#fff !important; color:#0a0a0a !important; }
-            .no-print { display:none !important; }
-            .deck-screen { display:none !important; }
+            @page { size:A4 landscape; margin:9mm; }
+            html, body { background:#fff !important; }
+            .no-print, .deck-screen { display:none !important; }
             .deck-print { display:block !important; }
+            /* Force backgrounds + colours to print even when "Background graphics" is off. */
+            html, body, .deck-print, .deck-print * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
             .print-slide { break-after:page; page-break-after:always; }
             .print-slide:last-child { break-after:auto; page-break-after:auto; }
+            /* Freeze reveal animations so nothing prints mid-fade (opacity 0). */
+            .deck-print .r, .deck-print .pp, .deck-print .fl { animation:none !important; opacity:1 !important; transform:none !important; }
         }
         .deck-print { display:none; }
     </style>
@@ -441,44 +444,57 @@
     @php
         $printSlides = [
             ['locolie for retailers', 'Back your high street. Own your customers.', 'The local platform for '.$llCity.'. Get found by nearby shoppers, run a free loyalty scheme, and bring your own customers back - the relationship stays yours.', ['A free listing shoppers actually use', 'A loyalty scheme that costs you nothing', 'Email, SMS and push to your own customers'], 'qr'],
-            ['The problem', 'Big platforms rent you your own customers', 'A shopper finds you on a marketplace or an ad, you pay to reach them, and you never get to keep them. Commissions up to 30%, ad spend to reach people who already love you, and their data - not yours.', ['Commissions on every order', 'Paying again to reach your own customers', 'You never own the relationship'], 'none'],
+            ['The problem', 'Big platforms rent you your own customers', 'A shopper finds you on a marketplace or an ad, you pay to reach them, and you never get to keep them. Commissions up to 30%, ad spend to reach people who already love you, and their data - not yours.', ['Commissions on every order', 'Paying again to reach your own customers', 'You never own the relationship'], 'costs'],
             ['The locolie way', 'A direct line to your customers', 'locolie connects you straight to the shopper - no marketplace, no ad auction, no one renting your audience back to you. You own the list, the data and the relationship.', ['Direct, no middleman', 'You own your customer list', 'Indies only, verified local'], 'none'],
-            ['Our mission', 'Made in the North East, for independents', 'locolie exists to help independent shops, cafes, pubs and makers win back regulars from the chains and big platforms. Indies only, always.', ['Independents only', 'Built for the local high street', 'Verified, local listings'], 'none'],
-            ['Already building', 'A directory shoppers actually use', number_format($stats['businesses']).' independents mapped across '.$stats['categories'].' categories in '.$llCity.'. Indies only, and rated on Trustpilot.', [number_format($stats['businesses']).' independents mapped', $stats['categories'].' categories', '100% independents only'], 'none'],
-            ['Pricing', 'Free to start. Pay only to grow.', 'Free listing and loyalty for every shop. Featured from £'.($plans['featured']['price'] ?? 19).'/mo unlocks placement and marketing; Premium £'.($plans['premium']['price'] ?? 49).'/mo adds push and analytics; Enterprise for chains.', ['Free: listing, offers, loyalty', 'Featured £'.($plans['featured']['price'] ?? 19).': placement + 2,000 emails / 250 SMS', 'Premium £'.($plans['premium']['price'] ?? 49).': push, analytics, 10,000 emails'], 'none'],
+            ['Our mission', 'Made in the North East, for independents', 'locolie exists to help independent shops, cafes, pubs and makers win back regulars from the chains and big platforms. Indies only, always.', ['Independents only', 'Built for the local high street', 'Verified, local listings'], 'seal'],
+            ['Already building', 'A directory shoppers actually use', number_format($stats['businesses']).' independents mapped across '.$stats['categories'].' categories in '.$llCity.'. Indies only, and rated on Trustpilot.', [number_format($stats['businesses']).' independents mapped', $stats['categories'].' categories', '100% independents only'], 'stats'],
+            ['Pricing', 'Free to start. Pay only to grow.', 'Free listing and loyalty for every shop. Featured from £'.($plans['featured']['price'] ?? 19).'/mo unlocks placement and marketing; Premium £'.($plans['premium']['price'] ?? 49).'/mo adds push and analytics; Enterprise for chains.', ['Free: listing, offers, loyalty', 'Featured £'.($plans['featured']['price'] ?? 19).': placement + 2,000 emails / 250 SMS', 'Premium £'.($plans['premium']['price'] ?? 49).': push, analytics, 10,000 emails'], 'pricing'],
             ['Step 1 - Get found', 'Claim your shop, get found', 'Add your photos, hours and story in minutes. You appear in search, on the map and on your own '.$llCity.' page - so nearby shoppers find you, not just the chains.', ['Live in the '.$llCity.' directory and map', 'Your own shareable shop page', 'Found via category search pages'], 'listing'],
             ['Step 2 - How customers join', 'One scan builds your customer list', 'Put your locolie poster on the counter. A customer scans it, opts in on a branded page, and joins your loyalty scheme and marketing list in seconds.', ['Scan the poster in store', 'Opt in on your branded page', 'Straight onto your customer list'], 'qr'],
             ['Step 3 - Loyalty (free)', 'A loyalty scheme that costs nothing', 'A digital stamp card on the customer\'s phone. No plastic, no app to build, no fees. You set the reward.', ['Digital stamp card, nothing to print', 'You set the reward', 'Built into your free listing'], 'stamp'],
             ['Step 4 - Marketing', 'Bring your customers back', 'Send a branded email, SMS or push anytime. Contact details stay protected - we never sell or share them, and messages go out through locolie, so the relationship stays yours.', ['Branded email, SMS and push', 'Contact details stay protected', 'The relationship stays yours'], 'push'],
             ['The app, live', 'What your customers hold', 'Shoppers discover you, save your offers and loyalty, and scan at the till - all in one beautiful app.', ['Discover local shops and offers', 'Reveal and redeem in store', 'Savings add up automatically'], 'none'],
-            ['Your dashboard', 'Go live, then watch it work', 'Who is visiting, loyalty stamps collected and how your messages land. Clear numbers, no jargon.', ['Customers and new sign-ups', 'Loyalty running automatically', 'Message performance, live'], 'none'],
+            ['Your dashboard', 'Go live, then watch it work', 'Who is visiting, loyalty stamps collected and how your messages land. Clear numbers, no jargon.', ['Customers and new sign-ups', 'Loyalty running automatically', 'Message performance, live'], 'kpis'],
             ['Sign up', 'Claim your shop today', 'Free listing, always. Loyalty included. Priority placement and marketing from £'.($plans['featured']['price'] ?? 19).'/mo. Questions: info@locolie.com', ['Scan the QR to sign up', 'Free listing and loyalty', 'Upgrade only when you grow'], 'qr'],
         ];
     @endphp
     @foreach ($printSlides as $i => $s)
-        <section class="print-slide mx-auto my-6 flex max-w-[250mm] flex-col rounded-2xl border border-slate-200 bg-white p-9" style="min-height:150mm">
-            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
-                <span class="text-lg">{!! $wm('text-[#0a0a0a]') !!}</span>
-                <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Slide {{ $i + 1 }} of {{ count($printSlides) }}</span>
+        <section class="print-slide relative mx-auto my-5 flex w-full max-w-[265mm] flex-col overflow-hidden rounded-2xl bg-[#070a09] p-10 text-white" style="aspect-ratio:16/9">
+            <span class="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full" style="background:radial-gradient(circle, rgba(16,185,129,.22), transparent 70%)"></span>
+            <span class="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full" style="background:radial-gradient(circle, rgba(5,150,105,.15), transparent 70%)"></span>
+            <span class="pointer-events-none absolute inset-0" style="background-image:radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px);background-size:24px 24px"></span>
+            <div class="relative flex items-center justify-between border-b border-white/10 pb-3">
+                <span class="text-lg">{!! $wm('text-white') !!}</span>
+                <span class="text-[11px] font-semibold uppercase tracking-wider text-white/40">Slide {{ $i + 1 }} of {{ count($printSlides) }}</span>
             </div>
-            <p class="mt-5 text-xs font-bold uppercase tracking-wider text-emerald-600">{{ $s[0] }}</p>
-            <h2 class="mt-1.5 text-3xl font-extrabold tracking-tight">{{ $s[1] }}</h2>
-            <p class="mt-3 max-w-2xl text-sm leading-relaxed text-slate-600">{{ $s[2] }}</p>
-            <div class="mt-6 flex flex-1 items-center gap-10">
-                <ul class="flex-1 space-y-2.5">
+            <p class="relative mt-6 text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">{{ $s[0] }}</p>
+            <h2 class="relative mt-2 text-4xl font-extrabold tracking-tight">{{ $s[1] }}</h2>
+            <p class="relative mt-3 max-w-2xl text-sm leading-relaxed text-white/65">{{ $s[2] }}</p>
+            <div class="relative mt-6 flex flex-1 items-center gap-10">
+                <ul class="flex-1 space-y-3">
                     @foreach ($s[3] as $point)
-                        <li class="flex items-start gap-2.5 text-sm"><svg class="mt-0.5 h-4.5 w-4.5 shrink-0 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span class="text-slate-700">{{ $point }}</span></li>
+                        <li class="flex items-start gap-2.5 text-sm"><svg class="mt-0.5 h-4.5 w-4.5 shrink-0 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span class="text-white/85">{{ $point }}</span></li>
                     @endforeach
                 </ul>
                 <div class="shrink-0">
                     @if ($s[4] === 'qr')
-                        <div class="text-center"><div class="h-40 w-40 rounded-xl border border-slate-200 p-2 [&>svg]:h-full [&>svg]:w-full">{!! $signupQr !!}</div><div class="mt-2 text-[11px] font-bold">Scan to sign up</div></div>
+                        <div class="text-center"><div class="h-44 w-44 rounded-xl bg-white p-2.5 [&>svg]:h-full [&>svg]:w-full">{!! $signupQr !!}</div><div class="mt-2 text-[11px] font-bold text-white">Scan to sign up</div></div>
                     @elseif ($s[4] === 'stamp')
-                        <div class="w-44 rounded-2xl border border-slate-200 p-3"><div class="grid grid-cols-5 gap-1.5">@for($x=1;$x<=10;$x++)<div class="flex aspect-square items-center justify-center rounded-full {{ $x<=7?'bg-emerald-500 text-white':'border-2 border-dashed border-slate-200 text-slate-300' }}">@if($x<=7)<svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>@else<span class="text-[9px] font-bold">{{ $x }}</span>@endif</div>@endfor</div><div class="mt-2 rounded-lg bg-emerald-50 py-1 text-center text-[10px] font-bold text-emerald-700">3 to go: free coffee</div></div>
+                        <div class="w-48 rounded-2xl bg-white p-3 text-[#0a0a0a]"><div class="grid grid-cols-5 gap-1.5">@for($x=1;$x<=10;$x++)<div class="flex aspect-square items-center justify-center rounded-full {{ $x<=7?'bg-emerald-500 text-white':'border-2 border-dashed border-slate-200 text-slate-300' }}">@if($x<=7)<svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>@else<span class="text-[9px] font-bold">{{ $x }}</span>@endif</div>@endfor</div><div class="mt-2 rounded-lg bg-emerald-50 py-1 text-center text-[10px] font-bold text-emerald-700">3 to go: free coffee</div></div>
                     @elseif ($s[4] === 'push')
-                        <div class="w-44 space-y-2 rounded-2xl border border-slate-200 bg-slate-50 p-3"><div class="rounded-xl bg-white p-2.5 shadow-sm"><div class="flex items-center gap-1.5"><span class="flex h-5 w-5 items-center justify-center overflow-hidden rounded" style="background: {{ $bColor }};">{!! $brandMark !!}</span><span class="text-[10px] font-bold">{{ \Illuminate\Support\Str::limit($bName, 14) }}</span></div><p class="mt-1 text-[10px] text-slate-600">New autumn menu just dropped.</p></div><div class="rounded-xl bg-white p-2.5 shadow-sm"><span class="text-[10px] font-bold">Email · branded</span><p class="mt-0.5 text-[10px] text-slate-600">3 stamps from a free coffee.</p></div></div>
+                        <div class="w-48 space-y-2"><div class="rounded-xl bg-white p-2.5 text-[#0a0a0a] shadow-sm"><div class="flex items-center gap-1.5"><span class="flex h-5 w-5 items-center justify-center overflow-hidden rounded" style="background: {{ $bColor }};">{!! $brandMark !!}</span><span class="text-[10px] font-bold">{{ \Illuminate\Support\Str::limit($bName, 14) }}</span></div><p class="mt-1 text-[10px] text-slate-600">New autumn menu just dropped.</p></div><div class="rounded-xl bg-white p-2.5 text-[#0a0a0a] shadow-sm"><span class="text-[10px] font-bold">Email · branded</span><p class="mt-0.5 text-[10px] text-slate-600">3 stamps from a free coffee.</p></div></div>
                     @elseif ($s[4] === 'listing')
-                        <div class="w-44 overflow-hidden rounded-2xl border border-slate-200"><div class="h-24" style="background: linear-gradient(135deg, {{ $bColor }}, #0a0a0a);">@if($bPhoto)<img src="{{ $bPhoto }}" alt="" onerror="this.remove()" class="h-full w-full object-cover">@endif</div><div class="p-2.5"><div class="text-xs font-bold">{{ \Illuminate\Support\Str::limit($bName, 16) }}</div><div class="text-[10px] text-slate-500">{{ $bCategory }} · {{ $bCity }}</div></div></div>
+                        <div class="w-48 overflow-hidden rounded-2xl bg-white text-[#0a0a0a]"><div class="h-24" style="background: linear-gradient(135deg, {{ $bColor }}, #0a0a0a);">@if($bPhoto)<img src="{{ $bPhoto }}" alt="" onerror="this.remove()" class="h-full w-full object-cover">@endif</div><div class="p-2.5"><div class="text-xs font-bold">{{ \Illuminate\Support\Str::limit($bName, 16) }}</div><div class="text-[10px] text-slate-500">{{ $bCategory }} · {{ $bCity }}</div></div></div>
+                    @elseif ($s[4] === 'costs')
+                        <div class="w-52 space-y-2">@foreach ([['Commissions','up to 30% per order'],['Ad spend','to reach your own fans'],['No list','their data, not yours']] as $cst)<div class="rounded-xl border border-white/10 bg-white/5 p-3"><div class="text-xs font-bold text-white">{{ $cst[0] }}</div><div class="text-[10px] text-white/60">{{ $cst[1] }}</div></div>@endforeach</div>
+                    @elseif ($s[4] === 'stats')
+                        <div class="grid w-56 grid-cols-2 gap-2.5">@foreach ([[number_format($stats['businesses']),'independents'],[$stats['categories'],'categories'],[$llCity,'launch city'],['100%','indies only']] as $kpi)<div class="rounded-xl border border-white/10 bg-white/5 p-3"><div class="text-xl font-extrabold text-white">{{ $kpi[0] }}</div><div class="text-[9px] font-semibold uppercase tracking-wider text-white/55">{{ $kpi[1] }}</div></div>@endforeach</div>
+                    @elseif ($s[4] === 'pricing')
+                        <div class="grid w-60 grid-cols-2 gap-2.5">@foreach ($plans as $key => $p)<div class="rounded-xl border {{ $key==='featured'?'border-emerald-400/50 bg-emerald-500/10':'border-white/10 bg-white/5' }} p-3"><div class="text-xs font-extrabold text-white">{{ $p['label'] }}</div><div class="text-lg font-extrabold text-white">{{ is_null($p['price'])?'Custom':'£'.$p['price'] }}</div></div>@endforeach</div>
+                    @elseif ($s[4] === 'kpis')
+                        <div class="grid w-56 grid-cols-2 gap-2.5">@foreach ([['128','Customers'],['46','Stamps'],['62%','Opens'],['£1,240','Spend']] as $kpi)<div class="rounded-xl border border-white/10 bg-white/5 p-3"><div class="text-xl font-extrabold text-white">{{ $kpi[0] }}</div><div class="text-[9px] font-semibold uppercase tracking-wider text-white/55">{{ $kpi[1] }}</div></div>@endforeach</div>
+                    @elseif ($s[4] === 'seal')
+                        <div class="flex flex-col items-center gap-2"><x-seal variant="light" class="h-24 w-24" /><div class="text-[11px] font-semibold text-white/80">Independents only</div></div>
                     @endif
                 </div>
             </div>
