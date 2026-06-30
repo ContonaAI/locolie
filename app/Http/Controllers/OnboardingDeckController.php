@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Business;
+use App\Support\QrSvg;
 
 /**
  * In-app, on-brand retailer onboarding deck (about five slides) that walks a new
@@ -22,8 +23,14 @@ class OnboardingDeckController extends Controller
         $business = Business::live()->whereNotNull('photos')->inRandomOrder()->first()
             ?? Business::whereNotNull('photos')->first();
 
+        // The deck's scannable QR points at the website signup (retailer join page),
+        // so anyone viewing or printing the deck can scan straight through to sign up.
+        $signupUrl = route('business.join');
+
         return view('site.onboarding.deck', [
             'business' => $business,
+            'signupUrl' => $signupUrl,
+            'signupQr' => QrSvg::make($signupUrl, 360, '#0a0a0a'),
         ]);
     }
 }
