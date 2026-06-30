@@ -29,6 +29,18 @@ return [
      */
     'offers_public' => filter_var(env('OFFERS_PUBLIC', false), FILTER_VALIDATE_BOOLEAN),
 
+    /*
+     | Plan pricing - the single source of truth for what each retailer tier
+     | costs. Business::PLANS reads these so we never hardcode "£19" in a view.
+     | Enterprise is contact-sales (no fixed price), hence null.
+     */
+    'pricing' => [
+        'free' => (int) env('LOCOLIE_PRICE_FREE', 0),
+        'featured' => (int) env('LOCOLIE_PRICE_FEATURED', 19),
+        'premium' => (int) env('LOCOLIE_PRICE_PREMIUM', 49),
+        'enterprise' => null, // custom / contact sales
+    ],
+
     'launch' => [
         'city' => $city,
         'city_full' => $cityFull,

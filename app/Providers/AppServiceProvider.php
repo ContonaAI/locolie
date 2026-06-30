@@ -33,6 +33,6 @@ class AppServiceProvider extends ServiceProvider
         View::share('ll', $launch);
         View::share('llPlace', $launch['place']);       // "Newcastle NE1"
         View::share('llCity', $launch['city']);         // "Newcastle"
-        View::share('llFeaturedPrice', Business::PLANS['featured']['price'] ?? 19);
+        View::share('llFeaturedPrice', config('locolie.pricing.featured', Business::PLANS['featured']['price'] ?? 19));
     }
 }

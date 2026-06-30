@@ -268,19 +268,45 @@
       <p class="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Simple plans. Cancel anytime.</p>
       <p class="mt-4 text-slate-500">Start free and upgrade whenever you want more reach. No contracts, no setup fees, no catch.</p>
     </div>
-    <div class="mt-12 grid gap-6 lg:grid-cols-3">
+
+    {{-- Free = loyalty only / paid = full marketing, made explicit --}}
+    <div class="mx-auto mt-8 max-w-3xl rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-center text-sm text-slate-600">
+      <span class="font-semibold text-slate-900">Free</span> covers your listing, offers and loyalty scheme.
+      <span class="font-semibold text-slate-900">Paid plans</span> add full marketing - email, SMS &amp; push campaigns to your own customers, within a monthly send allowance.
+    </div>
+
+    <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
       @foreach ($plans as $key => $plan)
         @php $featured = $key === 'featured'; @endphp
-        <div class="relative flex flex-col rounded-2xl border p-7 shadow-sm {{ $featured ? 'border-emerald-500 ring-1 ring-emerald-200 bg-white' : 'border-slate-200 bg-white' }}">
+        <div class="relative flex flex-col rounded-2xl border p-6 shadow-sm {{ $featured ? 'border-emerald-500 ring-1 ring-emerald-200 bg-white' : 'border-slate-200 bg-white' }}">
           @if ($featured)
             <span class="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-emerald-600 px-3 py-1 text-xs font-bold text-white">Most popular</span>
           @endif
           <div class="text-sm font-bold uppercase tracking-wider text-slate-500">{{ $plan['label'] }}</div>
           <div class="mt-3 flex items-baseline gap-1">
-            <span class="text-4xl font-extrabold text-slate-900">£{{ $plan['price'] }}</span>
-            <span class="text-sm font-medium text-slate-400">/mo</span>
+            @if (is_null($plan['price']))
+              <span class="text-3xl font-extrabold text-slate-900">Custom</span>
+            @else
+              <span class="text-4xl font-extrabold text-slate-900">£{{ $plan['price'] }}</span>
+              <span class="text-sm font-medium text-slate-400">/mo</span>
+            @endif
           </div>
-          <ul class="mt-6 flex-1 space-y-2.5">
+
+          {{-- Monthly send allowance --}}
+          <div class="mt-4 rounded-xl bg-slate-50 px-3.5 py-2.5 text-xs">
+            <div class="font-semibold uppercase tracking-wider text-slate-400">Monthly sends</div>
+            @if (! ($plan['marketing'] ?? false))
+              <div class="mt-1 font-medium text-slate-700">Loyalty scheme only - no marketing sends</div>
+            @elseif (($plan['sends']['email'] ?? 0) >= PHP_INT_MAX)
+              <div class="mt-1 font-medium text-emerald-700">Unlimited email, SMS &amp; push</div>
+            @else
+              <div class="mt-1 font-medium text-slate-700">
+                {{ number_format($plan['sends']['email']) }} email · {{ number_format($plan['sends']['sms']) }} SMS@if (! empty($plan['sends']['push'])) · push @endif
+              </div>
+            @endif
+          </div>
+
+          <ul class="mt-5 flex-1 space-y-2.5">
             @foreach ($plan['perks'] as $perk)
               <li class="flex items-start gap-2.5 text-sm text-slate-600">
                 <svg class="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
@@ -288,9 +314,15 @@
               </li>
             @endforeach
           </ul>
-          <a href="#register" @click="tab = 'register'" class="mt-7 block rounded-xl py-3 text-center text-sm font-bold transition {{ $featured ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'border border-slate-300 text-slate-900 hover:border-slate-900' }}">
-            {{ $plan['price'] == 0 ? 'Start free' : 'Choose '.$plan['label'] }}
-          </a>
+          @if ($key === 'enterprise')
+            <a href="mailto:sales@locolie.com?subject=Enterprise%20enquiry" class="mt-7 block rounded-xl py-3 text-center text-sm font-bold transition border border-slate-300 text-slate-900 hover:border-slate-900">
+              Contact sales
+            </a>
+          @else
+            <a href="#register" @click="tab = 'register'" class="mt-7 block rounded-xl py-3 text-center text-sm font-bold transition {{ $featured ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'border border-slate-300 text-slate-900 hover:border-slate-900' }}">
+              {{ ($plan['price'] === 0) ? 'Start free' : 'Choose '.$plan['label'] }}
+            </a>
+          @endif
         </div>
       @endforeach
     </div>

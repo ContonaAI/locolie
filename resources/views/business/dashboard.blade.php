@@ -85,7 +85,13 @@
           </a>
         </div>
       </div>
-      <p class="text-sm text-slate-500 mb-4">Every shopper who redeems an offer is captured here - <span class="font-semibold text-slate-700">your own customer list to market to</span>, something the big chains have always had and independents never did. {{ $customers->count() }} captured · {{ $customers->where('opt_in',true)->count() }} opted in to marketing.</p>
+      <p class="text-sm text-slate-500 mb-3">Every shopper who redeems an offer is captured here - <span class="font-semibold text-slate-700">your own customer list to market to</span>, something the big chains have always had and independents never did. {{ $customers->count() }} captured · {{ $customers->where('opt_in',true)->count() }} opted in to marketing.</p>
+
+      {{-- Privacy promise: we show the name, protect the contact details --}}
+      <div class="mb-4 flex items-start gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50/60 px-4 py-3 text-sm text-emerald-900">
+        <svg class="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0-1.1.9-2 2-2s2 .9 2 2v2H8v-2c0-1.1.9-2 2-2"/><rect x="5" y="11" width="14" height="9" rx="2"/></svg>
+        <span>We protect your customers' contact details - reach them via locolie messaging. You see who they are; emails and mobiles stay masked, so you cannot lose them to a list broker and they stay opted-in with us.</span>
+      </div>
 
       <div x-show="compose" x-cloak class="mb-5 rounded-xl border border-emerald-200 bg-emerald-50/40 p-4">
         <p class="text-xs text-slate-500 mb-3">Jot down a campaign now and save it as a draft. When you are ready to send it as branded email to your {{ $customers->where('opt_in',true)->count() }} opted-in customers, open the <a href="{{ route('business.messaging') }}" class="font-semibold text-emerald-700 hover:underline">Messaging Studio</a>.</p>
@@ -101,13 +107,13 @@
         <div class="overflow-x-auto -mx-2">
           <table class="w-full text-sm">
             <thead class="text-left text-slate-400 text-xs uppercase tracking-wider">
-              <tr class="border-b border-slate-100"><th class="px-2 py-2 font-medium">Customer</th><th class="px-2 py-2 font-medium">Email</th><th class="px-2 py-2 font-medium">Visits</th><th class="px-2 py-2 font-medium">Marketing</th></tr>
+              <tr class="border-b border-slate-100"><th class="px-2 py-2 font-medium">Customer</th><th class="px-2 py-2 font-medium">Email <span class="font-normal normal-case text-slate-300">(protected)</span></th><th class="px-2 py-2 font-medium">Visits</th><th class="px-2 py-2 font-medium">Marketing</th></tr>
             </thead>
             <tbody>
               @foreach ($customers->take(25) as $c)
                 <tr class="border-b border-slate-50">
                   <td class="px-2 py-2.5 font-medium text-slate-800">{{ $c->name }}</td>
-                  <td class="px-2 py-2.5 text-slate-500">{{ $c->email }}</td>
+                  <td class="px-2 py-2.5 text-slate-500 font-mono text-xs" title="Protected - message via locolie">{{ $c->email_masked }}</td>
                   <td class="px-2 py-2.5 text-slate-500">{{ $c->visits }}</td>
                   <td class="px-2 py-2.5">
                     <span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ $c->opt_in ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">{{ $c->opt_in ? 'Opted in' : ' - ' }}</span>
@@ -132,15 +138,26 @@
           <div class="rounded-xl border p-4 {{ $business->plan===$key ? 'border-emerald-500 bg-emerald-50/50' : 'border-slate-200' }}">
             <div class="flex items-center justify-between">
               <div class="font-bold text-slate-900">{{ $p['label'] }}</div>
-              <div class="text-sm font-semibold text-slate-500">{{ $p['price'] ? '£'.$p['price'].'/mo' : 'Free' }}</div>
+              <div class="text-sm font-semibold text-slate-500">{{ is_null($p['price']) ? 'Custom' : ($p['price'] ? '£'.$p['price'].'/mo' : 'Free') }}</div>
+            </div>
+            <div class="mt-1.5 text-[11px] font-semibold uppercase tracking-wide {{ ($p['marketing'] ?? false) ? 'text-emerald-600' : 'text-slate-400' }}">
+              @if (! ($p['marketing'] ?? false))
+                Loyalty only · no marketing sends
+              @elseif (($p['sends']['email'] ?? 0) >= PHP_INT_MAX)
+                Unlimited email, SMS &amp; push
+              @else
+                {{ number_format($p['sends']['email']) }} email · {{ number_format($p['sends']['sms']) }} SMS / mo
+              @endif
             </div>
             <ul class="mt-2 space-y-1">
               @foreach ($p['perks'] as $perk)
-                <li class="text-xs text-slate-500 flex gap-1.5"><span class="text-emerald-500">✓</span>{{ $perk }}</li>
+                <li class="text-xs text-slate-500 flex gap-1.5"><span class="text-emerald-500">✓</span><span>{!! $perk !!}</span></li>
               @endforeach
             </ul>
             @if ($business->plan===$key)
               <div class="mt-3 text-center text-xs font-bold text-emerald-700 uppercase tracking-wide">Current plan</div>
+            @elseif ($key==='enterprise')
+              <a href="mailto:sales@locolie.com?subject=Enterprise%20enquiry" class="mt-3 block w-full rounded-lg bg-slate-900 text-white hover:bg-slate-700 text-center font-semibold py-2 text-sm transition">Contact sales</a>
             @else
               <form method="POST" action="{{ route('business.upgrade') }}" class="mt-3">
                 @csrf <input type="hidden" name="plan" value="{{ $key }}">

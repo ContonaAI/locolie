@@ -283,17 +283,18 @@
 
     {{-- 8. Recent customers --}}
     <div class="rounded-2xl border border-slate-200 bg-white p-6">
-        <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center justify-between mb-2">
             <h2 class="font-bold text-lg text-slate-900">Recent customers</h2>
             <a href="{{ route('business.dashboard') }}" class="text-sm font-semibold text-emerald-700 hover:underline print:hidden">Full customer list</a>
         </div>
+        <p class="mb-4 text-xs text-emerald-800 bg-emerald-50/60 border border-emerald-200 rounded-lg px-3 py-2">We protect your customers' contact details - reach them via locolie messaging. Emails and mobiles are masked here and in exports.</p>
         @if (count($report['recent_customers']))
             <div class="overflow-x-auto -mx-2">
                 <table class="w-full text-sm min-w-[480px]">
                     <thead class="text-left text-slate-400 text-xs uppercase tracking-wider">
                         <tr class="border-b border-slate-100">
                             <th class="px-2 py-2 font-medium">Customer</th>
-                            <th class="px-2 py-2 font-medium">Email</th>
+                            <th class="px-2 py-2 font-medium">Email <span class="font-normal normal-case text-slate-300">(protected)</span></th>
                             <th class="px-2 py-2 font-medium text-right">Visits</th>
                             <th class="px-2 py-2 font-medium">Marketing</th>
                         </tr>
@@ -302,7 +303,7 @@
                         @foreach ($report['recent_customers'] as $c)
                             <tr class="border-b border-slate-50 last:border-0">
                                 <td class="px-2 py-2.5 font-medium text-slate-800">{{ $c['name'] }}</td>
-                                <td class="px-2 py-2.5 text-slate-500">{{ $c['email'] }}</td>
+                                <td class="px-2 py-2.5 text-slate-500 font-mono text-xs" title="Protected - message via locolie">{{ \App\Models\Business::maskEmail($c['email']) }}</td>
                                 <td class="px-2 py-2.5 text-right text-slate-500">{{ number_format($c['visits']) }}</td>
                                 <td class="px-2 py-2.5">
                                     <span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ $c['opt_in'] ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">{{ $c['opt_in'] ? 'Opted in' : 'Not opted in' }}</span>

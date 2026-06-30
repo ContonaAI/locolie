@@ -35,7 +35,7 @@ class BusinessPortalController extends Controller
 
         return view('business.join', [
             'demo' => $demo,
-            'plans' => Business::PLANS,
+            'plans' => Business::plans(),
         ]);
     }
 
@@ -109,7 +109,7 @@ class BusinessPortalController extends Controller
 
         return view('business.dashboard', [
             'business' => $business,
-            'plans' => Business::PLANS,
+            'plans' => Business::plans(),
             'customers' => $this->customersFor($business),
             'stats' => [
                 'offers' => $business->offers->where('status', 'active')->count(),
@@ -131,7 +131,11 @@ class BusinessPortalController extends Controller
             ->filter(fn ($r) => $r->customer_email)
             ->groupBy('customer_email')
             ->map(fn ($g) => (object) [
+                // Raw email is kept for internal sending (messagingSend), never
+                // shown raw in the UI or export - see email_masked / our privacy
+                // promise: retailers reach customers THROUGH locolie messaging.
                 'email' => $g->first()->customer_email,
+                'email_masked' => Business::maskEmail($g->first()->customer_email),
                 'name' => $g->first()->customer_name ?: '—',
                 'visits' => $g->count(),
                 'opt_in' => (bool) $g->max('marketing_opt_in'),
@@ -146,9 +150,13 @@ class BusinessPortalController extends Controller
         $business = Auth::guard('business')->user();
         $customers = $this->customersFor($business);
 
-        $csv = "Name,Email,Visits,Marketing opt-in,Last visit\n";
+        // Privacy promise: the export carries the customer NAME and visit data,
+        // but contact details are masked - the retailer cannot lift raw emails
+        // out of locolie. To reach a customer they go through our messaging,
+        // which keeps the relationship (and opt-out compliance) with us.
+        $csv = "Name,Email (protected),Visits,Marketing opt-in,Last visit\n";
         foreach ($customers as $c) {
-            $csv .= '"'.str_replace('"', '""', $c->name).'","'.$c->email.'",'.$c->visits.','.($c->opt_in ? 'yes' : 'no').','.optional($c->last)->toDateString()."\n";
+            $csv .= '"'.str_replace('"', '""', $c->name).'","'.$c->email_masked.'",'.$c->visits.','.($c->opt_in ? 'yes' : 'no').','.optional($c->last)->toDateString()."\n";
         }
 
         return response($csv, 200, [

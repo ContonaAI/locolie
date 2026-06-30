@@ -621,6 +621,26 @@
         <div class="mt-10 text-center reveal">
             <a href="/for-business" class="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald hover:text-ink">See everything retailers get <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
         </div>
+
+        {{-- Tier model + privacy promise --}}
+        <div class="reveal mt-12 grid gap-5 lg:grid-cols-2">
+            {{-- Free vs paid split --}}
+            <div class="rounded-card border border-hair bg-white p-7">
+                <div class="flex items-center gap-3">
+                    <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-soft text-emerald"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+                    <h3 class="text-lg font-bold">Free for loyalty. Paid for marketing.</h3>
+                </div>
+                <p class="mt-3 text-sm leading-relaxed text-muted"><span class="font-semibold text-ink">Free</span> gets you listed, lets you publish offers and run your loyalty scheme - forever. <span class="font-semibold text-ink">Paid plans</span> (from £{{ $llFeaturedPrice }}/mo) unlock full marketing: email, SMS and push campaigns to the customers you capture, within a generous monthly send allowance. Need more? <span class="font-semibold text-ink">Enterprise</span> is unlimited, for chains and multi-site indies.</p>
+            </div>
+            {{-- Privacy promise --}}
+            <div class="rounded-card border border-emerald/30 bg-emerald-soft/40 p-7">
+                <div class="flex items-center gap-3">
+                    <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald text-white"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg></span>
+                    <h3 class="text-lg font-bold">Your customers' details, protected.</h3>
+                </div>
+                <p class="mt-3 text-sm leading-relaxed text-muted">Retailers see <span class="font-semibold text-ink">who</span> their customers are - names and visit history - but email and mobile stay masked. We protect your customers' contact details: retailers reach them <span class="font-semibold text-ink">through locolie messaging</span>, never by lifting a raw list. It keeps shoppers in control and every send fully opted-in.</p>
+            </div>
+        </div>
     </div>
 </section>
 

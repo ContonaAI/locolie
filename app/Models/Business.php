@@ -20,15 +20,51 @@ use Illuminate\Support\Str;
 #[\Illuminate\Database\Eloquent\Attributes\Hidden(['owner_secret', 'password'])]
 class Business extends Authenticatable
 {
-    /** Plan catalogue — label, monthly price, and the perks each unlocks. */
+    /**
+     * Plan catalogue — label, monthly price, the perks each unlocks, and the
+     * monthly marketing send allowance (email / SMS / push) per tier.
+     *
+     * The free / paid split is deliberate and explicit:
+     *   - FREE  = loyalty + listing only. No marketing sends at all.
+     *   - PAID  = featured / premium / enterprise unlock full marketing
+     *             (email, SMS and push campaigns) within their thresholds.
+     *
+     * `price` here is the documented fallback. The live price is config-driven
+     * (config/locolie.php → locolie.pricing) and resolved by self::plans() /
+     * planConfig(), so we never hardcode "£19" in a view. `null` allowance = no
+     * sends on that channel; `PHP_INT_MAX` = unlimited (Enterprise).
+     */
     public const PLANS = [
-        'free' => ['label' => 'Free', 'price' => 0, 'priority' => 0, 'featured' => false,
-            'perks' => ['Listed in search & map', 'Publish offers', 'QR redemptions']],
-        'featured' => ['label' => 'Featured', 'price' => 19, 'priority' => 50, 'featured' => true,
-            'perks' => ['Everything in Free', 'Featured-rail placement', '“Sponsored” badge', 'Priority in search & map', 'Monthly email feature']],
-        'premium' => ['label' => 'Premium', 'price' => 49, 'priority' => 100, 'featured' => true,
-            'perks' => ['Everything in Featured', 'Top placement', 'Push to nearby shoppers', 'Unlimited email campaigns', 'Analytics dashboard']],
+        'free' => ['label' => 'Free', 'price' => 0, 'priority' => 0, 'featured' => false, 'marketing' => false,
+            'sends' => ['email' => 0, 'sms' => 0, 'push' => 0],
+            'perks' => ['Listed in search & map', 'Publish offers', 'QR redemptions', 'Loyalty scheme', '<span class="text-slate-400">No marketing sends</span>']],
+        'featured' => ['label' => 'Featured', 'price' => 19, 'priority' => 50, 'featured' => true, 'marketing' => true,
+            'sends' => ['email' => 2000, 'sms' => 250, 'push' => 2000],
+            'perks' => ['Everything in Free', 'Featured-rail placement', '“Sponsored” badge', 'Priority in search & map', 'Email &amp; SMS campaigns', '<strong>2,000</strong> emails, <strong>250</strong> SMS / month']],
+        'premium' => ['label' => 'Premium', 'price' => 49, 'priority' => 100, 'featured' => true, 'marketing' => true,
+            'sends' => ['email' => 10000, 'sms' => 1500, 'push' => 10000],
+            'perks' => ['Everything in Featured', 'Top placement', 'Push to nearby shoppers', 'Analytics dashboard', '<strong>10,000</strong> emails, <strong>1,500</strong> SMS, push / month']],
+        'enterprise' => ['label' => 'Enterprise', 'price' => null, 'priority' => 150, 'featured' => true, 'marketing' => true,
+            'sends' => ['email' => PHP_INT_MAX, 'sms' => PHP_INT_MAX, 'push' => PHP_INT_MAX],
+            'perks' => ['Everything in Premium', 'Unlimited email, SMS &amp; push', 'Multi-location / chains', 'Dedicated success manager', 'Custom integrations &amp; SLA']],
     ];
+
+    /**
+     * Plan catalogue with live, config-driven prices merged in. Views and the
+     * portal should use this so a price change in config/locolie.php flows
+     * everywhere without touching code.
+     */
+    public static function plans(): array
+    {
+        $plans = self::PLANS;
+        foreach (config('locolie.pricing', []) as $key => $price) {
+            if (isset($plans[$key])) {
+                $plans[$key]['price'] = $price;
+            }
+        }
+
+        return $plans;
+    }
 
     protected function casts(): array
     {
@@ -46,20 +82,68 @@ class Business extends Authenticatable
         ];
     }
 
-    /** Config for this business's current plan. */
+    /** Config for this business's current plan (config-driven price merged in). */
     public function planConfig(): array
     {
-        return self::PLANS[$this->plan] ?? self::PLANS['free'];
+        $plans = self::plans();
+
+        return $plans[$this->plan] ?? $plans['free'];
     }
 
     public function isPaid(): bool
     {
-        return in_array($this->plan, ['featured', 'premium'], true);
+        return in_array($this->plan, ['featured', 'premium', 'enterprise'], true);
     }
 
+    /**
+     * Whether this plan may send marketing (email / SMS / push) at all. FREE is
+     * loyalty + listing only; every PAID tier unlocks marketing within its
+     * thresholds.
+     */
+    public function canMarket(): bool
+    {
+        return (bool) ($this->planConfig()['marketing'] ?? false);
+    }
+
+    /** Push is available on Premium and Enterprise. */
     public function canPush(): bool
     {
-        return $this->plan === 'premium';
+        return in_array($this->plan, ['premium', 'enterprise'], true);
+    }
+
+    /**
+     * Monthly included send allowance for a channel (email|sms|push). 0 = none
+     * (free tier), PHP_INT_MAX = unlimited (enterprise).
+     */
+    public function sendAllowance(string $channel): int
+    {
+        return (int) ($this->planConfig()['sends'][$channel] ?? 0);
+    }
+
+    // ── Customer-contact privacy: retailers see the name, we protect the rest ──
+
+    /** Mask an email for display/export: jane@acme.com → j••••@••••.com */
+    public static function maskEmail(?string $email): string
+    {
+        if (blank($email) || ! str_contains($email, '@')) {
+            return '••••';
+        }
+        [$local, $domain] = explode('@', $email, 2);
+        $dot = strrpos($domain, '.');
+        $tld = $dot !== false ? substr($domain, $dot) : '';
+
+        return Str::substr($local, 0, 1).'••••@••••'.$tld;
+    }
+
+    /** Mask a phone for display/export: keep the last 3 digits only. */
+    public static function maskPhone(?string $phone): string
+    {
+        if (blank($phone)) {
+            return '••••';
+        }
+        $digits = preg_replace('/\D/', '', $phone);
+
+        return '••••••'.Str::substr($digits, -3);
     }
 
     /** Onboarded, live businesses only — what shoppers should ever see. */
