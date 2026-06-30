@@ -99,6 +99,37 @@ return [
         'subject' => env('VAPID_SUBJECT', env('APP_URL', 'mailto:hello@locolie.com')),
     ],
 
+    // ── Social media control centre (/portal/social). All optional - posts can
+    //    be drafted + scheduled today; direct API publishing goes live once each
+    //    developer app is approved and its client id/secret + token are added.
+    //    Each block holds the OAuth client credentials read by the connect flow;
+    //    the per-account access token is captured at connect time and stored
+    //    (encrypted) on the social_accounts row, never here. ──
+    'social' => [
+        'facebook' => [
+            'client_id' => env('FB_APP_ID'),
+            'client_secret' => env('FB_APP_SECRET'),
+            'redirect' => env('FB_REDIRECT_URI'),
+        ],
+        'instagram' => [
+            // Instagram publishing runs on the Facebook Graph app; these default
+            // to the Facebook app credentials but can be overridden.
+            'client_id' => env('INSTAGRAM_APP_ID', env('FB_APP_ID')),
+            'client_secret' => env('INSTAGRAM_APP_SECRET', env('FB_APP_SECRET')),
+            'redirect' => env('INSTAGRAM_REDIRECT_URI'),
+        ],
+        'tiktok' => [
+            'client_id' => env('TIKTOK_CLIENT_KEY'),
+            'client_secret' => env('TIKTOK_CLIENT_SECRET'),
+            'redirect' => env('TIKTOK_REDIRECT_URI'),
+        ],
+        'linkedin' => [
+            'client_id' => env('LINKEDIN_CLIENT_ID'),
+            'client_secret' => env('LINKEDIN_CLIENT_SECRET'),
+            'redirect' => env('LINKEDIN_REDIRECT_URI'),
+        ],
+    ],
+
     // Stripe billing for paid plans (scaffolded — paste keys to go live).
     'stripe' => [
         'key' => env('STRIPE_KEY'),

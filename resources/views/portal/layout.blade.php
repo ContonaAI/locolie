@@ -73,6 +73,7 @@
         $trailing = [
             ['route' => 'portal.admin', 'label' => 'Admin'],
             ['route' => 'messaging.studio', 'label' => 'Messaging'],
+            ['route' => 'social.calendar', 'label' => 'Social', 'match' => 'social.*'],
             ['route' => 'portal.reports', 'label' => 'Reports'],
             ['route' => 'portal.setup', 'label' => 'Setup'],
             ['route' => 'portal.settings', 'label' => 'Settings'],
@@ -113,7 +114,7 @@
 
                 @foreach ($trailing as $item)
                     <a href="{{ route($item['route']) }}"
-                       class="px-3 py-1.5 rounded-lg transition {{ request()->routeIs($item['route']) ? 'font-semibold text-emerald-700 bg-emerald-50' : 'text-slate-600 hover:bg-slate-100' }}">{{ $item['label'] }}</a>
+                       class="px-3 py-1.5 rounded-lg transition {{ request()->routeIs($item['match'] ?? $item['route']) ? 'font-semibold text-emerald-700 bg-emerald-50' : 'text-slate-600 hover:bg-slate-100' }}">{{ $item['label'] }}</a>
                 @endforeach
             </nav>
 
@@ -142,7 +143,7 @@
             @endforeach
             <div class="border-t border-slate-100 my-2"></div>
             @foreach ($trailing as $item)
-                <a href="{{ route($item['route']) }}" class="block px-3 py-2 rounded-lg {{ request()->routeIs($item['route']) ? 'font-semibold text-emerald-700 bg-emerald-50' : 'text-slate-700' }}">{{ $item['label'] }}</a>
+                <a href="{{ route($item['route']) }}" class="block px-3 py-2 rounded-lg {{ request()->routeIs($item['match'] ?? $item['route']) ? 'font-semibold text-emerald-700 bg-emerald-50' : 'text-slate-700' }}">{{ $item['label'] }}</a>
             @endforeach
             <form method="POST" action="{{ route('portal.logout') }}" class="px-3 pt-2">
                 @csrf
