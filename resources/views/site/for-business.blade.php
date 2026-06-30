@@ -134,6 +134,10 @@
                 <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald">Loyalty, built in</h2>
                 <p class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-balance">Turn first-timers into regulars.</p>
                 <p class="mt-4 text-lg text-muted">Set your own rules and locolie does the counting. No plastic stamp cards, no extra app - every code you verify at the till moves that customer closer to a reward, automatically.</p>
+                <div class="mt-5 inline-flex items-center gap-2 rounded-full border border-emerald/30 bg-emerald-soft px-4 py-2 text-sm font-bold text-emerald">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                    Free, forever - included on every plan
+                </div>
                 <ul class="mt-6 space-y-3 text-sm">
                     @foreach ([
                         'Your rules: "scan 5 times, get one free" or "spend £50, unlock 10% off"',
@@ -148,7 +152,7 @@
                     @endforeach
                 </ul>
                 <a href="/business/join" class="mt-8 inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald">
-                    Set up loyalty
+                    Set up loyalty free
                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
                 </a>
             </div>
@@ -182,6 +186,17 @@
                     </div>
                     <p class="mt-3 text-xs text-muted">£18 more to unlock the reward.</p>
                 </div>
+            </div>
+        </div>
+
+        {{-- Step-by-step explainer (shared partial, reused inside the retailer editor too) --}}
+        <div class="mt-20 border-t border-hair pt-16">
+            @include('site._loyalty_how')
+            <div class="mt-10 text-center">
+                <a href="{{ route('site.how-loyalty') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-emerald hover:text-ink">
+                    See the full loyalty walkthrough
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </a>
             </div>
         </div>
     </div>
