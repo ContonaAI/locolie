@@ -158,4 +158,21 @@ Route::middleware('portal')->group(function () {
     Route::post('/messaging/push/preview', [\App\Http\Controllers\Messaging\PushStudioController::class, 'preview'])->name('messaging.push.preview');
     Route::post('/messaging/push/test', [\App\Http\Controllers\Messaging\PushStudioController::class, 'test'])->name('messaging.push.test');
     Route::post('/messaging/push/send', [\App\Http\Controllers\Messaging\PushStudioController::class, 'send'])->name('messaging.push.send');
+
+    // ── Social media control centre: marketing calendar + post drafts +
+    //    handle / account management + OAuth publishing plumbing ──────────────
+    Route::get('/social', [\App\Http\Controllers\Portal\SocialController::class, 'calendar'])->name('social.calendar');
+    Route::get('/social/posts/create', [\App\Http\Controllers\Portal\SocialController::class, 'create'])->name('social.create');
+    Route::post('/social/posts', [\App\Http\Controllers\Portal\SocialController::class, 'store'])->name('social.store');
+    Route::get('/social/posts/{post}/edit', [\App\Http\Controllers\Portal\SocialController::class, 'edit'])->name('social.edit');
+    Route::put('/social/posts/{post}', [\App\Http\Controllers\Portal\SocialController::class, 'update'])->name('social.update');
+    Route::delete('/social/posts/{post}', [\App\Http\Controllers\Portal\SocialController::class, 'destroy'])->name('social.destroy');
+    Route::post('/social/posts/{post}/publish', [\App\Http\Controllers\Portal\SocialController::class, 'publishNow'])->name('social.publish');
+
+    // Handles / accounts manager + OAuth connect flow
+    Route::get('/social/accounts', [\App\Http\Controllers\Portal\SocialController::class, 'accounts'])->name('social.accounts');
+    Route::post('/social/accounts/{platform}', [\App\Http\Controllers\Portal\SocialController::class, 'saveAccount'])->name('social.accounts.save');
+    Route::post('/social/accounts/{platform}/disconnect', [\App\Http\Controllers\Portal\SocialController::class, 'disconnect'])->name('social.disconnect');
+    Route::get('/social/connect/{platform}', [\App\Http\Controllers\Portal\SocialController::class, 'connect'])->name('social.connect');
+    Route::get('/social/connect/{platform}/callback', [\App\Http\Controllers\Portal\SocialController::class, 'connectCallback'])->name('social.connect.callback');
 });
