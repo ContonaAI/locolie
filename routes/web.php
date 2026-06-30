@@ -18,6 +18,9 @@ Route::get('/demo', [\App\Http\Controllers\DemoController::class, 'index'])->nam
 Route::get('/contact', [\App\Http\Controllers\ContactController::class, 'index'])->name('site.contact');
 Route::post('/contact', [\App\Http\Controllers\ContactController::class, 'submit'])->middleware('throttle:5,1')->name('site.contact.submit');
 
+// Proof of the DB-backed CMS: renders cms() values to show the admin round-trip.
+Route::get('/cms-demo', fn () => view('site.cms_demo'))->name('site.cms-demo');
+
 // ── Programmatic local SEO: "{category} in {area}" landing pages + hubs ──────
 Route::get('/local', [\App\Http\Controllers\SeoController::class, 'index'])->name('seo.index');
 Route::get('/local/{area}', [\App\Http\Controllers\SeoController::class, 'area'])->name('seo.area');
@@ -123,6 +126,10 @@ Route::middleware('portal')->group(function () {
 
     // Custom <head> scripts (analytics / pixels), injected site-wide
     Route::post('/admin/scripts', [\App\Http\Controllers\ScriptsController::class, 'save'])->name('admin.scripts');
+
+    // ── CMS: admin content manager (edit site copy/images live) ──────────────
+    Route::get('/portal/content', [\App\Http\Controllers\ContentController::class, 'index'])->name('portal.content');
+    Route::put('/portal/content/{block}', [\App\Http\Controllers\ContentController::class, 'update'])->name('portal.content.update');
 
     // Admin CRM
     Route::get('/admin', [PortalController::class, 'admin'])->name('portal.admin');
