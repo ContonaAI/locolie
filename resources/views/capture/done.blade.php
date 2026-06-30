@@ -43,7 +43,7 @@
             <ul class="mt-3 space-y-2.5 text-sm text-slate-600">
                 <li class="flex items-start gap-2.5">
                     <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" style="background: {{ $accent }};"></span>
-                    {{ $business->name }} sends you their next offer - landing in your inbox@if($sms) or texts@endif.
+                    {{ $business->name }} sends you their next offer - landing in your inbox @if($sms) or texts @endif.
                 </li>
                 <li class="flex items-start gap-2.5">
                     <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" style="background: {{ $accent }};"></span>

@@ -301,7 +301,7 @@
               <div class="mt-1 font-medium text-emerald-700">Unlimited email, SMS &amp; push</div>
             @else
               <div class="mt-1 font-medium text-slate-700">
-                {{ number_format($plan['sends']['email']) }} email · {{ number_format($plan['sends']['sms']) }} SMS@if (! empty($plan['sends']['push'])) · push @endif
+                {{ number_format($plan['sends']['email']) }} email · {{ number_format($plan['sends']['sms']) }} SMS @if (! empty($plan['sends']['push'])) · push @endif
               </div>
             @endif
           </div>
