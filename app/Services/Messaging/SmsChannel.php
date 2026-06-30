@@ -15,9 +15,10 @@ use Throwable;
  * sends are logged + counted and reported as 'demo'. The moment a provider's
  * env keys exist, delivery goes live with no change to any calling code.
  *
- * Twilio is wired for real HTTP delivery; the other five providers degrade to a
- * logged optimistic send with a clear "live-send not yet wired" note. Any
- * missing credential routes back to demo - this class never throws.
+ * ClickSend (our recommended cheap default) and Twilio are wired for real HTTP
+ * delivery; the other four providers degrade to a logged optimistic send with a
+ * clear "live-send not yet wired" note. Any missing credential routes back to
+ * demo - this class never throws.
  */
 class SmsChannel extends BaseChannel
 {
@@ -37,13 +38,16 @@ class SmsChannel extends BaseChannel
      */
     public function providerDrivers(): array
     {
+        // ClickSend first: it is the recommended cheap default, so when more than
+        // one provider has real keys readyProvider() picks it. A sender id (from)
+        // is optional for ClickSend, so it is not required to be "ready".
         return [
+            'clicksend' => ['services.clicksend.username', 'services.clicksend.key'],
             'twilio' => ['services.twilio.sid', 'services.twilio.token', 'services.twilio.from'],
             'vonage' => ['services.vonage.key', 'services.vonage.secret', 'services.vonage.from'],
             'messagebird' => ['services.messagebird.key', 'services.messagebird.originator'],
             'plivo' => ['services.plivo.auth_id', 'services.plivo.auth_token', 'services.plivo.from'],
             'aws_sns' => ['services.sns.key', 'services.sns.secret', 'services.sns.region'],
-            'clicksend' => ['services.clicksend.username', 'services.clicksend.key', 'services.clicksend.from'],
         ];
     }
 
@@ -256,9 +260,66 @@ class SmsChannel extends BaseChannel
         return $this->stubProvider('aws_sns', $phones);
     }
 
+    /**
+     * Real ClickSend delivery via the REST API (one batched request, up to the
+     * provider's per-call message cap). Basic-auth is username + API key. The
+     * sender id ("from") is optional - ClickSend uses a shared/dedicated number
+     * when omitted, and alphanumeric ids are honoured where the destination
+     * country allows them.
+     */
     protected function sendViaClicksend(array $phones, string $body, string $sender): SendResult
     {
-        return $this->stubProvider('clicksend', $phones);
+        $username = config('services.clicksend.username');
+        $apiKey = config('services.clicksend.key');
+        $from = config('services.clicksend.from') ?: $sender;
+
+        if (blank($username) || blank($apiKey)) {
+            return SendResult::demo(count($phones), 'ClickSend credentials incomplete - logged in demo mode.');
+        }
+
+        $messages = array_map(fn ($to) => array_filter([
+            'source' => 'php',
+            'from' => $from ?: null,
+            'to' => $to,
+            'body' => $body,
+        ]), $phones);
+
+        $sent = 0;
+        $errors = [];
+
+        // ClickSend caps messages per request; batch to stay well under it.
+        foreach (array_chunk($messages, 100) as $batch) {
+            $resp = Http::withBasicAuth($username, $apiKey)
+                ->acceptJson()
+                ->post('https://rest.clicksend.com/v3/sms/send', [
+                    'messages' => array_values($batch),
+                ]);
+
+            if (! $resp->successful()) {
+                $errors[] = $resp->json('response_msg') ?? "HTTP {$resp->status()}";
+
+                continue;
+            }
+
+            foreach ((array) $resp->json('data.messages', []) as $m) {
+                if (($m['status'] ?? null) === 'SUCCESS') {
+                    $sent++;
+                } else {
+                    $errors[] = $m['status'] ?? 'ClickSend rejected a message.';
+                }
+            }
+        }
+
+        if ($sent === 0 && $errors) {
+            return SendResult::failed('ClickSend rejected every message: '.implode('; ', array_slice($errors, 0, 3)), 'clicksend');
+        }
+
+        $note = "Sent {$sent} SMS via ClickSend.";
+        if ($errors) {
+            $note .= ' '.count($errors).' failed.';
+        }
+
+        return SendResult::sent($sent, 'clicksend', $note);
     }
 
     /**

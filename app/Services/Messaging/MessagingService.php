@@ -6,13 +6,35 @@ use App\Jobs\SendCampaignJob;
 use App\Models\Business;
 use App\Models\Campaign;
 use App\Models\MessagingChannel;
+use App\Models\Redemption;
 use App\Models\Subscription;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 
 /**
  * Registry + facade over the three delivery channels. Resolves a channel by
  * key, exposes connection state for the studio, and records every send to the
  * campaigns log so the CRM has a single history across email, SMS and push.
+ *
+ * ---------------------------------------------------------------------------
+ * CONTACT-ANONYMISATION CONTRACT (enforced on the sending side)
+ * ---------------------------------------------------------------------------
+ * MessagingService is the ONLY sanctioned route from a retailer to a customer.
+ * Retailers never hold, export, or type raw customer email/mobile - they pick a
+ * customer by id or pick a segment, and the actual address is resolved here,
+ * server-side, from our own stored Redemption / Subscription data.
+ *
+ * Practically this means retailer-facing send flows MUST pass either:
+ *   - an audience SPEC (channel + brand + segment) to resolveAudience(), which
+ *     reads addresses out of stored records the retailer never sees; or
+ *   - a list of customer IDs to recipientsFromCustomerIds(); never raw
+ *     addresses lifted from a retailer-supplied field.
+ *
+ * The two trusted exceptions are the platform's own "send a test to MY address"
+ * action and platform-operator broadcasts - both originate server-side from a
+ * verified owner, not from an exported contact list. dispatch() still applies
+ * consent filtering to whatever it is handed, so a leaked address cannot be
+ * messaged once that customer has opted out.
  */
 class MessagingService
 {
@@ -123,6 +145,79 @@ class MessagingService
         ]);
 
         return $result;
+    }
+
+    /**
+     * Resolve an audience SPEC into deliverable recipients, entirely server-side,
+     * from our own stored Redemption records. This is the anonymisation-safe way
+     * for a retailer flow to reach customers: the caller names a channel, a brand
+     * and a segment - never an address - and the addresses are read out here.
+     *
+     * Recipients carry an opaque 'customer_id' (the redemption id) plus the name,
+     * so downstream UI can show "who" without ever surfacing the raw address.
+     * consent is still applied later by dispatch().
+     *
+     * @param  string  $channelKey  'email' | 'sms'
+     * @param  'all'|'opted_in'  $segment  audience segment within the brand
+     * @return Collection<int,array{customer_id:int,email?:string,phone?:string,name:string}>
+     */
+    public function resolveAudience(string $channelKey, ?Business $brand = null, string $segment = 'opted_in'): Collection
+    {
+        $query = Redemption::query();
+
+        if ($brand) {
+            $query->whereHas('offer', fn ($o) => $o->where('business_id', $brand->id));
+        }
+
+        if ($channelKey === 'sms') {
+            $query->whereNotNull('customer_phone');
+            if ($segment === 'opted_in') {
+                $query->where('sms_opt_in', true);
+            }
+        } else { // email
+            $query->whereNotNull('customer_email');
+            if ($segment === 'opted_in') {
+                $query->where('marketing_opt_in', true);
+            }
+        }
+
+        return $query->get(['id', 'customer_name', 'customer_email', 'customer_phone'])
+            ->map(fn (Redemption $r) => array_filter([
+                'customer_id' => $r->id,
+                'name' => $r->customer_name ?: 'Customer',
+                // Email is kept even on SMS sends so the consent gate can drop
+                // anyone who unsubscribed from SMS alerts (keyed on email).
+                'email' => $r->customer_email,
+                'phone' => $channelKey === 'sms' ? $r->customer_phone : null,
+            ], fn ($v) => $v !== null && $v !== ''))
+            ->unique(fn ($r) => $r['email'] ?? $r['phone'] ?? $r['customer_id'])
+            ->values();
+    }
+
+    /**
+     * Resolve a list of opaque customer (redemption) IDs into deliverable
+     * recipients server-side. Use this when a retailer flow lets a user tick
+     * specific customers: the UI passes IDs, NOT addresses, and we look the
+     * address up here so it never leaves our system in retailer-facing payloads.
+     *
+     * @param  array<int,int>  $customerIds  redemption ids
+     * @return Collection<int,array{customer_id:int,email?:string,phone?:string,name:string}>
+     */
+    public function recipientsFromCustomerIds(string $channelKey, array $customerIds): Collection
+    {
+        if (empty($customerIds)) {
+            return collect();
+        }
+
+        return Redemption::whereIn('id', $customerIds)
+            ->get(['id', 'customer_name', 'customer_email', 'customer_phone'])
+            ->map(fn (Redemption $r) => array_filter([
+                'customer_id' => $r->id,
+                'name' => $r->customer_name ?: 'Customer',
+                'email' => $r->customer_email,
+                'phone' => $channelKey === 'sms' ? $r->customer_phone : null,
+            ], fn ($v) => $v !== null && $v !== ''))
+            ->values();
     }
 
     /**

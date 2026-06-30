@@ -6,8 +6,10 @@ use App\Http\Controllers\TrackingController;
 use App\Mail\BrandedCampaign;
 use App\Models\Business;
 use App\Models\Subscription;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 
 /**
@@ -15,8 +17,14 @@ use Illuminate\Support\Str;
  *
  * Follows the house "demo-able now, live when keys added" rule: with no real
  * provider configured, sends are logged + counted and reported as 'demo'; the
- * moment Gmail OAuth, Resend, or a non-log mailer is configured, the very same
- * call delivers a branded, responsive HTML email for real - no caller change.
+ * moment Gmail OAuth, Resend, Mailjet, or a non-log mailer is configured, the
+ * very same call delivers a branded, responsive HTML email for real - no caller
+ * change.
+ *
+ * Mailjet is delivered over its Send API v3.1 directly via the Laravel Http
+ * client (no SDK dependency); every other provider goes out through a Laravel
+ * mailer transport. The same BrandedCampaign HTML is used either way, so the
+ * on-screen preview matches the delivered email exactly.
  */
 class EmailChannel extends BaseChannel
 {
@@ -48,10 +56,21 @@ class EmailChannel extends BaseChannel
             return true;
         }
 
+        if ($this->mailjetConfigured()) {
+            return true;
+        }
+
         // A default mailer other than the no-op 'log'/'array' transports.
         $default = config('mail.default');
 
         return filled($default) && ! in_array($default, ['log', 'array'], true);
+    }
+
+    /** Whether a Mailjet API key + secret pair is present. */
+    protected function mailjetConfigured(): bool
+    {
+        return filled(config('services.mailjet.key'))
+            && filled(config('services.mailjet.secret'));
     }
 
     /**
@@ -131,6 +150,13 @@ class EmailChannel extends BaseChannel
         $campaignId = $message['_campaign_id'] ?? null;
         $topic = $message['_topic'] ?? 'offers';
 
+        // Mailjet has its own API delivery path (Send API v3.1). Only take it when
+        // the key + secret are actually present; otherwise fall through to a
+        // Laravel mailer so we never throw on a half-configured Mailjet row.
+        if ($provider === 'mailjet' && $this->mailjetConfigured()) {
+            return $this->sendViaMailjet($list, $preview, $campaignId, $topic);
+        }
+
         try {
             $sent = 0;
             foreach ($list as $recipient) {
@@ -152,6 +178,105 @@ class EmailChannel extends BaseChannel
 
             return SendResult::failed('Email send failed: '.$e->getMessage(), $provider);
         }
+    }
+
+    /**
+     * Deliver via the Mailjet Send API v3.1 (https://api.mailjet.com/v3.1/send).
+     *
+     * Each recipient gets its own Message so the per-recipient tracking pixel,
+     * click-wrapped CTA and one-click unsubscribe header are preserved - exactly
+     * as the Laravel-mailer path does. We render the same emails.branded view to
+     * HTML, so the inbox email matches the on-screen preview. Mailjet caps a
+     * single request at 50 Messages, so we batch. Never throws - any transport
+     * failure degrades to a SendResult::failed.
+     *
+     * @param  \Illuminate\Support\Collection<int,array{email:string,name?:string}>  $list
+     */
+    protected function sendViaMailjet($list, array $preview, ?int $campaignId, string $topic): SendResult
+    {
+        $key = config('services.mailjet.key');
+        $secret = config('services.mailjet.secret');
+        $fromEmail = config('services.mailjet.from') ?: $preview['from_email'];
+        $fromName = $preview['from_name'] ?? 'locolie';
+
+        $messages = $list->map(function (array $recipient) use ($preview, $campaignId, $topic, $fromEmail, $fromName) {
+            $rp = $this->withTracking($preview, $recipient['email'], $campaignId, $topic);
+
+            $message = [
+                'From' => ['Email' => $fromEmail, 'Name' => $fromName],
+                'To' => [array_filter([
+                    'Email' => $recipient['email'],
+                    'Name' => $recipient['name'] ?? null,
+                ])],
+                'Subject' => $rp['subject'] ?? 'A message from locolie',
+                'HTMLPart' => $this->renderHtml($rp, $recipient),
+            ];
+
+            if (filled($rp['reply_to'] ?? null)) {
+                $message['ReplyTo'] = ['Email' => $rp['reply_to'], 'Name' => $fromName];
+            }
+
+            // RFC 8058 one-click unsubscribe, mirroring the mailer path's headers.
+            if (filled($rp['unsubscribe_url'] ?? null)) {
+                $message['Headers'] = [
+                    'List-Unsubscribe' => '<'.$rp['unsubscribe_url'].'>',
+                    'List-Unsubscribe-Post' => 'List-Unsubscribe=One-Click',
+                ];
+            }
+
+            return $message;
+        })->values();
+
+        $sent = 0;
+        $errors = [];
+
+        try {
+            foreach ($messages->chunk(50) as $batch) {
+                $resp = Http::withBasicAuth($key, $secret)
+                    ->acceptJson()
+                    ->post('https://api.mailjet.com/v3.1/send', [
+                        'Messages' => $batch->values()->all(),
+                    ]);
+
+                if (! $resp->successful()) {
+                    $errors[] = $resp->json('ErrorMessage') ?? "HTTP {$resp->status()}";
+
+                    continue;
+                }
+
+                foreach ((array) $resp->json('Messages', []) as $m) {
+                    if (($m['Status'] ?? null) === 'success') {
+                        $sent += count($m['To'] ?? []);
+                    } else {
+                        $errors[] = $m['Errors'][0]['ErrorMessage'] ?? 'Mailjet rejected a message.';
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::error('[email] mailjet send failed', ['error' => $e->getMessage()]);
+
+            return SendResult::failed('Mailjet send failed: '.$e->getMessage(), 'mailjet');
+        }
+
+        if ($sent === 0 && $errors) {
+            return SendResult::failed('Mailjet rejected every message: '.implode('; ', array_slice($errors, 0, 3)), 'mailjet');
+        }
+
+        $note = "Sent {$sent} branded email(s) via Mailjet.";
+        if ($errors) {
+            $note .= ' '.count($errors).' failed.';
+        }
+
+        return SendResult::sent($sent, 'mailjet', $note);
+    }
+
+    /** Render the branded email view to an HTML string for API-based providers. */
+    protected function renderHtml(array $preview, array $recipient): string
+    {
+        return View::make('emails.branded', [
+            'preview' => $preview,
+            'recipient' => $recipient,
+        ])->render();
     }
 
     /**
@@ -188,6 +313,9 @@ class EmailChannel extends BaseChannel
         }
         if (filled(config('services.resend.key'))) {
             return 'resend';
+        }
+        if ($this->mailjetConfigured()) {
+            return 'mailjet';
         }
 
         return 'smtp';
