@@ -14,6 +14,8 @@ Route::get('/for-business/loyalty', fn () => view('site.how-loyalty'))->name('si
 Route::get('/category/{slug}', [SiteController::class, 'category'])->name('site.category');
 Route::get('/shop/{slug}', [SiteController::class, 'business'])->name('site.business');
 Route::get('/demo', [\App\Http\Controllers\DemoController::class, 'index'])->name('site.demo');
+// Retailer onboarding deck - shareable, printable "how locolie works" slides.
+Route::get('/onboarding/deck', [\App\Http\Controllers\OnboardingDeckController::class, 'deck'])->name('site.onboarding.deck');
 
 // ── Contact (all enquiries route to a single inbox for now) ──────────────────
 Route::get('/contact', [\App\Http\Controllers\ContactController::class, 'index'])->name('site.contact');
