@@ -157,7 +157,7 @@
             @if ($business->plan===$key)
               <div class="mt-3 text-center text-xs font-bold text-emerald-700 uppercase tracking-wide">Current plan</div>
             @elseif ($key==='enterprise')
-              <a href="mailto:sales@locolie.com?subject=Enterprise%20enquiry" class="mt-3 block w-full rounded-lg bg-slate-900 text-white hover:bg-slate-700 text-center font-semibold py-2 text-sm transition">Contact sales</a>
+              <a href="{{ route('site.contact') }}?topic=enterprise" class="mt-3 block w-full rounded-lg bg-slate-900 text-white hover:bg-slate-700 text-center font-semibold py-2 text-sm transition">Contact sales</a>
             @else
               <form method="POST" action="{{ route('business.upgrade') }}" class="mt-3">
                 @csrf <input type="hidden" name="plan" value="{{ $key }}">

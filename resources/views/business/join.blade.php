@@ -315,7 +315,7 @@
             @endforeach
           </ul>
           @if ($key === 'enterprise')
-            <a href="mailto:sales@locolie.com?subject=Enterprise%20enquiry" class="mt-7 block rounded-xl py-3 text-center text-sm font-bold transition border border-slate-300 text-slate-900 hover:border-slate-900">
+            <a href="{{ route('site.contact') }}?topic=enterprise" class="mt-7 block rounded-xl py-3 text-center text-sm font-bold transition border border-slate-300 text-slate-900 hover:border-slate-900">
               Contact sales
             </a>
           @else

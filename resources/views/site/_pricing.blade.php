@@ -59,7 +59,7 @@
                     </li>
                 @endforeach
             </ul>
-            <a href="{{ $key === 'enterprise' ? 'mailto:sales@locolie.com?subject=Enterprise%20enquiry' : '/business/join' }}"
+            <a href="{{ $key === 'enterprise' ? route('site.contact').'?topic=enterprise' : '/business/join' }}"
                class="mt-7 inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition
                       {{ $highlight ? 'bg-emerald text-white hover:bg-ink' : 'border border-hair text-ink hover:border-ink' }}">
                 @if ($key === 'free')

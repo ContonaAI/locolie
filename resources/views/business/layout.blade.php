@@ -43,6 +43,7 @@
           $bnav = [
             ['route' => 'business.dashboard', 'label' => 'Dashboard'],
             ['route' => 'business.loyalty', 'label' => 'Loyalty'],
+            ['route' => 'business.marketing', 'label' => 'Marketing'],
             ['route' => 'business.messaging', 'label' => 'Messaging'],
             ['route' => 'business.reports', 'label' => 'Reports'],
           ];
