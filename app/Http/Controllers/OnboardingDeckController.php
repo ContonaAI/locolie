@@ -19,9 +19,19 @@ class OnboardingDeckController extends Controller
 {
     public function deck()
     {
-        // A real local business with a photo makes the deck feel like the product.
-        $business = Business::live()->whereNotNull('photos')->inRandomOrder()->first()
-            ?? Business::whereNotNull('photos')->first();
+        // Real local businesses (with photos) make the deck feel like the product:
+        // one hero business for the brand mocks, plus a few for the live app demo.
+        $cards = Business::live()->whereNotNull('photos')->inRandomOrder()->take(3)->get();
+        if ($cards->isEmpty()) {
+            $cards = Business::whereNotNull('photos')->take(3)->get();
+        }
+        $business = $cards->first();
+
+        // Live directory stats for the proof slide (honest, current numbers).
+        $stats = [
+            'businesses' => Business::live()->count(),
+            'categories' => \App\Models\Category::count(),
+        ];
 
         // The deck's scannable QR points at the website signup (retailer join page),
         // so anyone viewing or printing the deck can scan straight through to sign up.
@@ -29,6 +39,10 @@ class OnboardingDeckController extends Controller
 
         return view('site.onboarding.deck', [
             'business' => $business,
+            'cards' => $cards,
+            'stats' => $stats,
+            'plans' => Business::plans(),
+            'appSrc' => url('/app'),
             'signupUrl' => $signupUrl,
             'signupQr' => QrSvg::make($signupUrl, 360, '#0a0a0a'),
         ]);
