@@ -427,6 +427,7 @@
                 <ul class="mt-4 space-y-2.5 text-sm">
                     <li><a href="/for-business" class="text-ink/80 transition hover:text-emerald">For business</a></li>
                     <li><a href="/#pricing" class="text-ink/80 transition hover:text-emerald">Pricing</a></li>
+                    <li><a href="{{ route('site.onboarding.deck') }}" class="text-ink/80 transition hover:text-emerald">Retailer deck</a></li>
                     <li><a href="/business/join" class="text-ink/80 transition hover:text-emerald">Business login</a></li>
                 </ul>
             </div>
