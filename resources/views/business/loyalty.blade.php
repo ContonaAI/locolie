@@ -19,6 +19,32 @@
   <div class="mb-6 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 px-4 py-3 text-sm font-medium">{{ $errors->first() }}</div>
 @endif
 
+{{-- Free, forever + how it works --}}
+<div class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-5" x-data="{ how: false }">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div class="flex items-start gap-3">
+      <span class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </span>
+      <div>
+        <div class="font-bold text-emerald-900">Loyalty is free, forever.</div>
+        <p class="text-sm text-emerald-800/80">It is included on every plan, the Free plan included. No add-on, no monthly fee - set your rules and locolie does the counting.</p>
+      </div>
+    </div>
+    <button type="button" @click="how = !how" class="rounded-lg border border-emerald-300 bg-white text-sm font-semibold text-emerald-700 px-3.5 py-2 hover:bg-emerald-50">
+      <span x-text="how ? 'Hide how it works' : 'How loyalty works'"></span>
+    </button>
+  </div>
+
+  <div x-show="how" x-cloak x-transition class="mt-6 border-t border-emerald-200 pt-6">
+    @include('site._loyalty_how', [
+      'compact' => true,
+      'title' => 'How loyalty works, step by step.',
+      'intro' => 'Here is the journey your customers go on once your scheme is live.',
+    ])
+  </div>
+</div>
+
 <div class="grid lg:grid-cols-3 gap-6">
   <div class="lg:col-span-2 space-y-6">
 

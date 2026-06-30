@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 // ── Public presentation / marketing site (ngrok root = our showcase) ─────────
 Route::get('/', [SiteController::class, 'home'])->name('site.home');
 Route::get('/for-business', [SiteController::class, 'forBusiness'])->name('site.for-business');
+Route::get('/for-business/loyalty', fn () => view('site.how-loyalty'))->name('site.how-loyalty');
 Route::get('/category/{slug}', [SiteController::class, 'category'])->name('site.category');
 Route::get('/shop/{slug}', [SiteController::class, 'business'])->name('site.business');
 Route::get('/demo', [\App\Http\Controllers\DemoController::class, 'index'])->name('site.demo');
