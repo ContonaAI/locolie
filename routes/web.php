@@ -14,6 +14,10 @@ Route::get('/category/{slug}', [SiteController::class, 'category'])->name('site.
 Route::get('/shop/{slug}', [SiteController::class, 'business'])->name('site.business');
 Route::get('/demo', [\App\Http\Controllers\DemoController::class, 'index'])->name('site.demo');
 
+// ── Contact (all enquiries route to a single inbox for now) ──────────────────
+Route::get('/contact', [\App\Http\Controllers\ContactController::class, 'index'])->name('site.contact');
+Route::post('/contact', [\App\Http\Controllers\ContactController::class, 'submit'])->middleware('throttle:5,1')->name('site.contact.submit');
+
 // ── Programmatic local SEO: "{category} in {area}" landing pages + hubs ──────
 Route::get('/local', [\App\Http\Controllers\SeoController::class, 'index'])->name('seo.index');
 Route::get('/local/{area}', [\App\Http\Controllers\SeoController::class, 'area'])->name('seo.area');
