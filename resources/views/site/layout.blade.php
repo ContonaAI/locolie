@@ -434,6 +434,7 @@
                 <h4 class="text-xs font-semibold uppercase tracking-wider text-muted">Company</h4>
                 <ul class="mt-4 space-y-2.5 text-sm">
                     <li><a href="/#founders" class="text-ink/80 transition hover:text-emerald">Founders</a></li>
+                    <li><a href="{{ route('site.contact') }}" class="text-ink/80 transition hover:text-emerald">Contact</a></li>
                     <li><a href="/#download" class="text-ink/80 transition hover:text-emerald">Get the app</a></li>
                     <li><a href="{{ route('legal.terms') }}" class="text-ink/80 transition hover:text-emerald">Terms &amp; Conditions</a></li>
                     <li><a href="{{ route('legal.privacy') }}" class="text-ink/80 transition hover:text-emerald">Privacy Policy</a></li>
@@ -442,9 +443,58 @@
                 </ul>
             </div>
         </div>
-        <div class="mt-12 flex flex-col items-center justify-between gap-3 border-t border-hair pt-6 text-xs text-muted sm:flex-row">
+        {{-- Social + Trustpilot row --}}
+        @php
+            // Social profiles (config/social.php). Blank values are skipped.
+            $socials = [
+                ['url' => config('social.facebook'), 'label' => 'Facebook', 'icon' => '<path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.9 3.78-3.9 1.1 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.89h2.78l-.44 2.9h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94Z"/>'],
+                ['url' => config('social.instagram'), 'label' => 'Instagram', 'icon' => '<rect x="2" y="2" width="20" height="20" rx="5.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.6" cy="6.4" r="1.4"/>'],
+                ['url' => config('social.tiktok'), 'label' => 'TikTok', 'icon' => '<path d="M15.5 3c.4 2.2 1.7 3.7 3.9 4v2.6c-1.4 0-2.7-.4-3.9-1.1v5.6a5.6 5.6 0 1 1-5.6-5.6c.3 0 .6 0 .9.1v2.7a2.9 2.9 0 1 0 2 2.8V3h2.7Z"/>'],
+                ['url' => config('social.linkedin'), 'label' => 'LinkedIn', 'icon' => '<path d="M4.98 3.5A2.5 2.5 0 1 0 5 8.5a2.5 2.5 0 0 0-.02-5ZM3 9.5h4v11H3v-11Zm6.5 0h3.8v1.5h.05c.53-.95 1.83-1.95 3.77-1.95 4.03 0 4.78 2.5 4.78 5.76v5.69h-4v-5.05c0-1.2-.02-2.75-1.7-2.75-1.7 0-1.96 1.31-1.96 2.66v5.14h-4v-11Z"/>'],
+            ];
+            $socials = array_values(array_filter($socials, fn ($s) => !empty($s['url'])));
+            $trustpilotUrl = config('social.trustpilot_url');
+        @endphp
+        @if ($socials || $trustpilotUrl)
+            <div class="mt-12 flex flex-col items-center justify-between gap-6 border-t border-hair pt-8 sm:flex-row">
+                {{-- Social icons --}}
+                @if ($socials)
+                    <div class="flex items-center gap-2.5">
+                        @foreach ($socials as $s)
+                            <a href="{{ $s['url'] }}" target="_blank" rel="noopener noreferrer" aria-label="{{ $s['label'] }}" title="{{ $s['label'] }}"
+                               class="flex h-10 w-10 items-center justify-center rounded-full border border-hair bg-white text-muted transition hover:border-emerald hover:text-emerald">
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">{!! $s['icon'] !!}</svg>
+                            </a>
+                        @endforeach
+                    </div>
+                @endif
+
+                {{-- Trustpilot (stars + link, no external requests) --}}
+                @if ($trustpilotUrl)
+                    <a href="{{ $trustpilotUrl }}" target="_blank" rel="noopener noreferrer"
+                       class="group inline-flex items-center gap-2.5 rounded-full border border-hair bg-white px-3.5 py-2 transition hover:border-emerald"
+                       aria-label="Read our reviews on Trustpilot">
+                        <span class="inline-flex items-center gap-1.5 text-sm font-bold text-ink">
+                            <svg class="h-4 w-4 text-[#00b67a]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+                            Trustpilot
+                        </span>
+                        <span class="flex items-center gap-0.5" aria-hidden="true">
+                            @for ($i = 0; $i < 5; $i++)
+                                <span class="flex h-5 w-5 items-center justify-center bg-[#00b67a]">
+                                    <svg class="h-3.5 w-3.5 text-white" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+                                </span>
+                            @endfor
+                        </span>
+                        <span class="hidden text-xs font-medium text-muted transition group-hover:text-ink sm:inline">Reviews</span>
+                    </a>
+                @endif
+            </div>
+        @endif
+
+        <div class="mt-8 flex flex-col items-center justify-between gap-3 border-t border-hair pt-6 text-xs text-muted sm:flex-row">
             <p>© {{ config('legal.company') }} 2026. All rights reserved.</p>
             <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+                <a href="{{ route('site.contact') }}" class="transition hover:text-ink">Contact</a>
                 <a href="{{ route('legal.terms') }}" class="transition hover:text-ink">Terms</a>
                 <a href="{{ route('legal.privacy') }}" class="transition hover:text-ink">Privacy</a>
                 <a href="{{ route('legal.cookies') }}" class="transition hover:text-ink">Cookies</a>
