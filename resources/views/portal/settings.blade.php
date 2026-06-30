@@ -11,6 +11,23 @@
   <div class="mb-5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 text-sm font-medium">{{ session('status') }}</div>
 @endif
 
+{{-- ── Retailer onboarding deck ────────────────────────────────────────── --}}
+<section class="rounded-2xl border border-slate-200 bg-white p-6 mb-6">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h2 class="text-lg font-bold text-slate-900">Retailer onboarding deck</h2>
+      <p class="text-sm text-slate-500 mt-1 max-w-2xl">A short, on-brand walkthrough of how locolie works for a new shop - welcome, claim and set up, the free loyalty scheme, marketing to your own customers, and going live. Open it online to share, or print it to a clean PDF.</p>
+    </div>
+    <div class="flex shrink-0 gap-2">
+      <a href="{{ route('site.onboarding.deck') }}" target="_blank" rel="noopener"
+         class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 text-white text-sm font-bold px-4 py-2.5 hover:bg-emerald-700">
+        Open deck
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5h5v5M19 5l-9 9M5 7v12h12"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
 {{-- ── Data sync ───────────────────────────────────────────────────────── --}}
 <section class="rounded-2xl border border-slate-200 bg-white p-6 mb-6">
   <div class="flex items-center justify-between gap-4 mb-5">

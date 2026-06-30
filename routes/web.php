@@ -13,6 +13,8 @@ Route::get('/for-business', [SiteController::class, 'forBusiness'])->name('site.
 Route::get('/category/{slug}', [SiteController::class, 'category'])->name('site.category');
 Route::get('/shop/{slug}', [SiteController::class, 'business'])->name('site.business');
 Route::get('/demo', [\App\Http\Controllers\DemoController::class, 'index'])->name('site.demo');
+// Retailer onboarding deck - shareable, printable "how locolie works" slides.
+Route::get('/onboarding/deck', [\App\Http\Controllers\OnboardingDeckController::class, 'deck'])->name('site.onboarding.deck');
 
 // ── Programmatic local SEO: "{category} in {area}" landing pages + hubs ──────
 Route::get('/local', [\App\Http\Controllers\SeoController::class, 'index'])->name('seo.index');
