@@ -76,7 +76,16 @@ Route::middleware('auth:business')->group(function () {
     Route::post('/business/brand', [BusinessPortalController::class, 'saveBrand'])->name('business.brand');
     Route::post('/business/messaging/preview', [BusinessPortalController::class, 'messagingPreview'])->name('business.messaging.preview');
     Route::post('/business/messaging/send', [BusinessPortalController::class, 'messagingSend'])->name('business.messaging.send');
+
+    // Retailer marketing suite: "how it works" walkthrough + printable QR poster
+    Route::get('/business/marketing', [\App\Http\Controllers\Business\MarketingController::class, 'index'])->name('business.marketing');
+    Route::get('/business/marketing/poster', [\App\Http\Controllers\Business\MarketingController::class, 'poster'])->name('business.marketing.poster');
 });
+
+// ── Scan-to-join: public in-store QR capture landing (no login) ──────────────
+Route::get('/j/{business:slug}', [\App\Http\Controllers\Business\MarketingController::class, 'capture'])->name('marketing.capture');
+Route::post('/j/{business:slug}', [\App\Http\Controllers\Business\MarketingController::class, 'store'])->middleware('throttle:10,1')->name('marketing.capture.store');
+Route::get('/j/{business:slug}/done', [\App\Http\Controllers\Business\MarketingController::class, 'done'])->name('marketing.capture.done');
 
 // ── Email open + click tracking (encrypted tokens, public) ───────────────────
 Route::get('/e/open', [\App\Http\Controllers\TrackingController::class, 'open'])->name('track.open');

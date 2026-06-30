@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
-    'offer_id', 'user_id', 'customer_name', 'customer_email', 'customer_phone',
-    'marketing_opt_in', 'sms_opt_in', 'code', 'status', 'expires_at', 'redeemed_at',
+    'offer_id', 'business_id', 'user_id', 'customer_name', 'customer_email', 'customer_phone',
+    'marketing_opt_in', 'sms_opt_in', 'code', 'status', 'source', 'expires_at', 'redeemed_at',
 ])]
 class Redemption extends Model
 {
@@ -25,6 +25,11 @@ class Redemption extends Model
     public function offer(): BelongsTo
     {
         return $this->belongsTo(Offer::class);
+    }
+
+    public function business(): BelongsTo
+    {
+        return $this->belongsTo(Business::class);
     }
 
     public function user(): BelongsTo
